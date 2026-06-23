@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="1000" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="t0" value="Диаграмма состояний сеанса просмотра трансляции
+Приложение «СвойСпорт TV»" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+      <mxGeometry x="100" y="10" width="980" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="s1" value="&lt;b&gt;Инициализация&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;entry / запуск PlayerManager&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="360" y="90" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s2" value="&lt;b&gt;Загрузка параметров&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;do / HTTP-запрос URL потока к SportTV API&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="360" y="225" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s3" value="&lt;b&gt;Буферизация&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;do / ExoPlayer.prepare()&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="360" y="360" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s4" value="&lt;b&gt;Воспроизведение&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;do / ExoPlayer.play()  entry / показ UI&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="120" y="495" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s5" value="&lt;b&gt;Пауза&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;do / ExoPlayer.pause()&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="120" y="635" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s6" value="&lt;b&gt;Ошибка&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;entry / показать сообщение об ошибке&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="620" y="495" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s7" value="&lt;b&gt;Повтор подключения&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;do / retry  max 3 попытки&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="620" y="635" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="s8" value="&lt;b&gt;Завершён&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;font-style:italic;&quot;&gt;exit / PlayerManager.release()&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;;" vertex="1" parent="1">
+      <mxGeometry x="360" y="775" width="280" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="ini" value="" style="ellipse;aspect=fixed;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="480" y="30" width="30" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="fin" value="" style="doubleEllipse;aspect=fixed;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="480" y="905" width="30" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="t01" value="Запуск плеера" style="endArrow=block;endFill=1;html=1;" edge="1" source="ini" target="s1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t12" value="matchId получен" style="endArrow=block;endFill=1;html=1;" edge="1" source="s1" target="s2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t23" value="URL потока получен" style="endArrow=block;endFill=1;html=1;" edge="1" source="s2" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t34" value="Буфер заполнен" style="endArrow=block;endFill=1;html=1;" edge="1" source="s3" target="s4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t36" value="Таймаут / сервер недоступен" style="endArrow=block;endFill=1;html=1;curved=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" source="s3" target="s6" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t45" value="Команда «Пауза»" style="endArrow=block;endFill=1;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" source="s4" target="s5" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t54" value="Команда «Продолжить»" style="endArrow=block;endFill=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" source="s5" target="s4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t46" value="Потеря соединения / ошибка потока" style="endArrow=block;endFill=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="s6" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t67" value="Повторная попытка" style="endArrow=block;endFill=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" source="s6" target="s7" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t73" value="Соединение восстановлено" style="endArrow=block;endFill=1;html=1;curved=1;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;" edge="1" source="s7" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t48" value="Команда «Выход»" style="endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t58" value="Команда «Выход»" style="endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;curved=1;" edge="1" source="s5" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t68" value="Отмена" style="endArrow=block;endFill=1;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" source="s6" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t78" value="Превышен лимит попыток" style="endArrow=block;endFill=1;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;curved=1;" edge="1" source="s7" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="t8f" value="" style="endArrow=block;endFill=1;html=1;" edge="1" source="s8" target="fin" parent="1">
+      <mxGeometry relative="1" as="geometry">
+      </mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>

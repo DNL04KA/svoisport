@@ -1,0 +1,167 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="700" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/><mxCell id="1" parent="0"/>
+
+    <!-- ЗАГОЛОВОК -->
+    <mxCell id="title" value="Архитектура системы управления спортивными трансляциями SvoySport TV" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="30" y="20" width="1440" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- КОЛОНКА 1: Модуль представления -->
+    <mxCell id="c1" value="&lt;b&gt;Модуль&#xa;представления (UI)&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="30" y="130" width="230" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_1" value="Главный экран" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="225" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_2" value="Экран деталей события" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="275" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_3" value="Экран видеоплеера" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="325" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_4" value="Экран авторизации" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="375" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_5" value="Экран расписания" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="425" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c1_6" value="Экран профиля" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="475" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОЛОНКА 2: Модуль бизнес-логики -->
+    <mxCell id="c2" value="&lt;b&gt;Модуль бизнес-&#xa;логики (ViewModel)&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="310" y="130" width="230" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="c2_1" value="ViewModel главного экрана" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="225" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c2_2" value="ViewModel деталей события" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="275" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c2_3" value="ViewModel видеоплеера" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="325" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c2_4" value="ViewModel авторизации" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="375" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c2_5" value="Поток данных / Состояние UI" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="425" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОЛОНКА 3: Модуль данных -->
+    <mxCell id="c3" value="&lt;b&gt;Модуль данных&#xa;(Repository)&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="590" y="130" width="230" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="c3_1" value="Репозиторий матчей&#xa;(интерфейс)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="590" y="225" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c3_2" value="API-репозиторий матчей&#xa;(Retrofit2)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="590" y="275" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c3_3" value="Тестовый репозиторий матчей" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="590" y="325" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c3_4" value="Менеджер сессии" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="590" y="375" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c3_5" value="Загрузчик изображений (Coil)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="590" y="425" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОЛОНКА 4: Серверный REST API -->
+    <mxCell id="c4" value="&lt;b&gt;Серверный&#xa;REST API&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="870" y="130" width="230" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="c4_1" value="Получение каталога трансляций" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="870" y="225" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c4_2" value="Получение данных о матче" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="870" y="275" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c4_3" value="Отправка кода подтверждения" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="870" y="325" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c4_4" value="Проверка кода авторизации" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="870" y="375" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c4_5" value="Получение расписания событий" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="870" y="425" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОЛОНКА 5: Хранилище данных -->
+    <mxCell id="c5" value="&lt;b&gt;Хранилище&#xa;данных&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="130" width="230" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="c5_1" value="База данных PostgreSQL" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="225" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c5_2" value="Кэш Redis" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="275" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c5_3" value="Сеть доставки видеоконтента" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="325" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c5_4" value="Внешний источник sport-tv.by" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="375" width="230" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="c5_5" value="Локальные настройки" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="1150" y="425" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ЛИНИИ: title → колонки -->
+    <mxCell id="l1" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="title" target="c1" parent="1">
+      <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="145" y="90"/><mxPoint x="145" y="130"/></Array></mxGeometry>
+    </mxCell>
+    <mxCell id="l2" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="title" target="c2" parent="1">
+      <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="425" y="90"/><mxPoint x="425" y="130"/></Array></mxGeometry>
+    </mxCell>
+    <mxCell id="l3" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="title" target="c3" parent="1">
+      <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="705" y="90"/><mxPoint x="705" y="130"/></Array></mxGeometry>
+    </mxCell>
+    <mxCell id="l4" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="title" target="c4" parent="1">
+      <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="985" y="90"/><mxPoint x="985" y="130"/></Array></mxGeometry>
+    </mxCell>
+    <mxCell id="l5" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="title" target="c5" parent="1">
+      <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1265" y="90"/><mxPoint x="1265" y="130"/></Array></mxGeometry>
+    </mxCell>
+
+    <!-- ЛИНИИ: колонки → элементы (c1) -->
+    <mxCell id="lc1a" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="c1" target="c1_1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="225"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc1b" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c1" target="c1_2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="295"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc1c" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c1" target="c1_3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="345"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc1d" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c1" target="c1_4" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="395"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc1e" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c1" target="c1_5" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="445"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc1f" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c1" target="c1_6" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="80" y="200"/><mxPoint x="80" y="495"/></Array></mxGeometry></mxCell>
+
+    <!-- (c2) -->
+    <mxCell id="lc2a" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="c2" target="c2_1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="360" y="200"/><mxPoint x="360" y="225"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc2b" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c2" target="c2_2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="360" y="200"/><mxPoint x="360" y="295"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc2c" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c2" target="c2_3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="360" y="200"/><mxPoint x="360" y="345"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc2d" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c2" target="c2_4" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="360" y="200"/><mxPoint x="360" y="395"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc2e" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c2" target="c2_5" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="360" y="200"/><mxPoint x="360" y="445"/></Array></mxGeometry></mxCell>
+
+    <!-- (c3) -->
+    <mxCell id="lc3a" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="c3" target="c3_1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="640" y="200"/><mxPoint x="640" y="225"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc3b" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c3" target="c3_2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="640" y="200"/><mxPoint x="640" y="295"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc3c" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c3" target="c3_3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="640" y="200"/><mxPoint x="640" y="345"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc3d" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c3" target="c3_4" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="640" y="200"/><mxPoint x="640" y="395"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc3e" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c3" target="c3_5" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="640" y="200"/><mxPoint x="640" y="445"/></Array></mxGeometry></mxCell>
+
+    <!-- (c4) -->
+    <mxCell id="lc4a" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="c4" target="c4_1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="200"/><mxPoint x="920" y="225"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc4b" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c4" target="c4_2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="200"/><mxPoint x="920" y="295"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc4c" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c4" target="c4_3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="200"/><mxPoint x="920" y="345"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc4d" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c4" target="c4_4" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="200"/><mxPoint x="920" y="395"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc4e" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c4" target="c4_5" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="200"/><mxPoint x="920" y="445"/></Array></mxGeometry></mxCell>
+
+    <!-- (c5) -->
+    <mxCell id="lc5a" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;" edge="1" source="c5" target="c5_1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1200" y="200"/><mxPoint x="1200" y="225"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc5b" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c5" target="c5_2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1200" y="200"/><mxPoint x="1200" y="295"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc5c" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c5" target="c5_3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1200" y="200"/><mxPoint x="1200" y="345"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc5d" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c5" target="c5_4" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1200" y="200"/><mxPoint x="1200" y="395"/></Array></mxGeometry></mxCell>
+    <mxCell id="lc5e" value="" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;entryX=0;entryY=0.5;" edge="1" source="c5" target="c5_5" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1200" y="200"/><mxPoint x="1200" y="445"/></Array></mxGeometry></mxCell>
+
+  </root>
+</mxGraphModel>

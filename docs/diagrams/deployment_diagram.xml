@@ -1,0 +1,253 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="950" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ЗАГОЛОВОК -->
+    <mxCell id="title" value="Схема аппаратного комплекса системы управления спортивными трансляциями" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="150" y="20" width="1200" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- ======== ТЕЛЕВИЗОР 1 ======== -->
+    <mxCell id="tv1_outer" value="" style="rounded=1;arcSize=4;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="30" y="70" width="430" height="420" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_title" value="Телевизор 1  |  Зритель 1  (Android TV)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="74" width="430" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Модуль представления TV1 -->
+    <mxCell id="tv1_ui_box" value="" style="rounded=1;arcSize=5;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="45" y="105" width="190" height="360" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_title" value="Модуль представления" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="45" y="108" width="190" height="18" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_1" value="Главный экран" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="132" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_2" value="Экран деталей события" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="159" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_3" value="Экран видеоплеера" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="186" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_4" value="Экран авторизации" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="213" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_5" value="Экран расписания" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="240" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_ui_6" value="Экран профиля" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="267" width="170" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Модуль бизнес-логики TV1 -->
+    <mxCell id="tv1_biz_box" value="" style="rounded=1;arcSize=5;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="45" y="300" width="190" height="165" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_title" value="Модуль бизнес-логики" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="45" y="303" width="190" height="18" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_1" value="ViewModel главного экрана" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="326" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_2" value="ViewModel деталей события" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="353" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_3" value="ViewModel видеоплеера" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="380" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_4" value="Поток данных / Состояние UI" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="407" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_biz_5" value="ViewModel авторизации" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="434" width="170" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Модуль данных TV1 -->
+    <mxCell id="tv1_data_box" value="" style="rounded=1;arcSize=5;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="248" y="105" width="198" height="375" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_title" value="Модуль данных" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="248" y="108" width="198" height="18" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_1" value="Репозиторий матчей (интерфейс)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="132" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_2" value="API-репозиторий матчей (Retrofit2)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="159" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_3" value="Тестовый репозиторий матчей" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="186" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_4" value="Менеджер сессии" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="213" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tv1_data_5" value="Загрузчик изображений (Coil)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="240" width="178" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- ======== ТОЧКИ ======== -->
+    <mxCell id="dots" value="•  •  •" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=22;fontStyle=1;fontColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="180" y="510" width="120" height="40" as="geometry"/>
+    </mxCell>
+    <!-- пунктирная линия между TV1 и TVN -->
+    <mxCell id="dot_line" value="" style="endArrow=none;dashed=1;dashPattern=8 6;strokeColor=#6c8ebf;strokeWidth=2;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="492" as="sourcePoint"/>
+        <mxPoint x="245" y="568" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ======== ТЕЛЕВИЗОР N ======== -->
+    <mxCell id="tvn_outer" value="" style="rounded=1;arcSize=4;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="30" y="570" width="430" height="340" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_title" value="Телевизор N  |  Зритель N  (Android TV)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="574" width="430" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Модуль представления TVN -->
+    <mxCell id="tvn_ui_box" value="" style="rounded=1;arcSize=5;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="45" y="603" width="190" height="292" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_title" value="Модуль представления" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="45" y="606" width="190" height="18" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_1" value="Главный экран" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="630" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_2" value="Экран деталей события" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="657" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_3" value="Экран видеоплеера" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="684" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_4" value="Экран авторизации" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="711" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_5" value="Экран расписания" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="738" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_6" value="Экран профиля" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="55" y="765" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_7" value="Модуль бизнес-логики" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="55" y="800" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_ui_8" value="Модуль данных" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="55" y="827" width="170" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_box" value="" style="rounded=1;arcSize=5;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="248" y="603" width="198" height="292" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_title" value="Модуль данных" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="248" y="606" width="198" height="18" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_1" value="Репозиторий матчей (интерфейс)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="630" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_2" value="API-репозиторий матчей (Retrofit2)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="657" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_3" value="Менеджер сессии" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="684" width="178" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tvn_data_4" value="Загрузчик изображений (Coil)" style="rounded=1;fillColor=#f3e5f5;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="258" y="711" width="178" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- ======== СЕРВЕР: REST API ======== -->
+    <mxCell id="server_outer" value="" style="rounded=1;arcSize=4;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="70" width="890" height="840" as="geometry"/>
+    </mxCell>
+    <mxCell id="server_title" value="Серверная часть системы" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="560" y="74" width="890" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Серверный REST API -->
+    <mxCell id="api_box" value="" style="rounded=1;arcSize=5;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+      <mxGeometry x="578" y="106" width="400" height="780" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_title" value="Серверный REST API" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="578" y="110" width="400" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_1" value="GET /catalog — получение каталога трансляций" style="rounded=1;fillColor=#fff9f0;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="592" y="138" width="372" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_2" value="GET /match/{id} — получение данных о матче" style="rounded=1;fillColor=#fff9f0;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="592" y="168" width="372" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_3" value="GET /schedule — получение расписания событий" style="rounded=1;fillColor=#fff9f0;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="592" y="198" width="372" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_4" value="POST /auth/email — отправка кода подтверждения" style="rounded=1;fillColor=#fff9f0;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="592" y="228" width="372" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="api_5" value="POST /auth/verify — проверка кода авторизации" style="rounded=1;fillColor=#fff9f0;strokeColor=#d79b00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="592" y="258" width="372" height="24" as="geometry"/>
+    </mxCell>
+
+    <!-- Хранилище данных -->
+    <mxCell id="storage_box" value="" style="rounded=1;arcSize=5;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="1010" y="106" width="420" height="780" as="geometry"/>
+    </mxCell>
+    <mxCell id="storage_title" value="Хранилище данных" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="1010" y="110" width="420" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_1" value="База данных (пользователи, сеансы, подписки)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="138" width="396" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_2" value="Кэш каталога трансляций (D1)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="168" width="396" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_3" value="Хранилище сеансов просмотра (D2)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="198" width="396" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_4" value="Сеть доставки видеоконтента (CDN / HLS)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="228" width="396" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_5" value="Внешний источник данных (sport-tv.by API)" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="258" width="396" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="st_6" value="Локальные настройки приложения" style="rounded=1;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="1022" y="288" width="396" height="24" as="geometry"/>
+    </mxCell>
+
+    <!-- ======== СОЕДИНЕНИЯ ======== -->
+
+    <!-- TV1 → Server (HTTPS REST) -->
+    <mxCell id="conn1" value="HTTPS / REST API" style="html=1;fontSize=9;fontStyle=1;endArrow=block;endFill=1;startArrow=block;startFill=1;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="460" y="280" as="sourcePoint"/>
+        <mxPoint x="578" y="280" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- TVN → Server (HTTPS REST) -->
+    <mxCell id="conn2" value="HTTPS / REST API" style="html=1;fontSize=9;fontStyle=1;endArrow=block;endFill=1;startArrow=block;startFill=1;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="460" y="740" as="sourcePoint"/>
+        <mxPoint x="578" y="490" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- REST API → Storage -->
+    <mxCell id="conn3" value="" style="html=1;fontSize=9;endArrow=block;endFill=1;startArrow=block;startFill=1;strokeColor=#555;strokeWidth=1.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="978" y="280" as="sourcePoint"/>
+        <mxPoint x="1010" y="280" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- TV1 → Storage (HLS) -->
+    <mxCell id="conn4" value="HLS-поток" style="html=1;fontSize=9;fontStyle=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#82b366;strokeWidth=2;dashed=1;dashPattern=8 4;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="460" y="320" as="sourcePoint"/>
+        <mxPoint x="1010" y="240" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

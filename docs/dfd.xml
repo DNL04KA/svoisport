@@ -1,0 +1,214 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ===== ВНЕШНИЕ СУЩНОСТИ (прямоугольники с двойной рамкой) ===== -->
+    <mxCell id="viewer" value="Зритель" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;fontStyle=1;double=1;" vertex="1" parent="1">
+      <mxGeometry x="450" y="30" width="120" height="50" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="server" value="Сервер трансляций&#xa;(sport-tv.by)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontStyle=1;double=1;" vertex="1" parent="1">
+      <mxGeometry x="20" y="295" width="140" height="55" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ПРОЦЕССЫ (окружности) ===== -->
+    <mxCell id="p1" value="P1&#xa;Загрузка каталога&#xa;трансляций" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="340" y="155" width="160" height="80" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="p2" value="P2&#xa;Формирование&#xa;каталога" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="700" y="270" width="150" height="80" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="p3" value="P3&#xa;Инициализация&#xa;просмотра" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="180" y="430" width="155" height="80" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="p4" value="P4&#xa;Регистрация&#xa;сеанса" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="440" y="570" width="150" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ХРАНИЛИЩА ДАННЫХ (открытые прямоугольники — стиль BPwin) ===== -->
+    <!-- D1 -->
+    <mxCell id="d1_top" value="" style="line;strokeColor=#000000;fillColor=none;html=1;" vertex="1" parent="1">
+      <mxGeometry x="700" y="155" width="200" height="10" as="geometry"/>
+    </mxCell>
+    <mxCell id="d1_bot" value="" style="line;strokeColor=#000000;fillColor=none;html=1;" vertex="1" parent="1">
+      <mxGeometry x="700" y="185" width="200" height="10" as="geometry"/>
+    </mxCell>
+    <mxCell id="d1_left" value="" style="line;strokeColor=#000000;fillColor=none;html=1;horizontal=0;" vertex="1" parent="1">
+      <mxGeometry x="700" y="155" width="10" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="d1" value="D1   Каталог трансляций" style="text;html=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;fontSize=10;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="710" y="155" width="190" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- D2 -->
+    <mxCell id="d2_top" value="" style="line;strokeColor=#000000;fillColor=none;html=1;" vertex="1" parent="1">
+      <mxGeometry x="440" y="700" width="200" height="10" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2_bot" value="" style="line;strokeColor=#000000;fillColor=none;html=1;" vertex="1" parent="1">
+      <mxGeometry x="440" y="730" width="200" height="10" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2_left" value="" style="line;strokeColor=#000000;fillColor=none;html=1;horizontal=0;" vertex="1" parent="1">
+      <mxGeometry x="440" y="700" width="10" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2" value="D2   Сеансы просмотра" style="text;html=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;fontSize=10;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="450" y="700" width="190" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ПОТОКИ ДАННЫХ ===== -->
+
+    <!-- Зритель → P1 -->
+    <mxCell id="f1" value="запрос обновления каталога" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="viewer" target="p1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- P1 → Сервер -->
+    <mxCell id="f2" value="запрос данных каталога" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p1" target="server" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="340" y="205"/>
+          <mxPoint x="90" y="205"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Сервер → P1 -->
+    <mxCell id="f3" value="данные каталога (JSON)" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="server" target="p1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="90" y="240"/>
+          <mxPoint x="360" y="240"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P1 → P2 -->
+    <mxCell id="f4" value="данные каталога" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p1" target="p2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="500" y="195"/>
+          <mxPoint x="775" y="195"/>
+          <mxPoint x="775" y="270"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P2 → D1 -->
+    <mxCell id="f5" value="список трансляций" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p2" target="d1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- D1 → P2 -->
+    <mxCell id="f6" value="данные каталога" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" source="d1" target="p2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="940" y="172"/>
+          <mxPoint x="940" y="280"/>
+          <mxPoint x="850" y="280"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Зритель → P2 -->
+    <mxCell id="f7" value="команды навигации" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="viewer" target="p2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="570" y="55"/>
+          <mxPoint x="775" y="55"/>
+          <mxPoint x="775" y="270"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P2 → Зритель -->
+    <mxCell id="f8" value="экран каталога" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p2" target="viewer" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="720" y="350"/>
+          <mxPoint x="610" y="350"/>
+          <mxPoint x="610" y="80"/>
+          <mxPoint x="510" y="80"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Зритель → P3 -->
+    <mxCell id="f9" value="выбор трансляции" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="viewer" target="p3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="450" y="55"/>
+          <mxPoint x="257" y="55"/>
+          <mxPoint x="257" y="430"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P3 → Сервер -->
+    <mxCell id="f10" value="запрос параметров потока" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p3" target="server" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="180" y="470"/>
+          <mxPoint x="90" y="470"/>
+          <mxPoint x="90" y="350"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Сервер → P3 -->
+    <mxCell id="f11" value="URL потока" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="server" target="p3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="50" y="350"/>
+          <mxPoint x="50" y="500"/>
+          <mxPoint x="180" y="500"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P3 → Зритель -->
+    <mxCell id="f12" value="запуск видео" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p3" target="viewer" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="335" y="430"/>
+          <mxPoint x="335" y="110"/>
+          <mxPoint x="510" y="110"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P3 → P4 -->
+    <mxCell id="f13" value="информация о сеансе" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p3" target="p4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="257" y="510"/>
+          <mxPoint x="257" y="610"/>
+          <mxPoint x="440" y="610"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Зритель → P4 -->
+    <mxCell id="f14" value="завершение сеанса" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="viewer" target="p4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="510" y="80"/>
+          <mxPoint x="510" y="570"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- P4 → D2 -->
+    <mxCell id="f15" value="запись истории" style="html=1;fontSize=8;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="p4" target="d2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Заголовок -->
+    <mxCell id="title" value="DFD – Диаграмма потоков данных системы SvoySport TV" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="150" y="810" width="750" height="30" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

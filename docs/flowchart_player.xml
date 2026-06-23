@@ -1,0 +1,264 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="1400" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/><mxCell id="1" parent="0"/>
+
+    <!-- ========= НАЧАЛО ========= -->
+    <mxCell id="s1" value="Запуск приложения" style="ellipse;whiteSpace=wrap;html=1;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="310" y="20" width="160" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- Инициализация компонентов -->
+    <mxCell id="s2" value="Инициализация компонентов" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="95" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Запрос списка трансляций -->
+    <mxCell id="s3" value="Запрос списка трансляций к серверу" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="175" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Ответ получен? -->
+    <mxCell id="d1" value="Ответ получен?" style="rhombus;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="310" y="255" width="160" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Отображение каталога (паралелограмм - вывод) -->
+    <mxCell id="s4" value="Отображение каталога трансляций" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fontSize=9;fixedSize=1;" vertex="1" parent="1">
+      <mxGeometry x="300" y="355" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Пользователь выбирает трансляцию -->
+    <mxCell id="s5" value="Пользователь выбирает трансляцию" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="435" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Запрос параметров потока -->
+    <mxCell id="s6" value="Запрос параметров потока" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="515" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Поток доступен? -->
+    <mxCell id="d2" value="Поток доступен?" style="rhombus;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="310" y="595" width="160" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Инициализация видеоплеера -->
+    <mxCell id="s7" value="Инициализация видеоплеера" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="695" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Начало воспроизведения -->
+    <mxCell id="s8" value="Начало воспроизведения" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="775" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Ожидание команды пользователя -->
+    <mxCell id="s9" value="Ожидание команды пользователя" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="855" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Команда? -->
+    <mxCell id="d3" value="Команда?" style="rhombus;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="310" y="935" width="160" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Приостановить воспроизведение (ЛЕВАЯ ветка) -->
+    <mxCell id="s10" value="Приостановить воспроизведение" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="80" y="940" width="165" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Возобновить воспроизведение (ПРАВАЯ ветка команды) -->
+    <mxCell id="s11" value="Возобновить воспроизведение" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="545" y="940" width="165" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Выход? -->
+    <mxCell id="d4" value="Выход?" style="rhombus;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="310" y="1040" width="160" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Сохранение данных сеанса в БД -->
+    <mxCell id="s12" value="Сохранение данных сеанса в БД" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="300" y="1145" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОНЕЦ -->
+    <mxCell id="s13" value="Конец" style="ellipse;whiteSpace=wrap;html=1;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="330" y="1230" width="120" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- ======= ПРАВАЯ ВЕТКА: ошибка сети ======= -->
+    <!-- Вывод сообщения об ошибке сети -->
+    <mxCell id="r1" value="Вывод сообщения об ошибке сети" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fontSize=9;fixedSize=1;" vertex="1" parent="1">
+      <mxGeometry x="640" y="260" width="175" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Повторить попытку? -->
+    <mxCell id="dr1" value="Повторить попытку?" style="rhombus;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="647" y="340" width="160" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Закрыть приложение -->
+    <mxCell id="r2" value="Закрыть приложение" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="652" y="440" width="150" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- КОНЕЦ (правая ветка) -->
+    <mxCell id="r3" value="Конец" style="ellipse;whiteSpace=wrap;html=1;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="667" y="520" width="120" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- Вывод сообщения об ошибке потока -->
+    <mxCell id="r4" value="Вывод сообщения об ошибке потока" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fontSize=9;fixedSize=1;" vertex="1" parent="1">
+      <mxGeometry x="635" y="600" width="180" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- =========================================================== -->
+    <!-- СТРЕЛКИ: ОСНОВНАЯ КОЛОНКА -->
+    <!-- =========================================================== -->
+
+    <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s1" target="s2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s2" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s3" target="d1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d1 → s4 (Да, вниз) -->
+    <mxCell id="e4" value="Да" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="d1" target="s4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d1 → r1 (Нет, вправо) -->
+    <mxCell id="e5" value="Нет" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;fontSize=8;" edge="1" source="d1" target="r1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e6" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s4" target="s5" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s5" target="s6" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s6" target="d2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d2 → s7 (Да) -->
+    <mxCell id="e9" value="Да" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="d2" target="s7" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d2 → r4 (Нет, вправо) -->
+    <mxCell id="e10" value="Нет" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;fontSize=8;" edge="1" source="d2" target="r4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e11" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s7" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s8" target="s9" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s9" target="d3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d3 → s10 (Пауза, влево) -->
+    <mxCell id="e14" value="Пауза" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=1;entryY=0.5;fontSize=8;" edge="1" source="d3" target="s10" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d3 → s11 (Продолжить, вправо) -->
+    <mxCell id="e15" value="Продолжить" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=8;" edge="1" source="d3" target="s11" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d3 → d4 (Выход, вниз) -->
+    <mxCell id="e16" value="Выход" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="d3" target="d4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- s10 → s9 (назад вверх по левому краю) -->
+    <mxCell id="e17" value="" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;entryX=0;entryY=0.5;" edge="1" source="s10" target="s9" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="162" y="875"/>
+          <mxPoint x="270" y="875"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- s11 → s9 (назад вверх по правому краю) -->
+    <mxCell id="e18" value="" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;entryX=1;entryY=0.5;" edge="1" source="s11" target="s9" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="627" y="875"/>
+          <mxPoint x="510" y="875"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- d4 → s12 (Да, вниз) -->
+    <mxCell id="e19" value="Да" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="d4" target="s12" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- d4 → s9 (Нет, назад вверх по левому дальнему краю) -->
+    <mxCell id="e20" value="Нет" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=0;entryY=1;fontSize=8;" edge="1" source="d4" target="s9" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="230" y="1070"/>
+          <mxPoint x="230" y="895"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="e21" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s12" target="s13" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- =========================================================== -->
+    <!-- СТРЕЛКИ: ПРАВАЯ ВЕТКА (ошибки) -->
+    <!-- =========================================================== -->
+
+    <mxCell id="er1" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="r1" target="dr1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- dr1 → s3 (Да, назад к Запрос списка по правому краю вверх) -->
+    <mxCell id="er2" value="Да" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=1;entryY=0.5;fontSize=8;" edge="1" source="dr1" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="860" y="370"/>
+          <mxPoint x="860" y="195"/>
+          <mxPoint x="480" y="195"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- dr1 → r2 (Нет, вниз) -->
+    <mxCell id="er3" value="Нет" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="dr1" target="r2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="er4" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="r2" target="r3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- r4 → s5 (назад к Пользователь выбирает трансляцию) -->
+    <mxCell id="er5" value="" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="r4" target="s5" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="560" y="625"/>
+          <mxPoint x="560" y="455"/>
+          <mxPoint x="480" y="455"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

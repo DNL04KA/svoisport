@@ -1,0 +1,26 @@
+# ─── Gradle / build output ───────────────────────────────────────────────
+.gradle/
+build/
+captures/
+.cxx/
+
+# ─── Android Studio / IntelliJ IDEA ──────────────────────────────────────
+.idea/
+*.iml
+.kotlin/
+
+# ─── Local config (machine-specific; never publish) ──────────────────────
+local.properties
+
+# ─── Claude Code local settings — contains local tokens/secrets ──────────
+.claude/
+
+# ─── Keystores & secrets ─────────────────────────────────────────────────
+*.jks
+*.keystore
+secrets.properties
+keystore.properties
+
+# ─── OS noise ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

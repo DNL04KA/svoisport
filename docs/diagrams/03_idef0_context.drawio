@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="frame" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="10" y="10" width="1634" height="1019" as="geometry"/>
+    </mxCell>
+    <mxCell id="ttl" value="Диаграмма IDEF0 — Контекстная диаграмма (A-0)
+Система: «СвойСпорт TV»   Назначение: просмотр спортивных трансляций на Smart TV" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="10" y="15" width="1634" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="mbox" value="A-0
+
+Обеспечить просмотр
+спортивных трансляций
+на Smart TV устройстве" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="577" y="300" width="500" height="300" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_i1" value="I1: Запрос пользователя
+(навигация, выбор трансляции)" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="30" y="380" as="sourcePoint"/>
+        <mxPoint x="577" y="380" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_i2" value="I2: Команды управления
+плеером (пауза, выход)" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="30" y="490" as="sourcePoint"/>
+        <mxPoint x="577" y="490" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="lbl_in" value="ВХОД" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=10;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="5" y="435" width="80" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_o1" value="O1: Видеопоток на экране (HLS/DASH)" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="1077" y="350" as="sourcePoint"/>
+        <mxPoint x="1574" y="350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_o2" value="O2: UI каталога и навигации" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="1077" y="430" as="sourcePoint"/>
+        <mxPoint x="1574" y="430" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_o3" value="O3: Уведомления об ошибках" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="1077" y="510" as="sourcePoint"/>
+        <mxPoint x="1574" y="510" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="lbl_out" value="ВЫХОД" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=10;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="1589" y="430" width="80" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_c1" value="C1: Требования к качеству
+видео (битрейт, разрешение)" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="630" y="60" as="sourcePoint"/>
+        <mxPoint x="630" y="300" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_c2" value="C2: Правила доступа
+к трансляциям" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="827" y="60" as="sourcePoint"/>
+        <mxPoint x="827" y="300" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_c3" value="C3: Протоколы
+HLS / DASH" style="endArrow=block;endFill=1;html=1;strokeColor=#000000;fontSize=11;fontStyle=0;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="1020" y="60" as="sourcePoint"/>
+        <mxPoint x="1020" y="300" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="lbl_ctrl" value="УПРАВЛЕНИЕ" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="700" y="45" width="130" height="25" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_m1" value="M1: Android TV OS
++ ExoPlayer" style="endArrow=block;endFill=1;html=1;strokeColor=#555555;fontSize=11;fontStyle=0;strokeWidth=1.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="660" y="680" as="sourcePoint"/>
+        <mxPoint x="660" y="600" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_m2" value="M2: Сервер трансляций
+(SportTV API)" style="endArrow=block;endFill=1;html=1;strokeColor=#555555;fontSize=11;fontStyle=0;strokeWidth=1.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="827" y="680" as="sourcePoint"/>
+        <mxPoint x="827" y="600" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e_m3" value="M3: Smart TV
+устройство (аппаратура)" style="endArrow=block;endFill=1;html=1;strokeColor=#555555;fontSize=11;fontStyle=0;strokeWidth=1.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="990" y="680" as="sourcePoint"/>
+        <mxPoint x="990" y="600" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="lbl_mech" value="МЕХАНИЗМЫ" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="760" y="685" width="130" height="25" as="geometry"/>
+    </mxCell>
+    <mxCell id="meta_frame" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="10" y="1024" width="1634" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk0" value="Автор:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="20" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv0" value="СвойСпорт команда" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="20" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk1" value="Проект:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="285" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv1" value="ProgramOnTV" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="285" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk2" value="Диаграмма:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="550" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv2" value="A-0 Контекстная" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="550" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk3" value="Стандарт:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="815" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv3" value="IDEF0 / ГОСТ Р ИСО 10746" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="815" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk4" value="Дата:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1080" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv4" value="2026-05-24" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1080" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mk5" value="Версия:" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1345" y="1034" width="260" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="mv5" value="1.0" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1345" y="1064" width="260" height="30" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

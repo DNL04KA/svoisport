@@ -1,0 +1,137 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="750" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- Начальная точка -->
+    <mxCell id="2" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="370" y="20" width="20" height="20" as="geometry"/>
+    </mxCell>
+
+    <!-- Инициализация -->
+    <mxCell id="3" value="Инициализация" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="300" y="80" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Ожидание -->
+    <mxCell id="4" value="Ожидание" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="300" y="190" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Воспроизведение -->
+    <mxCell id="5" value="Воспроизведение" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="300" y="310" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Пауза (слева) -->
+    <mxCell id="6" value="Пауза" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="80" y="420" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Ошибка (справа) -->
+    <mxCell id="7" value="Ошибка" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="540" y="310" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Завершён -->
+    <mxCell id="8" value="Завершён" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="300" y="520" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Конечная точка -->
+    <mxCell id="9" value="" style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;double=1;" vertex="1" parent="1">
+      <mxGeometry x="370" y="625" width="20" height="20" as="geometry"/>
+    </mxCell>
+
+    <!-- 1. Начало → Инициализация -->
+    <mxCell id="10" value="Запуск плеера" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="2" target="3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- 2. Инициализация → Ожидание -->
+    <mxCell id="11" value="Параметры потока получены" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="3" target="4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- 3. Ожидание → Воспроизведение -->
+    <mxCell id="12" value="Поток подключён" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="4" target="5" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- 4. Воспроизведение → Пауза (выход влево, вниз, вправо к Пауза) -->
+    <mxCell id="13" value="Команда «Пауза»" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="5" target="6" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="255" y="335"/>
+          <mxPoint x="255" y="445"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 5. Пауза → Воспроизведение (выход вправо, вверх) -->
+    <mxCell id="14" value="Команда «Продолжить»" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="6" target="5" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="275" y="445"/>
+          <mxPoint x="275" y="335"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 6. Воспроизведение → Ошибка (горизонтально вправо) -->
+    <mxCell id="15" value="Потеря соединения" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="5" target="7" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- 7. Инициализация → Ошибка (вправо по x=490, вниз к верху Ошибка) -->
+    <mxCell id="16" value="Сервер недоступен" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0.5;entryY=0;" edge="1" source="3" target="7" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="490" y="105"/>
+          <mxPoint x="490" y="310"/>
+          <mxPoint x="620" y="310"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 8. Ошибка → Инициализация (выход вправо, вверх по x=760, к правой стороне Инициализация) -->
+    <mxCell id="17" value="Повторная попытка" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" edge="1" source="7" target="3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="760" y="335"/>
+          <mxPoint x="760" y="105"/>
+          <mxPoint x="460" y="105"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 9. Ошибка → Завершён (вниз, влево к правой стороне Завершён) -->
+    <mxCell id="18" value="Отмена" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" edge="1" source="7" target="8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="620" y="545"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 10. Пауза → Завершён (вниз, вправо к левой стороне Завершён) -->
+    <mxCell id="19" value="Команда «Выход»" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0;entryY=0.5;" edge="1" source="6" target="8" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="160" y="545"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- 11. Воспроизведение → Завершён (вниз) -->
+    <mxCell id="20" value="Команда «Выход»" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="5" target="8" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- 12. Завершён → Конец -->
+    <mxCell id="21" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="8" target="9" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

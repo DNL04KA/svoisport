@@ -1,0 +1,205 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="650" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ===== 4 БЛОКА (диагональное расположение) ===== -->
+    <mxCell id="b1" value="Аутентификация&#xa;пользователя" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="60" y="130" width="160" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="b1n" value="1о" style="text;html=1;strokeColor=none;fillColor=none;fontSize=8;fontStyle=1;align=right;" vertex="1" parent="1">
+      <mxGeometry x="195" y="185" width="22" height="14" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="b2" value="Загрузка каталога&#xa;трансляций" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="310" y="200" width="160" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="b2n" value="2о" style="text;html=1;strokeColor=none;fillColor=none;fontSize=8;fontStyle=1;align=right;" vertex="1" parent="1">
+      <mxGeometry x="445" y="255" width="22" height="14" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="b3" value="Воспроизведение&#xa;трансляции" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="530" y="320" width="160" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="b3n" value="3о" style="text;html=1;strokeColor=none;fillColor=none;fontSize=8;fontStyle=1;align=right;" vertex="1" parent="1">
+      <mxGeometry x="665" y="375" width="22" height="14" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="b4" value="Завершение и&#xa;регистрация сеанса" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="780" y="390" width="160" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="b4n" value="4о" style="text;html=1;strokeColor=none;fillColor=none;fontSize=8;fontStyle=1;align=right;" vertex="1" parent="1">
+      <mxGeometry x="915" y="445" width="22" height="14" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== УПРАВЛЕНИЕ СВЕРХУ ===== -->
+    <!-- Одна метка управления -->
+    <mxCell id="ctrl_lbl" value="Стандарты платформы Android TV" style="text;html=1;strokeColor=none;fillColor=none;fontSize=10;align=center;" vertex="1" parent="1">
+      <mxGeometry x="350" y="20" width="250" height="25" as="geometry"/>
+    </mxCell>
+
+    <!-- Горизонтальная линия управления -->
+    <mxCell id="ctrl_hline" value="" style="html=1;endArrow=none;strokeColor=#000000;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <sourcePoint x="140" y="50"/>
+        <targetPoint x="860" y="50"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ctrl → b1 -->
+    <mxCell id="cp1" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="140" y="50" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ca1" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cp1" target="b1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ctrl → b2 -->
+    <mxCell id="cp2" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="390" y="50" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ca2" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cp2" target="b2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ctrl → b3 -->
+    <mxCell id="cp3" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="610" y="50" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ca3" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cp3" target="b3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ctrl → b4 -->
+    <mxCell id="cp4" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="860" y="50" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ca4" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cp4" target="b4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ВХОД СЛЕВА → B1 ===== -->
+    <mxCell id="isrc" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="10" y="165" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ilbl" value="Запрос&#xa;пользователя" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=right;" vertex="1" parent="1">
+      <mxGeometry x="10" y="145" width="95" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="iarr" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="isrc" target="b1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ПОТОК B1 → B2 ===== -->
+    <mxCell id="f12" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="b1" target="b2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="f12lbl" value="Данные&#xa;пользователя" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=center;" vertex="1" parent="1">
+      <mxGeometry x="232" y="152" width="75" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- Запрос пользователя → B3 (дополнительный вход слева) -->
+    <mxCell id="i3src" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="400" y="355" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="i3lbl" value="Запрос&#xa;пользователя" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=right;" vertex="1" parent="1">
+      <mxGeometry x="295" y="340" width="100" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="i3arr" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="i3src" target="b3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ПОТОК B2 → B3 ===== -->
+    <mxCell id="f23" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" source="b2" target="b3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="490" y="235"/>
+          <mxPoint x="490" y="290"/>
+          <mxPoint x="530" y="290"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="f23lbl" value="список трансляций" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+      <mxGeometry x="497" y="245" width="110" height="25" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ПОТОК B3 → B4 (Результат обработки) ===== -->
+    <mxCell id="f34" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="b3" target="b4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="f34lbl" value="Результат&#xa;обработки" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=center;" vertex="1" parent="1">
+      <mxGeometry x="698" y="338" width="75" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== ВЫХОДЫ из B4 вправо ===== -->
+    <mxCell id="o1dst" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="1060" y="415" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="o2dst" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="1060" y="445" width="1" height="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="o1arr" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="b4" target="o1dst" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="o1lbl" value="Неуспешное&#xa;завершение операции" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+      <mxGeometry x="955" y="398" width="140" height="30" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="o2arr" value="" style="html=1;endArrow=block;endFill=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="b4" target="o2dst" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="o2lbl" value="Успешное&#xa;завершение операции" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+      <mxGeometry x="955" y="433" width="140" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== МЕХАНИЗМ СНИЗУ ===== -->
+    <!-- Горизонтальная линия механизма -->
+    <mxCell id="mline" value="" style="html=1;endArrow=none;strokeColor=#000000;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <sourcePoint x="140" y="570"/>
+        <targetPoint x="860" y="570"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="mlbl" value="Информационная система (SvoySport TV, Android TV)" style="text;html=1;strokeColor=none;fillColor=none;fontSize=10;align=center;" vertex="1" parent="1">
+      <mxGeometry x="330" y="575" width="340" height="25" as="geometry"/>
+    </mxCell>
+
+    <!-- mech → b1 -->
+    <mxCell id="ms1" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="140" y="570" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ma1" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="ms1" target="b1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- mech → b2 -->
+    <mxCell id="ms2" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="390" y="570" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ma2" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="ms2" target="b2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- mech → b3 -->
+    <mxCell id="ms3" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="610" y="570" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ma3" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="ms3" target="b3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- mech → b4 -->
+    <mxCell id="ms4" value="" style="point;opacity=0;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+      <mxGeometry x="860" y="570" width="1" height="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ma4" value="" style="html=1;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="ms4" target="b4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Заголовок -->
+    <mxCell id="title" value="IDEF0 A1 – Декомпозиция процесса «Просмотр спортивных трансляций на Smart TV»" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="100" y="615" width="960" height="25" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

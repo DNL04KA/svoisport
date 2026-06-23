@@ -1,0 +1,201 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ===================== ПОЛЬЗОВАТЕЛЬ ===================== -->
+    <mxCell id="u1_box" value="Пользователь" style="text;html=1;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;dashed=1;dashPattern=8 4;fontSize=9;fontStyle=1;spacingLeft=5;spacingTop=3;" vertex="1" parent="1">
+      <mxGeometry x="20" y="200" width="160" height="155" as="geometry"/>
+    </mxCell>
+    <mxCell id="u1_router" value="Роутер" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="40" y="225" width="120" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="u1_tv" value="Smart TV (Android TV)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="40" y="270" width="120" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="u1_app" value="SvoySport TV App" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;fontColor=#0000FF;strokeColor=#0000FF;" vertex="1" parent="1">
+      <mxGeometry x="40" y="315" width="120" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== ИНТЕРНЕТ (вертикальная полоса) ===================== -->
+    <mxCell id="internet" value="Интернет" style="text;html=1;strokeColor=#000000;fillColor=#f5f5f5;fontColor=#333333;align=center;verticalAlign=middle;rounded=0;rotation=-90;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="210" y="195" width="230" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== ИСТОЧНИК ДАННЫХ sport-tv.by ===================== -->
+    <mxCell id="sport_box" value="Источник данных:&#xa;sport-tv.by" style="text;html=1;strokeColor=#FF0000;fillColor=none;align=left;verticalAlign=top;dashed=1;dashPattern=8 4;fontSize=9;fontStyle=1;fontColor=#FF0000;spacingLeft=5;spacingTop=3;" vertex="1" parent="1">
+      <mxGeometry x="210" y="450" width="160" height="100" as="geometry"/>
+    </mxCell>
+    <mxCell id="sport_api" value="API расписания (JSON)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;fontColor=#FF0000;strokeColor=#FF0000;" vertex="1" parent="1">
+      <mxGeometry x="225" y="475" width="130" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="sport_hls" value="HLS/DASH потоки" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;fontColor=#FF0000;strokeColor=#FF0000;" vertex="1" parent="1">
+      <mxGeometry x="225" y="515" width="130" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== БРАНДМАУЭР ===================== -->
+    <mxCell id="firewall" value="Брандмауэр" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;fontColor=#FF0000;strokeColor=#FF0000;" vertex="1" parent="1">
+      <mxGeometry x="400" y="210" width="130" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== МАРШРУТИЗАТОР ===================== -->
+    <mxCell id="mrouter" value="Маршрутизатор" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="400" y="310" width="130" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== КОММУТАТОР ===================== -->
+    <mxCell id="switch" value="Коммутатор" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="400" y="410" width="130" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== SMTP (внешний сервис) ===================== -->
+    <mxCell id="smtp" value="SMTP Email-сервис&#xa;(Gmail / SendGrid)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;fontColor=#FF0000;strokeColor=#FF0000;" vertex="1" parent="1">
+      <mxGeometry x="660" y="30" width="145" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== СЕРВЕР ПРИЛОЖЕНИЙ ===================== -->
+    <mxCell id="server_box" value="Сервер приложений SvoySport TV" style="text;html=1;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;dashed=1;dashPattern=8 4;fontSize=9;fontStyle=1;spacingLeft=5;spacingTop=3;" vertex="1" parent="1">
+      <mxGeometry x="580" y="160" width="520" height="510" as="geometry"/>
+    </mxCell>
+
+    <!-- Строка 1: Nginx | REST API | Auth | Менеджер трансляций -->
+    <mxCell id="srv_nginx" value="Nginx&#xa;(Reverse Proxy)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="595" y="195" width="110" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="srv_api" value="REST API&#xa;(endpoint_config)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="720" y="195" width="110" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="srv_auth" value="Сервис&#xa;аутентификации" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="845" y="195" width="110" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="srv_stream" value="Менеджер&#xa;трансляций" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="970" y="195" width="110" height="45" as="geometry"/>
+    </mxCell>
+
+    <!-- Строка 2: PostgreSQL -->
+    <mxCell id="pg_box" value="База данных PostgreSQL" style="text;html=1;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;fontSize=9;fontStyle=1;spacingLeft=5;spacingTop=3;" vertex="1" parent="1">
+      <mxGeometry x="595" y="295" width="490" height="165" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_users" value="users" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="608" y="320" width="100" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_events" value="events" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="718" y="320" width="100" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_streams" value="streams" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="828" y="320" width="100" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_sessions" value="sessions" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="938" y="320" width="100" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_fav" value="favorites" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="608" y="370" width="100" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="db_ep" value="endpoint_config" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="718" y="370" width="120" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- Строка 3: Ubuntu -->
+    <mxCell id="srv_os" value="Ubuntu Server 22.04 LTS" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="595" y="480" width="490" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Строка 4: Железо -->
+    <mxCell id="hw_net" value="Сетевое&#xa;оборудование" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="595" y="535" width="150" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="hw_cpu" value="CPU &amp; RAM" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="760" y="535" width="150" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="hw_ssd" value="Хранилище SSD" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="925" y="535" width="150" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ===================== СОЕДИНЕНИЯ ===================== -->
+
+    <!-- Пользователь: App → TV → Router → Internet -->
+    <mxCell id="e_u1a" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="u1_app" target="u1_tv" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_u1b" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="u1_tv" target="u1_router" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_u1c" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="u1_router" target="internet" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Internet → Firewall -->
+    <mxCell id="e_if" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="internet" target="firewall" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Firewall → Маршрутизатор -->
+    <mxCell id="e_fm" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="firewall" target="mrouter" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Маршрутизатор → Коммутатор -->
+    <mxCell id="e_ms" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="mrouter" target="switch" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Коммутатор → Nginx -->
+    <mxCell id="e_sn" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="switch" target="srv_nginx" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- sport-tv.by → Коммутатор -->
+    <mxCell id="e_sp" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="sport_api" target="switch" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Nginx → REST API, Auth, StreamManager -->
+    <mxCell id="e_na" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_nginx" target="srv_api" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_nauth" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_nginx" target="srv_auth" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_nst" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_nginx" target="srv_stream" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Auth → SMTP -->
+    <mxCell id="e_as" value="код на e-mail" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="srv_auth" target="smtp" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="900" y="50"/>
+          <mxPoint x="732" y="50"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Сервисы → PostgreSQL -->
+    <mxCell id="e_apg" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_api" target="pg_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_authpg" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_auth" target="pg_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_stpg" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_stream" target="pg_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- PostgreSQL → Ubuntu OS -->
+    <mxCell id="e_pgos" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="pg_box" target="srv_os" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Ubuntu OS → Hardware -->
+    <mxCell id="e_os1" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_os" target="hw_net" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_os2" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_os" target="hw_cpu" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e_os3" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="srv_os" target="hw_ssd" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>
