@@ -12,9 +12,6 @@ captures/
 # ─── Local config (machine-specific; never publish) ──────────────────────
 local.properties
 
-# ─── Claude Code local settings — contains local tokens/secrets ──────────
-.claude/
-
 # ─── Keystores & secrets ─────────────────────────────────────────────────
 *.jks
 *.keystore
