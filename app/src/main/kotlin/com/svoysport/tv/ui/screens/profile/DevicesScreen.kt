@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.theme.Primary
+import com.svoysport.tv.ui.theme.PrimaryPressed
 
 private val _PanelBg  = Color(0x33565A80)
 private val _KeyBg    = Color(0xFF343B4B)
@@ -83,12 +85,18 @@ fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                 onClick   = onBack,
                 modifier  = Modifier.size(closeSz).onFocusChanged { backFocused = it.isFocused }.scale(backSc),
                 shape     = ClickableSurfaceDefaults.shape(RoundedCornerShape(200.dp)),
-                colors    = ClickableSurfaceDefaults.colors(containerColor = _PanelBg, focusedContainerColor = _PanelBg),
+                colors    = ClickableSurfaceDefaults.colors(
+                    containerColor        = _PanelBg,
+                    focusedContainerColor = Primary,
+                    pressedContainerColor = PrimaryPressed
+                ),
                 scale     = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                        contentDescription = "Назад", tint = _TextMain, modifier = Modifier.size(iconSz))
+                        contentDescription = "Назад",
+                        tint = if (backFocused) Color.White else _TextMain,
+                        modifier = Modifier.size(iconSz))
                 }
             }
 

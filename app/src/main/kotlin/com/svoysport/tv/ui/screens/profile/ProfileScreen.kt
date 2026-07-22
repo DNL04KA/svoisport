@@ -41,6 +41,7 @@ fun ProfileScreen(
     onDevicesClick: () -> Unit = {},
     onAboutClick: () -> Unit = {},
     onLogout: () -> Unit = {},
+    onSidebarItem: (com.svoysport.tv.ui.components.nav.SidebarItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val email by remember { derivedStateOf { SessionManager.userEmail.value } }
@@ -62,8 +63,12 @@ fun ProfileScreen(
         val itemGap    : Dp       = (20f  * scale).dp
         val sectionGap : Dp       = (40f  * scale).dp
 
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        // Контент сдвинут на ширину свёрнутого сайдбара — как на Figma-профиле
+        Box(
+            modifier = Modifier.fillMaxSize().padding(start = 60.dp, top = 40.dp, end = 40.dp, bottom = 40.dp)
+        ) {
             Column(
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(sectionGap)
             ) {
@@ -92,8 +97,12 @@ fun ProfileScreen(
                     modifier            = Modifier.width(itemW),
                     verticalArrangement = Arrangement.spacedBy(itemGap)
                 ) {
+                    // Состояние подписки — из QR-активации (SubscriptionManager)
+                    val subActive = com.svoysport.tv.session.SubscriptionManager.isSubscribed.value
+                    val subUntil  = com.svoysport.tv.session.SubscriptionManager.subscribedUntil.value
                     WideProfileItem(
-                        title = "Подписка", subtitle = "Не оформлена",
+                        title = "Подписка",
+                        subtitle = if (subActive) "Активна до ${subUntil ?: "—"}" else "Не оформлена",
                         icon = R.drawable.ic_card, height = wideItemH, iconSz = iconSz,
                         titleSp = titleSp, subtitleSp = subtitleSp, onClick = onSubscriptionClick
                     )
@@ -126,10 +135,31 @@ fun ProfileScreen(
                 ExitButton(
                     modifier = Modifier.width(itemW).height(exitBtnH),
                     fontSize = (28f * scale).coerceAtLeast(12f).sp,
-                    onClick  = { SessionManager.isLoggedIn.value = false; onLogout() }
+                    onClick  = {
+                        SessionManager.isLoggedIn.value = false
+                        com.svoysport.tv.session.SubscriptionManager.clear()   // отвязка этого ТВ
+                        onLogout()
+                    }
                 )
             }
         }
+
+        // Шапка как на главной: лого по центру рельсы сайдбара (60dp)
+        androidx.compose.foundation.Image(
+            painter            = androidx.compose.ui.res.painterResource(R.drawable.logo_icon),
+            contentDescription = "Свой Спорт",
+            modifier           = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp, top = 14.dp)
+                .size(36.dp)
+        )
+
+        // Боковое меню поверх контента — на профиле оно тоже есть (Figma)
+        com.svoysport.tv.ui.components.nav.LeftSidebar(
+            selectedItem   = null,
+            onItemSelected = onSidebarItem,
+            modifier       = Modifier.align(Alignment.TopStart).padding(top = 64.dp)
+        )
     }
 }
 

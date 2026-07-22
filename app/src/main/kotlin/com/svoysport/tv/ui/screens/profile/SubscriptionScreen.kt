@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.theme.Primary
+import com.svoysport.tv.ui.theme.PrimaryPressed
 
 // ─── SubscriptionScreen ───────────────────────────────────────────────────────
 // Figma 551:18485 — 1920×1080 full-screen
@@ -83,12 +85,17 @@ fun SubscriptionScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 onClick   = onBack,
                 modifier  = Modifier.size(closeSz).onFocusChanged { backFocused = it.isFocused }.scale(backSc),
                 shape     = ClickableSurfaceDefaults.shape(RoundedCornerShape(200.dp)),
-                colors    = ClickableSurfaceDefaults.colors(containerColor = Color(0x33565A80), focusedContainerColor = Color(0x33565A80)),
+                colors    = ClickableSurfaceDefaults.colors(
+                    containerColor        = Color(0x33565A80),
+                    focusedContainerColor = Primary,
+                    pressedContainerColor = PrimaryPressed
+                ),
                 scale     = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                        contentDescription = "Назад", tint = Color(0xFFE2E2E2),
+                        contentDescription = "Назад",
+                        tint = if (backFocused) Color.White else Color(0xFFE2E2E2),
                         modifier = Modifier.size((24f * scale).dp))
                 }
             }

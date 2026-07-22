@@ -64,12 +64,15 @@ fun SportTvListingDto.toMatchItem(): MatchItem {
 
     val stream = source.takeIf { it.isNotBlank() && it != "no" }
 
-    // sport_id+date НЕ уникальны (один турнир — несколько кортов/потоков),
-    // поэтому добавляем стабильный дискриминатор из заголовка и источника.
+    // list2.php даёт стабильный id и реальное превью; list.php — нет, тогда
+    // id собираем из sport_id+date+хэша (сами по себе они не уникальны).
     val discriminator = kotlin.math.abs((title + "|" + source).hashCode())
+    val stableId = id?.takeIf { it.isNotBlank() }?.let { "stv_$it" }
+        ?: "${sport_id}_${date}_$discriminator"
+    val thumb = thumbnail?.takeIf { it.isNotBlank() } ?: sport.thumb
 
     return MatchItem(
-        id            = "${sport_id}_${date}_$discriminator",
+        id            = stableId,
         title         = title.trim(),
         description   = annotation.trim(),
         homeTeam      = Team(id = "home", name = homeName),
@@ -77,11 +80,12 @@ fun SportTvListingDto.toMatchItem(): MatchItem {
         competition   = Competition(id = sport.key, name = sport.label),
         isLive        = live,
         startTimeMs   = startMs,
-        thumbnailUrl  = sport.thumb,
-        backgroundUrl = sport.thumb,
+        thumbnailUrl  = thumb,
+        backgroundUrl = thumb,
         streamUrl     = stream,
-        isSubscriptionRequired = false,
-        isHot         = live
+        isSubscriptionRequired = isPaid == true,
+        isHot         = live,
+        durationSec   = duration ?: ((endMs - startMs) / 1000).coerceAtLeast(0)
     )
 }
 

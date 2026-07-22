@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Gray3
+import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.SidebarBg
 
 enum class SidebarItem {
@@ -28,14 +29,14 @@ enum class SidebarItem {
     FOOTBALL, HOCKEY, HANDBALL, BASKETBALL, VOLLEYBALL, OTHER
 }
 
-// Используем только контурную (outline) иконку и подкрашиваем её tint'ом:
-// серый в покое → белый в фокусе/выбранном. Filled-варианты (*_active) не
-// задействуем — часть из них экспортирована с белым фоном-прямоугольником
-// (ic_sport_other_active), из-за чего фокус «засвечивал» иконку белым блоком.
+// Figma NAVBAR: контурная иконка (iconRes) в покое, заливка (iconActive) в
+// фокусе/выбранном. (ic_sport_other_active был экспортирован с лишним белым
+// прямоугольником на весь кадр — починен, заливка теперь корректна.)
 private data class SidebarIconData(
-    val type:    SidebarItem,
-    val iconRes: Int,
-    val label:   String
+    val type:       SidebarItem,
+    val iconRes:    Int,
+    val iconActive: Int,
+    val label:      String
 )
 
 private val SIDEBAR_COLLAPSED = 60.dp
@@ -52,16 +53,16 @@ fun LeftSidebar(
     modifier: Modifier = Modifier
 ) {
     val topItems = listOf(
-        SidebarIconData(SidebarItem.SEARCH,    R.drawable.ic_search,    "Поиск"),
-        SidebarIconData(SidebarItem.BOOKMARKS, R.drawable.ic_bookmark,  "Избранное"),
+        SidebarIconData(SidebarItem.SEARCH,    R.drawable.ic_search,    R.drawable.ic_search_active,    "Поиск"),
+        SidebarIconData(SidebarItem.BOOKMARKS, R.drawable.ic_bookmark,  R.drawable.ic_bookmark_active,  "Избранное"),
     )
     val sportItems = listOf(
-        SidebarIconData(SidebarItem.FOOTBALL,   R.drawable.ic_sport_football,   "Футбол"),
-        SidebarIconData(SidebarItem.HOCKEY,     R.drawable.ic_sport_hockey,     "Хоккей"),
-        SidebarIconData(SidebarItem.HANDBALL,   R.drawable.ic_sport_handball,   "Гандбол"),
-        SidebarIconData(SidebarItem.BASKETBALL, R.drawable.ic_sport_basketball, "Баскетбол"),
-        SidebarIconData(SidebarItem.VOLLEYBALL, R.drawable.ic_sport_volleyball, "Волейбол"),
-        SidebarIconData(SidebarItem.OTHER,      R.drawable.ic_sport_other,      "Другой спорт"),
+        SidebarIconData(SidebarItem.FOOTBALL,   R.drawable.ic_sport_football,   R.drawable.ic_sport_football_active,   "Футбол"),
+        SidebarIconData(SidebarItem.HOCKEY,     R.drawable.ic_sport_hockey,     R.drawable.ic_sport_hockey_active,     "Хоккей"),
+        SidebarIconData(SidebarItem.HANDBALL,   R.drawable.ic_sport_handball,   R.drawable.ic_sport_handball_active,   "Гандбол"),
+        SidebarIconData(SidebarItem.BASKETBALL, R.drawable.ic_sport_basketball, R.drawable.ic_sport_basketball_active, "Баскетбол"),
+        SidebarIconData(SidebarItem.VOLLEYBALL, R.drawable.ic_sport_volleyball, R.drawable.ic_sport_volleyball_active, "Волейбол"),
+        SidebarIconData(SidebarItem.OTHER,      R.drawable.ic_sport_other,      R.drawable.ic_sport_other_active,      "Другой спорт"),
     )
 
     var sidebarFocused by remember { mutableStateOf(false) }
@@ -129,6 +130,13 @@ private fun SidebarRow(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val isActive = isSelected || isFocused
+    // Figma NAVBAR: покой — серый контур; фокус — светлая плашка + тёмный контент;
+    // выбран — синяя плашка + белый контент.
+    val contentColor = when {
+        isFocused  -> Color(0xFF171717)
+        isSelected -> Color.White
+        else       -> Gray3
+    }
 
     Surface(
         onClick  = onClick,
@@ -138,8 +146,8 @@ private fun SidebarRow(
             .onFocusChanged { isFocused = it.isFocused },
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(10.dp)),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor        = if (isSelected) Color(0xFF242840) else Color.Transparent,
-            focusedContainerColor = Color(0xFF242840)
+            containerColor        = if (isSelected) Primary else Color.Transparent,
+            focusedContainerColor = Color(0xFFE2E2E2)
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)
     ) {
@@ -151,10 +159,9 @@ private fun SidebarRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(
-                imageVector        = ImageVector.vectorResource(item.iconRes),
+                imageVector        = ImageVector.vectorResource(if (isActive) item.iconActive else item.iconRes),
                 contentDescription = item.label,
-                // покой — серый (Gray3), фокус/выбранный — белый
-                tint               = if (isActive) Color.White else Gray3,
+                tint               = contentColor,
                 modifier           = Modifier.size(ICON_SIZE)
             )
 
@@ -168,7 +175,7 @@ private fun SidebarRow(
                     style    = MaterialTheme.typography.labelSmall.copy(
                         fontSize   = 14.sp,
                         fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
-                        color      = if (isActive) Color.White else Color.White.copy(alpha = 0.65f)
+                        color      = contentColor
                     ),
                     maxLines = 1,
                     softWrap = false

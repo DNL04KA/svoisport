@@ -12,4 +12,7 @@ interface MatchRepository {
 
     /** Расписание на конкретный день (по началу дня в мс). */
     suspend fun getScheduleForDay(dayStartMs: Long): Result<List<MatchItem>>
+
+    /** Архив записей (DVR): воспроизводимый streamUrl + durationSec. */
+    suspend fun getArchive(): Result<List<MatchItem>>
 }

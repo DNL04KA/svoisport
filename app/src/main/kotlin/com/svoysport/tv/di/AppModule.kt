@@ -1,6 +1,8 @@
 package com.svoysport.tv.di
 
 import com.svoysport.tv.data.remote.SportTvMatchRepository
+import com.svoysport.tv.data.remote.activation.ActivationApi
+import com.svoysport.tv.data.remote.activation.MockActivationApi
 import com.svoysport.tv.domain.repository.MatchRepository
 import dagger.Binds
 import dagger.Module
@@ -21,4 +23,14 @@ abstract class AppModule {
     abstract fun bindMatchRepository(
         repository: SportTvMatchRepository
     ): MatchRepository
+
+    /**
+     * Активация подписки. Мок-бэкенд по умолчанию — чтобы подключить реальные
+     * эндпоинты sport-tv.by, замените [MockActivationApi] на RealActivationApi.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindActivationApi(
+        impl: MockActivationApi
+    ): ActivationApi
 }

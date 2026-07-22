@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.theme.Primary
+import com.svoysport.tv.ui.theme.PrimaryPressed
 
 // ─── SettingsScreen ───────────────────────────────────────────────────────────
 // Figma 584:20564 — 1920×1080 full-screen (без сайдбара)
@@ -83,14 +85,19 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                     onClick   = onBack,
                     modifier  = Modifier.size(closeSz).onFocusChanged { backFocused = it.isFocused }.scale(backSc),
                     shape     = ClickableSurfaceDefaults.shape(RoundedCornerShape(200.dp)),
-                    colors    = ClickableSurfaceDefaults.colors(containerColor = _SettingsPanelBg, focusedContainerColor = _SettingsPanelBg),
+                    colors    = ClickableSurfaceDefaults.colors(
+                        containerColor        = _SettingsPanelBg,
+                        focusedContainerColor = Primary,
+                        pressedContainerColor = PrimaryPressed
+                    ),
                     scale     = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
                 ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                            contentDescription = "Назад", tint = _SettingsTextMain,
-                            modifier = Modifier.size((24f * scale).dp))
-                    }
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                                contentDescription = "Назад",
+                                tint = if (backFocused) Color.White else _SettingsTextMain,
+                                modifier = Modifier.size((24f * scale).dp))
+                        }
                 }
                 Text(text = "Настройки", style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = titleSp, fontWeight = FontWeight.Medium, color = _SettingsTextMain))

@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -134,8 +137,9 @@ fun ScheduleScreen(
     val dayLoaded = state.matchesByDay.containsKey(state.selectedDayId)
     val matches = state.matchesByDay[state.selectedDayId] ?: emptyList()
 
-    // Матч в фокусе — для боковой кнопки «В избранное»
+    // Матч в фокусе — для боковой кнопки «В избранное» (выравнивается по строке)
     var focusedMatch by remember { mutableStateOf<ScheduleMatch?>(null) }
+    var focusedRowY  by remember { mutableStateOf(0f) }
     val favIds = com.svoysport.tv.session.FavoritesManager.favoriteIds.value
 
     // Снекбар
@@ -180,6 +184,8 @@ fun ScheduleScreen(
 
                 MatchListPanel(
                     matches        = matches,
+                    favIds         = favIds,
+                    activeId       = focusedMatch?.id,
                     isLoading      = !dayLoaded && state.isLoading,
                     error          = state.error,
                     panelH         = panelH,
@@ -187,17 +193,18 @@ fun ScheduleScreen(
                     fontSize       = fontSize,
                     fontSizeSm     = fontSizeSm,
                     onMatchClick   = onMatchClick,
-                    onMatchFocused = { focusedMatch = it },
+                    onMatchFocused = { m, y -> focusedMatch = m; focusedRowY = y },
                     modifier       = Modifier.weight(760f)
                 )
 
                 Spacer(Modifier.width(panelGap))
 
-                // Боковая кнопка «В избранное» для матча в фокусе
+                // Боковая кнопка «В избранное» — напротив строки, на которую наведён фокус
                 FavoriteAction(
                     match    = focusedMatch,
                     isFav    = focusedMatch?.id in favIds,
                     scale    = scale,
+                    rowY     = focusedRowY,
                     modifier = Modifier.weight(280f),
                     onToggle = { m ->
                         com.svoysport.tv.session.FavoritesManager.toggle(m.id)
@@ -243,6 +250,7 @@ private fun FavoriteAction(
     match: ScheduleMatch?,
     isFav: Boolean,
     scale: Float,
+    rowY: Float,
     modifier: Modifier = Modifier,
     onToggle: (ScheduleMatch) -> Unit
 ) {
@@ -251,10 +259,15 @@ private fun FavoriteAction(
         return
     }
     var isFocused by remember { mutableStateOf(false) }
-    Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
+    var colY by remember { mutableStateOf(0f) }
+    Box(
+        modifier = modifier.onGloballyPositioned { colY = it.positionInRoot().y },
+        contentAlignment = Alignment.TopStart
+    ) {
         Surface(
             onClick  = { onToggle(match) },
             modifier = Modifier.fillMaxWidth().height((72f * scale).dp)
+                .offset { IntOffset(0, (rowY - colY).coerceAtLeast(0f).toInt()) }
                 .onFocusChanged { isFocused = it.isFocused },
             shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape((16f * scale).dp)),
             colors = ClickableSurfaceDefaults.colors(
@@ -414,6 +427,8 @@ private fun DayItem(
 @Composable
 private fun MatchListPanel(
     matches: List<ScheduleMatch>,
+    favIds: Set<String> = emptySet(),
+    activeId: String? = null,
     isLoading: Boolean,
     error: String?,
     panelH: Dp,
@@ -421,7 +436,7 @@ private fun MatchListPanel(
     fontSize: TextUnit,
     fontSizeSm: TextUnit,
     onMatchClick: (String) -> Unit,
-    onMatchFocused: (ScheduleMatch) -> Unit = {},
+    onMatchFocused: (ScheduleMatch, Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -453,6 +468,8 @@ private fun MatchListPanel(
                 items(matches, key = { it.id }) { match ->
                     ScheduleMatchRow(
                         match        = match,
+                        isFav        = match.id in favIds,
+                        isActive     = match.id == activeId,
                         rowH         = rowH,
                         fontSize     = fontSize,
                         fontSizeSm   = fontSizeSm,
@@ -471,23 +488,34 @@ private fun MatchListPanel(
 @Composable
 private fun ScheduleMatchRow(
     match: ScheduleMatch,
+    isFav: Boolean = false,
+    isActive: Boolean = false,
     rowH: Dp,
     fontSize: TextUnit,
     fontSizeSm: TextUnit,
     onMatchClick: (String) -> Unit,
-    onFocused: (ScheduleMatch) -> Unit = {}
+    onFocused: (ScheduleMatch, Float) -> Unit = { _, _ -> }
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    var rowWinY by remember { mutableStateOf(0f) }
 
     Surface(
         onClick  = { onMatchClick(match.id) },
-        modifier = Modifier.fillMaxWidth().height(rowH).onFocusChanged {
-            isFocused = it.isFocused
-            if (it.isFocused) onFocused(match)
-        },
+        modifier = Modifier.fillMaxWidth().height(rowH)
+            .onGloballyPositioned { rowWinY = it.positionInRoot().y }
+            .onFocusChanged {
+                isFocused = it.isFocused
+                if (it.isFocused) onFocused(match, rowWinY)
+            },
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
+        // Figma: строка в фокусе — тёмная, чуть светлее остальных, с синей
+        // рамкой; слегка подсвеченной остаётся и пока фокус на «В избранное»
         colors = ClickableSurfaceDefaults.colors(
-            containerColor        = if (match.status == MatchStatus.FINISHED) Color.White.copy(alpha = 0.04f) else Color.White.copy(alpha = 0.08f),
+            containerColor        = when {
+                isActive                             -> Color.White.copy(alpha = 0.10f)
+                match.status == MatchStatus.FINISHED -> Color.White.copy(alpha = 0.04f)
+                else                                 -> Color.White.copy(alpha = 0.08f)
+            },
             focusedContainerColor = Color.White.copy(alpha = 0.10f)
         ),
         border = ClickableSurfaceDefaults.border(
@@ -563,6 +591,16 @@ private fun ScheduleMatchRow(
                     Text(text = "Подписка", style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.SemiBold, fontSize = fontSizeSm, color = Color.White))
                 }
+            }
+            // Закладка у избранной трансляции (Figma: строка 12:00)
+            if (isFav && !isFocused) {
+                Spacer(Modifier.width(14.dp))
+                Icon(
+                    imageVector        = ImageVector.vectorResource(R.drawable.ic_bookmark_active),
+                    contentDescription = "В избранном",
+                    tint               = Color.White.copy(alpha = 0.90f),
+                    modifier           = Modifier.size(20.dp)
+                )
             }
             // Шеврон появляется на фокусе — как в Figma
             if (isFocused) {

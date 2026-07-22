@@ -29,10 +29,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.tv.material3.*
 import coil3.compose.AsyncImage
 import com.svoysport.tv.R
+import com.svoysport.tv.domain.model.MatchItem
+import com.svoysport.tv.domain.repository.MatchRepository
 import com.svoysport.tv.ui.theme.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
 
 // ─── Data models ─────────────────────────────────────────────────────────────
 
@@ -51,34 +65,59 @@ data class ArchiveDateGroup(
     val matches: List<ArchiveMatch>
 )
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── ViewModel: реальный архив с sport-tv.by (list2.php?archive=1) ───────────
 
-private val footballUrl   = "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600"
-private val hockeyUrl     = "https://images.unsplash.com/photo-1515703407324-5f753afd8be8?q=80&w=600"
-private val basketballUrl = "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600"
-private val volleyballUrl = "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=600"
+@HiltViewModel
+class ArchiveViewModel @Inject constructor(
+    private val repository: MatchRepository
+) : ViewModel() {
 
-private val mockGroups = listOf(
-    ArchiveDateGroup("20.11.2025", listOf(
-        ArchiveMatch("a01", "Зенит — Спартак",            "РПЛ • Футбол",            "20.11.2025", "1:42:30", footballUrl),
-        ArchiveMatch("a02", "Реал Мадрид — Барселона",    "Ла Лига • Футбол",        "20.11.2025", "1:58:10", footballUrl, true),
-        ArchiveMatch("a03", "ЦСКА — Авангард",            "КХЛ • Хоккей",            "20.11.2025", "2:14:05", hockeyUrl),
-        ArchiveMatch("a04", "СКА — Металлург",            "КХЛ • Хоккей",            "20.11.2025", "1:50:22", hockeyUrl, true),
-        ArchiveMatch("a05", "ЦСКА — Химки",               "Единая лига • Баскетбол", "20.11.2025", "1:38:40", basketballUrl)
-    )),
-    ArchiveDateGroup("19.11.2025", listOf(
-        ArchiveMatch("a06", "Зенит-Казань — Белогорье",   "Суперлига • Волейбол",    "19.11.2025", "1:22:15", volleyballUrl),
-        ArchiveMatch("a07", "Манчестер Сити — Ливерпуль", "АПЛ • Футбол",            "19.11.2025", "2:01:55", footballUrl, true),
-        ArchiveMatch("a08", "Ак Барс — Динамо Минск",     "КХЛ • Хоккей",            "19.11.2025", "1:55:30", hockeyUrl),
-        ArchiveMatch("a09", "УНИКС — Локомотив-Кубань",   "Единая лига • Баскетбол", "19.11.2025", "1:40:00", basketballUrl, true)
-    )),
-    ArchiveDateGroup("18.11.2025", listOf(
-        ArchiveMatch("a10", "Факел — Кузбасс",            "Суперлига • Волейбол",    "18.11.2025", "1:28:50", volleyballUrl),
-        ArchiveMatch("a11", "Краснодар — Локомотив",      "РПЛ • Футбол",            "18.11.2025", "1:46:20", footballUrl),
-        ArchiveMatch("a12", "Динамо Мск — УГМК",          "Еврокубок • Баскетбол",   "18.11.2025", "1:35:45", basketballUrl, true),
-        ArchiveMatch("a13", "Салават Юлаев — Авангард",   "КХЛ Плей-офф • Хоккей",  "18.11.2025", "2:30:10", hockeyUrl)
-    ))
-)
+    data class State(
+        val groups: List<ArchiveDateGroup> = emptyList(),
+        val isLoading: Boolean = true,
+        val error: String? = null
+    )
+
+    private val _state = MutableStateFlow(State())
+    val state: StateFlow<State> = _state.asStateFlow()
+
+    init { load() }
+
+    fun load() {
+        viewModelScope.launch {
+            _state.value = State(isLoading = true)
+            repository.getArchive()
+                .onSuccess { items -> _state.value = State(groups = items.toGroups(), isLoading = false) }
+                .onFailure { e -> _state.value = State(isLoading = false, error = e.message ?: "Не удалось загрузить архив") }
+        }
+    }
+
+    private fun List<MatchItem>.toGroups(): List<ArchiveDateGroup> {
+        val dateFmt = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+        return this
+            .map { m ->
+                ArchiveMatch(
+                    id           = m.id,
+                    title        = m.title,
+                    competition  = m.competition.name,
+                    date         = dateFmt.format(Date(m.startTimeMs)),
+                    duration     = formatDuration(m.durationSec),
+                    thumbnailUrl = m.thumbnailUrl,
+                    isSubscriptionRequired = m.isSubscriptionRequired
+                )
+            }
+            .groupBy { it.date }
+            .map { (date, matches) -> ArchiveDateGroup(date, matches) }
+    }
+
+    private fun formatDuration(sec: Long): String {
+        if (sec <= 0) return ""
+        val h = sec / 3600; val m = (sec % 3600) / 60; val s = sec % 60
+        return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%d:%02d".format(m, s)
+    }
+}
+
+// Данные архива приходят из ArchiveViewModel (list2.php?archive=1).
 
 // ─── ArchiveScreen ────────────────────────────────────────────────────────────
 // Figma 614:23155 — Cards 400×237dp r=20 gap=20, date fs=28 fw=500
@@ -86,8 +125,11 @@ private val mockGroups = listOf(
 @Composable
 fun ArchiveScreen(
     onMatchClick: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ArchiveViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val sw = maxWidth.value
         val sh = maxHeight.value
@@ -100,21 +142,37 @@ fun ArchiveScreen(
         val groupGap: Dp       = (32f  * scale).dp
         val pad     : Dp       = (24f  * scale).dp
 
-        LazyColumn(
-            modifier            = Modifier.fillMaxSize(),
-            contentPadding      = PaddingValues(horizontal = pad, vertical = pad),
-            verticalArrangement = Arrangement.spacedBy(groupGap)
-        ) {
-            items(mockGroups, key = { it.date }) { group ->
-                ArchiveDateGroupRow(
-                    group    = group,
-                    cardW    = cardW,
-                    cardH    = cardH,
-                    cardGap  = cardGap,
-                    dateFs   = dateFs,
-                    innerGap = (24f * scale).dp,
-                    onMatchClick = onMatchClick
-                )
+        when {
+            state.isLoading || state.error != null || state.groups.isEmpty() -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text  = when {
+                            state.isLoading     -> "Загрузка архива…"
+                            state.error != null -> "Не удалось загрузить архив: ${state.error}"
+                            else                -> "В архиве пока нет записей"
+                        },
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = dateFs, color = Color.White.copy(alpha = 0.55f)
+                        )
+                    )
+                }
+            }
+            else -> LazyColumn(
+                modifier            = Modifier.fillMaxSize(),
+                contentPadding      = PaddingValues(horizontal = pad, vertical = pad),
+                verticalArrangement = Arrangement.spacedBy(groupGap)
+            ) {
+                items(state.groups, key = { it.date }) { group ->
+                    ArchiveDateGroupRow(
+                        group    = group,
+                        cardW    = cardW,
+                        cardH    = cardH,
+                        cardGap  = cardGap,
+                        dateFs   = dateFs,
+                        innerGap = (24f * scale).dp,
+                        onMatchClick = onMatchClick
+                    )
+                }
             }
         }
     }

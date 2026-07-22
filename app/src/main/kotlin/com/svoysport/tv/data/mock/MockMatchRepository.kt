@@ -110,4 +110,7 @@ class MockMatchRepository @Inject constructor() : MatchRepository {
 
     override suspend fun getScheduleForDay(dayStartMs: Long): Result<List<MatchItem>> =
         Result.success(matches)
+
+    override suspend fun getArchive(): Result<List<MatchItem>> =
+        Result.success(matches)
 }

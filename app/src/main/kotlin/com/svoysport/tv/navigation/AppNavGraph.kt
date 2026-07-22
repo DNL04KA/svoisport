@@ -5,6 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.svoysport.tv.session.SessionManager
+import com.svoysport.tv.session.SubscriptionManager
+import com.svoysport.tv.ui.screens.activation.ActivationRequiredScreen
+import com.svoysport.tv.ui.screens.activation.ActivationScreen
 import com.svoysport.tv.ui.screens.auth.AuthScreen
 import com.svoysport.tv.ui.screens.auth.CodeVerificationScreen
 import com.svoysport.tv.ui.screens.details.DetailsScreen
@@ -32,6 +35,8 @@ sealed class Screen(val route: String) {
     }
     object Profile : Screen("profile")
     object About : Screen("about")
+    object ActivationRequired : Screen("activation_required")
+    object Activation : Screen("activation")
     object Subscription : Screen("subscription")
     object Settings : Screen("settings")
     object Devices : Screen("devices")
@@ -57,10 +62,11 @@ fun AppNavGraph(navController: NavHostController) {
                     navController.navigate(Screen.Details.createRoute(matchId))
                 },
                 onAuthClick = {
-                    if (SessionManager.isLoggedIn.value) {
+                    // «Войти» → проверка подписки: есть → профиль, нет → активация
+                    if (SubscriptionManager.isSubscribed.value) {
                         navController.navigate(Screen.Profile.route)
                     } else {
-                        navController.navigate(Screen.Auth.route)
+                        navController.navigate(Screen.ActivationRequired.route)
                     }
                 },
             )
@@ -96,7 +102,8 @@ fun AppNavGraph(navController: NavHostController) {
                     navController.navigate(Screen.Player.createRoute(matchId))
                 },
                 onBack = { navController.popBackStack() },
-                onLoginClick = { navController.navigate(Screen.Auth.route) }
+                // Вся авторизация — через QR-активацию (флоу device_id)
+                onLoginClick = { navController.navigate(Screen.ActivationRequired.route) }
             )
         }
 
@@ -115,12 +122,38 @@ fun AppNavGraph(navController: NavHostController) {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
+                },
+                // Пункты сайдбара на профиле возвращают на главную (там уже
+                // откроется поиск/избранное/вид спорта)
+                onSidebarItem = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
                 }
             )
         }
 
         composable(Screen.About.route) {
             AboutScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.ActivationRequired.route) {
+            ActivationRequiredScreen(
+                onActivate = { navController.navigate(Screen.Activation.route) },
+                onBuy      = { navController.navigate(Screen.Subscription.route) },
+                onBack     = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Activation.route) {
+            ActivationScreen(
+                onFinished = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(Screen.Subscription.route) {

@@ -59,7 +59,8 @@ fun HomeScreen(
             selectedTab = tab
             sidebarMode = SidebarMode.NONE
         },
-        isLoggedIn          = SessionManager.isLoggedIn.value,
+        isLoggedIn          = SessionManager.isLoggedIn.value ||
+                              com.svoysport.tv.session.SubscriptionManager.isSubscribed.value,
         onAuthClick         = onAuthClick,
         selectedSidebarItem = selectedSport,
         onSidebarItemSelected = { item ->

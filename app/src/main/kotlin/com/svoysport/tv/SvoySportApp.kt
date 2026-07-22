@@ -7,6 +7,7 @@ import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowHardware
 import com.svoysport.tv.session.FavoritesManager
+import com.svoysport.tv.session.SubscriptionManager
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -15,6 +16,7 @@ class SvoySportApp : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         FavoritesManager.init(this)
+        SubscriptionManager.init(this)
     }
 
     /**

@@ -26,7 +26,9 @@ data class MatchItem(
     val backgroundUrl: String? = null,
     val streamUrl: String? = null,
     val isSubscriptionRequired: Boolean = false,
-    val isHot: Boolean = false
+    val isHot: Boolean = false,
+    /** Длительность записи в секундах (архив); 0 — неизвестна/не запись. */
+    val durationSec: Long = 0L
 )
 
 data class HomeSection(

@@ -34,4 +34,7 @@ class ApiMatchRepository @Inject constructor(
 
     override suspend fun getScheduleForDay(dayStartMs: Long): Result<List<MatchItem>> =
         Result.failure(Exception("ApiMatchRepository not implemented yet."))
+
+    override suspend fun getArchive(): Result<List<MatchItem>> =
+        Result.failure(Exception("ApiMatchRepository not implemented yet."))
 }

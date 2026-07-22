@@ -65,6 +65,25 @@ class SportTvMatchRepository @Inject constructor(
         }
     }
 
+    // Кэш архива (записи меняются редко)
+    private val archiveMutex = Mutex()
+    private var archiveCache: List<MatchItem> = emptyList()
+
+    override suspend fun getArchive(): Result<List<MatchItem>> {
+        archiveMutex.withLock {
+            if (archiveCache.isNotEmpty()) return Result.success(archiveCache)
+        }
+        return runCatching {
+            api.fetchArchive()
+                .toMatchItems()
+                .sortedByDescending { it.startTimeMs }
+                .also { result ->
+                    archiveMutex.withLock { archiveCache = result }
+                    index(result)   // детали/плеер находят запись по id
+                }
+        }
+    }
+
     override suspend fun getHomeContent(): Result<HomeContent> {
         return load().mapCatching { matches ->
             if (matches.isEmpty()) throw IllegalStateException("Нет доступных трансляций")

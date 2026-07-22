@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Свой Спорт — прямые спортивные трансляции</title>
+  <meta name="description" content="Прямые трансляции футбола, хоккея, гандбола, баскетбола и волейбола. Расписание на неделю и архив записей — бесплатно и без регистрации.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="logo" href="#/" aria-label="Свой Спорт — на главную">
+      <img class="logo-mark" src="img/logo.png" alt="" width="34" height="34">
+      <span class="logo-text">СВОЙ <span class="logo-accent">СПОРТ</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Основная навигация">
+      <a href="#/" data-nav="home">Главная</a>
+      <a href="#/schedule" data-nav="schedule">Расписание</a>
+      <a href="#/news" data-nav="news">Новости</a>
+      <a href="#/archive" data-nav="archive">Архив</a>
+      <a href="#/contacts" data-nav="contacts">Контакты</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="search-box" id="searchBox">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16.5 16.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="search" id="searchInput" placeholder="Поиск трансляций…" autocomplete="off" aria-label="Поиск трансляций">
+      </div>
+      <button class="btn btn-filled" id="subscribeBtn" type="button">Подписаться</button>
+      <button class="btn btn-outline" id="loginBtn" type="button">Войти</button>
+      <button class="burger" id="burgerBtn" type="button" aria-label="Меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sport-bar" id="sportBar" role="tablist" aria-label="Виды спорта"></div>
+</header>
+
+<main id="app">
+  <!-- ГЛАВНАЯ -->
+  <section class="view" id="view-home">
+    <div class="hero" id="hero" hidden>
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-content container">
+        <div class="hero-info" id="heroInfo"></div>
+        <div class="hero-poster" id="heroPoster"></div>
+      </div>
+      <div class="hero-dots" id="heroDots"></div>
+    </div>
+
+    <div class="container">
+      <section class="row-section" id="liveSection" hidden>
+        <h2 class="section-title"><span class="live-dot" aria-hidden="true"></span>Сейчас в эфире</h2>
+        <div class="card-row" id="liveRow"></div>
+      </section>
+
+      <section class="row-section" id="upcomingSection">
+        <div class="section-head">
+          <h2 class="section-title">Ближайшие трансляции</h2>
+          <a class="section-link" href="#/schedule">Всё расписание →</a>
+        </div>
+        <div class="schedule-list" id="upcomingList"></div>
+      </section>
+
+      <section class="row-section" id="homeArchiveSection" hidden>
+        <div class="section-head">
+          <h2 class="section-title">Записи трансляций</h2>
+          <a class="section-link" href="#/archive">Весь архив →</a>
+        </div>
+        <div class="card-row" id="homeArchiveRow"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- РАСПИСАНИЕ -->
+  <section class="view container" id="view-schedule" hidden>
+    <h1 class="page-title">Расписание на неделю</h1>
+    <div class="day-chips" id="dayChips" role="tablist" aria-label="День недели"></div>
+    <div class="schedule-list" id="scheduleList"></div>
+  </section>
+
+  <!-- АРХИВ -->
+  <section class="view container" id="view-archive" hidden>
+    <h1 class="page-title">Архив записей</h1>
+    <p class="page-sub">Полные записи прошедших трансляций — смотрите в любое время.</p>
+    <div class="card-grid" id="archiveGrid"></div>
+  </section>
+
+  <!-- НОВОСТИ -->
+  <section class="view container" id="view-news" hidden>
+    <h1 class="page-title">Новости</h1>
+    <p class="page-sub">Анонсы турниров и трансляций от редакции «Свой Спорт».</p>
+    <div class="news-grid" id="newsGrid"></div>
+    <div class="pagination" id="newsPagination"></div>
+  </section>
+
+  <!-- СТАТЬЯ -->
+  <section class="view container" id="view-article" hidden>
+    <a class="back-link" href="#/news">← Все новости</a>
+    <article class="doc-body" id="articleBody"></article>
+  </section>
+
+  <!-- ИНФО-СТРАНИЦЫ (оферта, оплата, правообладателям) -->
+  <section class="view container" id="view-doc" hidden>
+    <article class="doc-body" id="docBody"></article>
+  </section>
+
+  <!-- ТРАНСЛЯЦИЯ -->
+  <section class="view container" id="view-watch" hidden>
+    <a class="back-link" href="#/" id="watchBack">← Назад</a>
+    <div class="watch-shell">
+      <div class="player-video-wrap">
+        <video id="watchVideo" controls playsinline hidden></video>
+        <iframe id="watchFrame" hidden allowfullscreen
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                referrerpolicy="origin" title="Плеер трансляции"></iframe>
+        <div class="player-notice" id="watchNotice" hidden></div>
+      </div>
+      <div class="player-meta" id="watchMeta"></div>
+    </div>
+  </section>
+
+  <!-- ПОИСК -->
+  <section class="view container" id="view-search" hidden>
+    <h1 class="page-title" id="searchTitle">Поиск</h1>
+    <div class="schedule-list" id="searchResults"></div>
+  </section>
+
+  <!-- КОНТАКТЫ -->
+  <section class="view container" id="view-contacts" hidden>
+    <h1 class="page-title">Контакты</h1>
+    <div class="contacts-grid">
+      <div class="contact-card">
+        <h3>ООО «Спорт ТиВи»</h3>
+        <p class="muted">УНП 192619481, зарегистрировано 15.03.2016 Мингорисполкомом</p>
+        <p>220035, Республика Беларусь,<br>г. Минск, ул. Тимирязева, д. 67, пом. 1010</p>
+      </div>
+      <div class="contact-card">
+        <h3>Связаться с нами</h3>
+        <p><a href="tel:+375293101065">+375 (29) 310-10-65</a></p>
+        <p><a href="mailto:info@sport-tv.by">info@sport-tv.by</a></p>
+        <p class="muted">пн–пт, с 9:00 до 18:00</p>
+      </div>
+      <div class="contact-card">
+        <h3>Сотрудничество</h3>
+        <p class="muted">Видеопроизводство и организация трансляций спортивных событий, размещение рекламы.</p>
+        <p><a href="mailto:info@sport-tv.by">Написать нам</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="#/">
+        <img class="logo-mark" src="img/logo.png" alt="" width="34" height="34">
+        <span class="logo-text">СВОЙ <span class="logo-accent">СПОРТ</span></span>
+      </a>
+      <p class="muted">Прямые спортивные трансляции — бесплатно и без регистрации.</p>
+      <div class="socials">
+        <a href="https://instagram.com/sporttv.by/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.4" fill="currentColor"/></svg>
+        </a>
+        <a href="https://vk.com/public70983065" target="_blank" rel="noopener" aria-label="ВКонтакте">
+          <svg viewBox="0 0 24 24"><path d="M3 7c.3 6.5 4 11 10.5 11h1.2v-4c2.2.3 3.8 1.9 4.5 4H23c-.9-3-2.8-4.8-4.4-5.6 1.6-1 3.6-3.2 4-5.4h-3.5c-.6 1.9-2.4 3.9-4.4 4.1V7h-3.4v7C9.2 13.4 6.8 10 6.6 7H3z" fill="currentColor"/></svg>
+        </a>
+        <a href="https://facebook.com/sportvby.sportvby" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M14 8h3V4.5h-3c-2.5 0-4 1.7-4 4.2V11H7v3.5h3V21h3.5v-6.5h3l.5-3.5h-3.5V9c0-.7.3-1 1-1z" fill="currentColor"/></svg>
+        </a>
+        <a href="https://t.me/s/sport_tv_by" target="_blank" rel="noopener" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="m21 4-18 7 5.5 2L19 7l-8.5 7.5L10 20l3-3.5 4.5 3z" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Разделы</h4>
+      <a href="#/sport/football">Футбол</a>
+      <a href="#/sport/hockey">Хоккей</a>
+      <a href="#/sport/handball">Гандбол</a>
+      <a href="#/sport/basketball">Баскетбол</a>
+      <a href="#/sport/volleyball">Волейбол</a>
+      <a href="#/sport/other">Другой спорт</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Информация</h4>
+      <a href="#/news">Новости</a>
+      <a href="#/archive">Архив записей</a>
+      <a href="https://cloud.sport-tv.by:7001/" target="_blank" rel="noopener">Полный архив (облако)</a>
+      <a href="#/rights">Правообладателям</a>
+      <a href="#/oferta">Договор публичной оферты</a>
+      <a href="#/payment">Оплата</a>
+      <a href="#/contacts">Контакты</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Приложения</h4>
+      <a class="store-badge" href="https://apps.apple.com/ru/app/sport-tv/id1601993294" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M16.7 12.9c0-2 1.6-3 1.7-3-1-1.4-2.4-1.6-2.9-1.6-1.2-.1-2.4.7-3 .7-.6 0-1.6-.7-2.6-.7-1.3 0-2.6.8-3.3 2-1.4 2.4-.4 6 1 8 .7 1 1.5 2.1 2.6 2 1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2 .8-1.1 1.1-2.2 1.1-2.3 0 0-2.2-.9-2.3-3.1zM14.7 6.6c.5-.7.9-1.6.8-2.6-.8 0-1.8.6-2.3 1.2-.5.6-1 1.6-.8 2.5.9.1 1.8-.4 2.3-1.1z" fill="currentColor"/></svg>
+        <span><small>Загрузите в</small>App Store</span>
+      </a>
+      <a class="store-badge" href="https://play.google.com/store/apps/details?id=by.sporttv" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M4 3.5v17l9-8.5-9-8.5zm10.2 7.4 2.6-2.4L6.5 4l7.7 6.9zm0 2.2L6.5 20l10.3-4.5-2.6-2.4zm4.3-3.2-2.7 2.1 2.7 2.1L21 12l-2.5-2.1z" fill="currentColor"/></svg>
+        <span><small>Доступно в</small>Google Play</span>
+      </a>
+      <a class="store-badge" href="https://appgallery.huawei.com/#/app/C103201221" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 9c.5 2.5 1.7 4 3.5 4s3-1.5 3.5-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span><small>Скачайте из</small>AppGallery</span>
+      </a>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span class="muted">© 2016–2026 ООО «Спорт ТиВи». Все права защищены.</span>
+  </div>
+</footer>
+
+<!-- ПЛЕЕР -->
+<div class="modal" id="playerModal" hidden role="dialog" aria-modal="true" aria-label="Плеер трансляции">
+  <div class="modal-backdrop" data-close></div>
+  <div class="player-shell">
+    <button class="modal-close" data-close aria-label="Закрыть плеер">✕</button>
+    <div class="player-video-wrap" id="playerVideoWrap">
+      <video id="playerVideo" controls playsinline></video>
+      <div class="player-notice" id="playerNotice" hidden></div>
+    </div>
+    <div class="player-meta" id="playerMeta"></div>
+  </div>
+</div>
+
+<!-- ВХОД -->
+<div class="modal" id="loginModal" hidden role="dialog" aria-modal="true" aria-label="Вход">
+  <div class="modal-backdrop" data-close></div>
+  <div class="login-card">
+    <button class="modal-close" data-close aria-label="Закрыть">✕</button>
+    <h2>Вход в аккаунт</h2>
+    <p class="muted">Введите номер телефона — отправим код подтверждения по SMS.</p>
+    <form id="loginForm">
+      <label class="field">
+        <span>Номер телефона</span>
+        <input type="tel" id="loginPhone" placeholder="+375 (__) ___-__-__" required>
+      </label>
+      <button class="btn btn-filled btn-wide" type="submit">Получить код</button>
+    </form>
+    <p class="login-note muted" id="loginNote" hidden></p>
+  </div>
+</div>
+
+<!-- ПОДПИСКА НА РАССЫЛКУ -->
+<div class="modal" id="subscribeModal" hidden role="dialog" aria-modal="true" aria-label="Подписка на рассылку">
+  <div class="modal-backdrop" data-close></div>
+  <div class="login-card">
+    <button class="modal-close" data-close aria-label="Закрыть">✕</button>
+    <h2>Подписка на рассылку</h2>
+    <p class="muted">Получайте анонсы главных трансляций недели на почту.</p>
+    <form id="subscribeForm">
+      <label class="field">
+        <span>Ваш e-mail</span>
+        <input type="email" id="subscribeEmail" placeholder="you@example.com" required>
+      </label>
+      <button class="btn btn-filled btn-wide" type="submit">Подписаться</button>
+    </form>
+    <p class="login-note muted" id="subscribeNote" hidden></p>
+  </div>
+</div>
+
+<script src="vendor/hls.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

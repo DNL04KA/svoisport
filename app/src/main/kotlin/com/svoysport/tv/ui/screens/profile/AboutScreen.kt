@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.theme.Primary
+import com.svoysport.tv.ui.theme.PrimaryPressed
 
 private val _AboutBg     = Color(0xFF0F0F10)
 private val _AboutPanel  = Color(0x33565A80)
@@ -69,14 +71,18 @@ fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                     onClick   = onBack,
                     modifier  = Modifier.size(closeSz).onFocusChanged { backFocused = it.isFocused }.scale(backSc),
                     shape     = ClickableSurfaceDefaults.shape(RoundedCornerShape(200.dp)),
-                    colors    = ClickableSurfaceDefaults.colors(containerColor = _AboutPanel, focusedContainerColor = _AboutPanel),
+                    colors    = ClickableSurfaceDefaults.colors(
+                        containerColor        = _AboutPanel,
+                        focusedContainerColor = Primary,
+                        pressedContainerColor = PrimaryPressed
+                    ),
                     scale     = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
                 ) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector        = ImageVector.vectorResource(R.drawable.ic_arrow_left),
                             contentDescription = "Назад",
-                            tint               = _AboutText,
+                            tint               = if (backFocused) Color.White else _AboutText,
                             modifier           = Modifier.size(iconSz)
                         )
                     }

@@ -43,7 +43,7 @@ fun TopNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
-            .padding(horizontal = 24.dp),
+            .padding(start = 12.dp, end = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Логотип: иконка всегда, текст «СВОЙ СПОРТ» появляется при раскрытии сайдбара
@@ -76,8 +76,11 @@ fun TopNavigationBar(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Центральные табы
+        // Центральные табы — на полупрозрачной полосе-подложке (Figma)
         Row(
+            modifier = Modifier
+                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
@@ -144,9 +147,10 @@ private fun NavTabItem(
         onClick  = onClick,
         modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
         shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
-        // Figma Tabs: активный таб и фокус — accent (синий)
+        // Figma BUTTONS/Tabs: selected (не в фокусе) — серый чип «мы на этой
+        // странице», фокус — accent (синий), нажатие — тёмный accent
         colors   = ClickableSurfaceDefaults.colors(
-            containerColor        = if (selected) Primary else Color.Transparent,
+            containerColor        = if (selected) Color(0xFF343B4B) else Color.Transparent,
             focusedContainerColor = Primary,
             pressedContainerColor = PrimaryPressed
         ),
@@ -172,9 +176,9 @@ private fun AuthButton(onClick: () -> Unit) {
         onClick  = onClick,
         modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
         shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
-        // Figma: «Войти» — accent (синяя)
+        // Figma Final UI: «Войти» — серый чип в покое, accent в фокусе
         colors   = ClickableSurfaceDefaults.colors(
-            containerColor        = Primary,
+            containerColor        = Color(0xFF343B4B),
             focusedContainerColor = Primary,
             pressedContainerColor = PrimaryPressed
         ),
