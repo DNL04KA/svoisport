@@ -39,6 +39,11 @@ import com.svoysport.tv.ui.theme.Gray4
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
 
+private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
+    SidebarItem.SEARCH, SidebarItem.BOOKMARKS -> null
+    else -> NavTab.HOME
+}
+
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
 @Composable
@@ -87,7 +92,11 @@ fun HomeScreen(
             when (item) {
                 SidebarItem.SEARCH    -> sidebarMode = SidebarMode.SEARCH
                 SidebarItem.BOOKMARKS -> sidebarMode = SidebarMode.FAVORITES
-                else                  -> { selectedSport = item; sidebarMode = SidebarMode.NONE }
+                else                  -> {
+                    selectedSport = item
+                    selectedTab = tabForSidebarSelection(item) ?: selectedTab
+                    sidebarMode = SidebarMode.NONE
+                }
             }
         }
     ) {
