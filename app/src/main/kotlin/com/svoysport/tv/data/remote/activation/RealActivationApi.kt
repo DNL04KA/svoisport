@@ -30,9 +30,14 @@ class RealActivationApi @Inject constructor() : ActivationApi {
         @SerializedName("active") val active: Boolean = false,
         @SerializedName("until")  val until: String? = null
     )
+    private data class DevicesRes(val devices: List<DeviceRes> = emptyList())
+    private data class DeviceRes(val id: String, val name: String, @SerializedName("last_seen") val lastSeen: String?, @SerializedName("is_current") val isCurrent: Boolean)
 
     override suspend fun createSession(deviceId: String, planId: String?): ActivationSession = withContext(Dispatchers.IO) {
-        val body = gson.toJson(ActivationEndpoint.createRequest(deviceId, planId))
+        val request = ActivationEndpoint.createRequest(deviceId, planId).copy(
+            deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim()
+        )
+        val body = gson.toJson(request)
         val json = post("$baseUrl/create-activation-session.php", body)
         val res  = gson.fromJson(json, CreateRes::class.java)
         val sid  = res.sessionId ?: error("Пустой sessionId от сервера")
@@ -49,6 +54,16 @@ class RealActivationApi @Inject constructor() : ActivationApi {
         val json = get(ActivationEndpoint.subscriptionUrl(baseUrl, deviceId))
         val res  = gson.fromJson(json, SubRes::class.java)
         SubscriptionInfo(res.active, res.until)
+    }
+
+    override suspend fun devices(deviceId: String): List<LinkedDevice> = withContext(Dispatchers.IO) {
+        val json = get("$baseUrl/devices.php?current_device_id=${java.net.URLEncoder.encode(deviceId, "UTF-8")}")
+        gson.fromJson(json, DevicesRes::class.java).devices.map { LinkedDevice(it.id, it.name, it.lastSeen, it.isCurrent) }
+    }
+
+    override suspend fun disconnectDevice(currentDeviceId: String, targetDeviceId: String?, allOthers: Boolean) = withContext(Dispatchers.IO) {
+        post("$baseUrl/disconnect-device.php", gson.toJson(mapOf("current_device_id" to currentDeviceId, "target_device_id" to targetDeviceId, "all_others" to allOthers)))
+        Unit
     }
 
     private fun get(url: String): String = openConn(url, "GET").run {

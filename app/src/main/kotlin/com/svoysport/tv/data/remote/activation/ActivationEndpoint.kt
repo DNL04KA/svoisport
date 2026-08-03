@@ -5,7 +5,8 @@ import java.nio.charset.StandardCharsets
 
 data class ActivationCreateRequest(
     @com.google.gson.annotations.SerializedName("device_id") val deviceId: String,
-    @com.google.gson.annotations.SerializedName("plan_id") val planId: String?
+    @com.google.gson.annotations.SerializedName("plan_id") val planId: String?,
+    @com.google.gson.annotations.SerializedName("device_name") val deviceName: String = "Android TV"
 )
 
 internal object ActivationEndpoint {

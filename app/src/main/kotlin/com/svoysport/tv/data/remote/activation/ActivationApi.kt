@@ -8,6 +8,7 @@ data class ActivationSession(val sessionId: String, val qrUrl: String)
 
 /** Состояние подписки устройства. */
 data class SubscriptionInfo(val active: Boolean, val until: String?)
+data class LinkedDevice(val id: String, val name: String, val lastSeen: String?, val isCurrent: Boolean)
 
 /**
  * Контракт активации устройства по QR.
@@ -24,4 +25,6 @@ interface ActivationApi {
     suspend fun createSession(deviceId: String, planId: String? = null): ActivationSession
     suspend fun checkSession(sessionId: String): ActivationStatus
     suspend fun checkSubscription(deviceId: String): SubscriptionInfo
+    suspend fun devices(deviceId: String): List<LinkedDevice>
+    suspend fun disconnectDevice(currentDeviceId: String, targetDeviceId: String? = null, allOthers: Boolean = false)
 }

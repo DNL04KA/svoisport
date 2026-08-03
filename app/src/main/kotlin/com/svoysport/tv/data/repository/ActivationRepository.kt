@@ -4,6 +4,7 @@ import com.svoysport.tv.data.remote.activation.ActivationApi
 import com.svoysport.tv.data.remote.activation.ActivationSession
 import com.svoysport.tv.data.remote.activation.ActivationStatus
 import com.svoysport.tv.data.remote.activation.SubscriptionInfo
+import com.svoysport.tv.data.remote.activation.LinkedDevice
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,4 +21,7 @@ class ActivationRepository @Inject constructor(
 
     suspend fun subscription(deviceId: String): Result<SubscriptionInfo> =
         runCatching { api.checkSubscription(deviceId) }
+    suspend fun devices(deviceId: String): Result<List<LinkedDevice>> = runCatching { api.devices(deviceId) }
+    suspend fun disconnect(current: String, target: String? = null, allOthers: Boolean = false): Result<Unit> =
+        runCatching { api.disconnectDevice(current, target, allOthers) }
 }

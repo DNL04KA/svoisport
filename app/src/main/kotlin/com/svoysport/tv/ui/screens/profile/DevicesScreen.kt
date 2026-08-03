@@ -26,6 +26,7 @@ import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.PrimaryPressed
+import androidx.hilt.navigation.compose.hiltViewModel
 
 private val _PanelBg  = Color(0x33565A80)
 private val _KeyBg    = Color(0xFF343B4B)
@@ -36,20 +37,14 @@ private val _PrimaryGrad = Brush.horizontalGradient(listOf(Color(0xFF4556EB), Co
 
 data class DeviceItem(val id: String, val name: String, val lastLogin: String, val isCurrent: Boolean = false)
 
-private val mockDevices = listOf(
-    DeviceItem("d1", "Samsung Galaxy S23",        "Сегодня, 14:32"),
-    DeviceItem("d2", "iPhone 14 Pro",             "Вчера, 21:05"),
-    DeviceItem("d3", "TV_LG_568263VGK5_3CCVD56",  "Сейчас", isCurrent = true)
-)
-
 // ─── DevicesScreen ────────────────────────────────────────────────────────────
 // Figma 578:18689 — 1920×1080 full-screen (без сайдбара)
 // Было: offset(965,151) и т.д. → теперь Row с padding
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
-    var devices     by remember { mutableStateOf(mockDevices) }
+fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier, viewModel: DevicesViewModel = hiltViewModel()) {
+    val devices by viewModel.devices.collectAsState()
     var dialogState by remember { mutableStateOf<String?>(null) }
 
     BackHandler { if (dialogState != null) dialogState = null else onBack() }
@@ -221,8 +216,8 @@ fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                                 height  = dlgBtnH, useGrad = false,
                                 fontSize = (28f * scale).sp,
                                 onClick  = {
-                                    if (isExitAll) devices = devices.filter { it.isCurrent }
-                                    else { val id = dialogState!!.removePrefix("disconnect:"); devices = devices.filter { it.id != id } }
+                                    if (isExitAll) viewModel.disconnect(allOthers = true)
+                                    else viewModel.disconnect(target = dialogState!!.removePrefix("disconnect:"))
                                     dialogState = null
                                 }
                             )

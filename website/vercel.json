@@ -4,6 +4,8 @@
     { "source": "/api/check-activation-session.php", "destination": "/api/activation?action=status" },
     { "source": "/api/activation-session.php", "destination": "/api/activation?action=public" },
     { "source": "/api/activate-session.php", "destination": "/api/activation?action=activate" },
-    { "source": "/api/check-subscription.php", "destination": "/api/activation?action=subscription" }
+    { "source": "/api/check-subscription.php", "destination": "/api/activation?action=subscription" },
+    { "source": "/api/devices.php", "destination": "/api/activation?action=devices" },
+    { "source": "/api/disconnect-device.php", "destination": "/api/activation?action=disconnect" }
   ]
 }

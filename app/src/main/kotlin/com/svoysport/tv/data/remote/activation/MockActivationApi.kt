@@ -18,6 +18,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class MockActivationApi @Inject constructor() : ActivationApi {
+    override suspend fun devices(deviceId: String) = listOf(LinkedDevice(deviceId, "Android TV", null, true))
+    override suspend fun disconnectDevice(currentDeviceId: String, targetDeviceId: String?, allOthers: Boolean) = Unit
 
     private val pollsBySession = mutableMapOf<String, Int>()
 
