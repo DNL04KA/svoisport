@@ -183,7 +183,15 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         composable(Screen.Devices.route) {
-            DevicesScreen(onBack = { navController.popBackStack() })
+            DevicesScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    SessionManager.isLoggedIn.value = false
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

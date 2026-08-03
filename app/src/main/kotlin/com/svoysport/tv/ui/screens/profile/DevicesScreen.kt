@@ -43,7 +43,12 @@ data class DeviceItem(val id: String, val name: String, val lastLogin: String, v
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier, viewModel: DevicesViewModel = hiltViewModel()) {
+fun DevicesScreen(
+    onBack: () -> Unit = {},
+    onLogout: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: DevicesViewModel = hiltViewModel()
+) {
     val devices by viewModel.devices.collectAsState()
     var dialogState by remember { mutableStateOf<String?>(null) }
 
@@ -216,8 +221,14 @@ fun DevicesScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier, viewMo
                                 height  = dlgBtnH, useGrad = false,
                                 fontSize = (28f * scale).sp,
                                 onClick  = {
-                                    if (isExitAll) viewModel.disconnect(allOthers = true)
-                                    else viewModel.disconnect(target = dialogState!!.removePrefix("disconnect:"))
+                                    if (isExitAll) {
+                                        viewModel.disconnectAll {
+                                            com.svoysport.tv.session.SubscriptionManager.clear()
+                                            onLogout()
+                                        }
+                                    } else {
+                                        viewModel.disconnect(target = dialogState!!.removePrefix("disconnect:"))
+                                    }
                                     dialogState = null
                                 }
                             )
