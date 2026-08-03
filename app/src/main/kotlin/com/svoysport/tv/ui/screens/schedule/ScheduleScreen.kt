@@ -204,8 +204,9 @@ fun ScheduleScreen(
                     match    = focusedMatch,
                     isFav    = focusedMatch?.id in favIds,
                     scale    = scale,
+                    rowH     = rowH,
                     rowY     = focusedRowY,
-                    modifier = Modifier.weight(280f),
+                    modifier = Modifier.weight(280f).height(panelH),
                     onToggle = { m ->
                         com.svoysport.tv.session.FavoritesManager.toggle(m.id)
                         snackText = if (m.id in com.svoysport.tv.session.FavoritesManager.favoriteIds.value)
@@ -250,6 +251,7 @@ private fun FavoriteAction(
     match: ScheduleMatch?,
     isFav: Boolean,
     scale: Float,
+    rowH: Dp,
     rowY: Float,
     modifier: Modifier = Modifier,
     onToggle: (ScheduleMatch) -> Unit
@@ -266,7 +268,7 @@ private fun FavoriteAction(
     ) {
         Surface(
             onClick  = { onToggle(match) },
-            modifier = Modifier.fillMaxWidth().height((72f * scale).dp)
+            modifier = Modifier.fillMaxWidth().height(rowH)
                 .offset { IntOffset(0, (rowY - colY).coerceAtLeast(0f).toInt()) }
                 .onFocusChanged { isFocused = it.isFocused },
             shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape((16f * scale).dp)),
