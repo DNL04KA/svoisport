@@ -81,6 +81,10 @@ fun HomeScreen(
                     uiState      = uiState,
                     selectedSport = selectedSport,
                     onMatchClick = onMatchClick,
+                    onWatchMore  = { sectionTitle ->
+                        selectedTab = if (sectionTitle.contains("архив", ignoreCase = true)) NavTab.ARCHIVE else NavTab.SCHEDULE
+                        sidebarMode = SidebarMode.NONE
+                    },
                     onRetry      = { viewModel.loadHomeContent() }
                 )
             }
@@ -95,6 +99,7 @@ private fun HomeContent(
     uiState: HomeUiState,
     selectedSport: SidebarItem?,
     onMatchClick: (String) -> Unit,
+    onWatchMore: (String) -> Unit,
     onRetry: () -> Unit
 ) {
     when (uiState) {
@@ -164,6 +169,7 @@ private fun HomeContent(
                                 matches        = section.matches,
                                 onMatchClick   = onMatchClick,
                                 onMatchFocused = { focusedMatch = it },
+                                onWatchMore    = { onWatchMore(section.title) },
                                 modifier       = Modifier.padding(bottom = 28.dp)
                             )
                         }

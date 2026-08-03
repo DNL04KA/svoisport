@@ -230,6 +230,7 @@ fun ContentRow(
     matches       : List<MatchItem>,
     onMatchClick  : (String) -> Unit,
     onMatchFocused: (MatchItem) -> Unit = {},
+    onWatchMore   : (() -> Unit)? = null,
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -247,8 +248,8 @@ fun ContentRow(
                 items(items = matches, key = { it.id }) { match ->
                     MatchCard(match = match, onClick = onMatchClick, scale = scale, onFocused = onMatchFocused)
                 }
-                item {
-                    WatchMoreCard(onClick = {}, scale = scale)
+                if (onWatchMore != null) item {
+                    WatchMoreCard(onClick = onWatchMore, scale = scale)
                 }
             }
         }
