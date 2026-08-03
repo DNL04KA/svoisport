@@ -28,6 +28,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -46,6 +48,9 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.svoysport.tv.R
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
+import androidx.hilt.navigation.compose.hiltViewModel
 
 // ─── Константы ───────────────────────────────────────────────────────────────
 
@@ -66,11 +71,15 @@ private const val ANIM_TEXT_MS    = 800   // slide текста после ло�
 private const val ANIM_SPINNER_MS = 500   // fade спиннера (linear)
 
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen(
+    onTimeout: () -> Unit,
+    viewModel: SplashViewModel = hiltViewModel()
+) {
 
     var logoVisible    by remember { mutableStateOf(false) }
     var textVisible    by remember { mutableStateOf(false) }
     var spinnerVisible by remember { mutableStateOf(false) }
+    val validationComplete by viewModel.validationComplete.collectAsState()
 
     // delay(300) показать лого → delay(700) показать спиннер → delay(1500) onTimeout()
     LaunchedEffect(Unit) {
@@ -80,6 +89,9 @@ fun SplashScreen(onTimeout: () -> Unit) {
         delay(DELAY_SPINNER_MS)
         spinnerVisible = true
         delay(DELAY_NAVIGATE_MS)
+        withTimeoutOrNull(5_000) {
+            snapshotFlow { validationComplete }.first { it }
+        }
         onTimeout()
     }
 
