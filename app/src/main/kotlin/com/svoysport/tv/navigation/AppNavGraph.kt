@@ -21,6 +21,7 @@ import com.svoysport.tv.ui.screens.profile.ProfileScreen
 import com.svoysport.tv.ui.screens.profile.SettingsScreen
 import com.svoysport.tv.ui.screens.profile.SubscriptionScreen
 import com.svoysport.tv.ui.screens.splash.SplashScreen
+import com.svoysport.tv.ui.components.nav.SidebarItem
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -48,6 +49,8 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
+    var requestedSidebarItem by remember { mutableStateOf<SidebarItem?>(null) }
+
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
 
         composable(Screen.Splash.route) {
@@ -62,6 +65,7 @@ fun AppNavGraph(navController: NavHostController) {
 
         composable(Screen.Home.route) {
             HomeScreen(
+                initialSidebarItem = requestedSidebarItem,
                 onMatchClick = { matchId ->
                     navController.navigate(Screen.Details.createRoute(matchId))
                 },
@@ -127,9 +131,8 @@ fun AppNavGraph(navController: NavHostController) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 },
-                // Пункты сайдбара на профиле возвращают на главную (там уже
-                // откроется поиск/избранное/вид спорта)
-                onSidebarItem = {
+                onSidebarItem = { item ->
+                    requestedSidebarItem = item
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }

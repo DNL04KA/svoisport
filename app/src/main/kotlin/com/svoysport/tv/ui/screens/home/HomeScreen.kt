@@ -45,12 +45,32 @@ private enum class SidebarMode { NONE, SEARCH, FAVORITES }
 fun HomeScreen(
     onMatchClick: (String) -> Unit,
     onAuthClick: () -> Unit = {},
+    initialSidebarItem: SidebarItem? = null,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState         by viewModel.uiState.collectAsState()
     var selectedTab     by remember { mutableStateOf(NavTab.HOME) }
     var selectedSport   by remember { mutableStateOf<SidebarItem?>(null) }
     var sidebarMode     by remember { mutableStateOf(SidebarMode.NONE) }
+
+    LaunchedEffect(initialSidebarItem) {
+        when (initialSidebarItem) {
+            SidebarItem.SEARCH -> {
+                selectedSport = null
+                sidebarMode = SidebarMode.SEARCH
+            }
+            SidebarItem.BOOKMARKS -> {
+                selectedSport = null
+                sidebarMode = SidebarMode.FAVORITES
+            }
+            null -> Unit
+            else -> {
+                selectedSport = initialSidebarItem
+                selectedTab = NavTab.HOME
+                sidebarMode = SidebarMode.NONE
+            }
+        }
+    }
 
     TvScaffold(
         selectedTab         = selectedTab,
