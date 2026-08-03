@@ -22,6 +22,7 @@ import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.ui.theme.Primary
+import androidx.hilt.navigation.compose.hiltViewModel
 
 private val PanelBg  = Color(0x33565A80)
 private val KeyBg    = Color(0xFF343B4B)
@@ -42,14 +43,16 @@ fun ProfileScreen(
     onAboutClick: () -> Unit = {},
     onLogout: () -> Unit = {},
     onSidebarItem: (com.svoysport.tv.ui.components.nav.SidebarItem) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    devicesViewModel: DevicesViewModel = hiltViewModel()
 ) {
     val email by remember { derivedStateOf { SessionManager.userEmail.value } }
+    val linkedDevices by devicesViewModel.devices.collectAsState()
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val sw = maxWidth.value
         val sh = maxHeight.value
-        val scale = minOf(sw / 1760f, sh / 1080f, 1f).coerceAtLeast(0.35f)
+        val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
 
         val itemW      : Dp       = (800f * scale).dp
         val wideItemH  : Dp       = (126f * scale).dp
@@ -61,19 +64,13 @@ fun ProfileScreen(
         val titleSp    : TextUnit = (36f  * scale).coerceAtLeast(14f).sp
         val subtitleSp : TextUnit = (20f  * scale).coerceAtLeast(12f).sp
         val itemGap    : Dp       = (20f  * scale).dp
-        val sectionGap : Dp       = (40f  * scale).dp
-
-        // Контент сдвинут на ширину свёрнутого сайдбара — как на Figma-профиле
-        Box(
-            modifier = Modifier.fillMaxSize().padding(start = 60.dp, top = 40.dp, end = 40.dp, bottom = 40.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(sectionGap)
-            ) {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0F0F10))) {
                 // User info
-                Column(verticalArrangement = Arrangement.spacedBy(itemGap)) {
+                Column(
+                    modifier = Modifier.offset(x = (847f * scale).dp, y = (100f * scale).dp).width((386f * scale).dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(itemGap)
+                ) {
                     Box(
                         modifier = Modifier.size(avatarSz).background(PanelBg, RoundedCornerShape(20.dp)),
                         contentAlignment = Alignment.Center
@@ -94,7 +91,7 @@ fun ProfileScreen(
 
                 // Items
                 Column(
-                    modifier            = Modifier.width(itemW),
+                    modifier = Modifier.offset(x = (640f * scale).dp, y = (308f * scale).dp).width(itemW),
                     verticalArrangement = Arrangement.spacedBy(itemGap)
                 ) {
                     // Состояние подписки — из QR-активации (SubscriptionManager)
@@ -102,7 +99,7 @@ fun ProfileScreen(
                     val subUntil  = com.svoysport.tv.session.SubscriptionManager.subscribedUntil.value
                     WideProfileItem(
                         title = "Подписка",
-                        subtitle = if (subActive) "Активна до ${subUntil ?: "—"}" else "Не оформлена",
+                        subtitle = if (subActive) "Активна до ${formatSubscriptionDate(subUntil)}" else "Не оформлена",
                         icon = R.drawable.ic_card, height = wideItemH, iconSz = iconSz,
                         titleSp = titleSp, subtitleSp = subtitleSp, onClick = onSubscriptionClick
                     )
@@ -114,13 +111,15 @@ fun ProfileScreen(
                             title = "Настройки", subtitle = "Язык и качество видео",
                             icon = R.drawable.ic_settings, iconSz = iconSz,
                             titleSp = titleSp, subtitleSp = subtitleSp,
+                            scale = scale,
                             modifier = Modifier.width(tallItemW).height(tallItemH),
                             onClick  = onSettingsClick
                         )
                         TallProfileItem(
-                            title = "Мои устройства", subtitle = "1 из 3 подключено",
+                            title = "Мои устройства", subtitle = "${linkedDevices.size} из 3 подключено",
                             icon = R.drawable.ic_monitor, iconSz = iconSz,
                             titleSp = titleSp, subtitleSp = subtitleSp,
+                            scale = scale,
                             modifier = Modifier.width(tallItemW).height(tallItemH),
                             onClick  = onDevicesClick
                         )
@@ -133,7 +132,7 @@ fun ProfileScreen(
                 }
 
                 ExitButton(
-                    modifier = Modifier.width(itemW).height(exitBtnH),
+                    modifier = Modifier.offset(x = (640f * scale).dp, y = (940f * scale).dp).width(itemW).height(exitBtnH),
                     fontSize = (28f * scale).coerceAtLeast(12f).sp,
                     onClick  = {
                         SessionManager.isLoggedIn.value = false
@@ -141,7 +140,6 @@ fun ProfileScreen(
                         onLogout()
                     }
                 )
-            }
         }
 
         // Шапка как на главной: лого по центру рельсы сайдбара (60dp)
@@ -150,17 +148,22 @@ fun ProfileScreen(
             contentDescription = "Свой Спорт",
             modifier           = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 12.dp, top = 14.dp)
-                .size(36.dp)
+                .padding(start = (40f * scale).dp, top = (30f * scale).dp)
+                .size((80f * scale).dp)
         )
 
         // Боковое меню поверх контента — на профиле оно тоже есть (Figma)
         com.svoysport.tv.ui.components.nav.LeftSidebar(
             selectedItem   = null,
             onItemSelected = onSidebarItem,
-            modifier       = Modifier.align(Alignment.TopStart).padding(top = 64.dp)
+            modifier       = Modifier.align(Alignment.TopStart).padding(top = (160f * scale).dp)
         )
     }
+}
+
+private fun formatSubscriptionDate(value: String?): String {
+    val date = value?.take(10)?.split('-') ?: return "—"
+    return if (date.size == 3) "${date[2]}.${date[1]}.${date[0]}" else value
 }
 
 // ─── WideProfileItem ──────────────────────────────────────────────────────────
@@ -215,6 +218,7 @@ private fun TallProfileItem(
     iconSz    : Dp       = 54.dp,
     titleSp   : TextUnit = 36.sp,
     subtitleSp: TextUnit = 20.sp,
+    scale     : Float = 1f,
     onClick   : () -> Unit,
     modifier  : Modifier = Modifier
 ) {
@@ -228,8 +232,8 @@ private fun TallProfileItem(
         scale  = ClickableSurfaceDefaults.scale(scale = 1.0f, focusedScale = 1.0f)
     ) {
         Column(
-            modifier            = Modifier.fillMaxSize().padding(28.dp),
-            verticalArrangement = Arrangement.spacedBy(52.dp)
+            modifier            = Modifier.fillMaxSize().padding((24f * scale).dp),
+            verticalArrangement = Arrangement.spacedBy((52f * scale).dp)
         ) {
             Icon(imageVector = ImageVector.vectorResource(icon), contentDescription = null,
                 tint = TextMain, modifier = Modifier.size(iconSz))
