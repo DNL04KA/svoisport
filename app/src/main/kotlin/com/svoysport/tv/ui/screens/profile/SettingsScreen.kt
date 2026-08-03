@@ -26,6 +26,7 @@ import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.PrimaryPressed
+import com.svoysport.tv.session.SettingsManager
 
 // ─── SettingsScreen ───────────────────────────────────────────────────────────
 // Figma 584:20564 — 1920×1080 full-screen (без сайдбара)
@@ -37,15 +38,15 @@ private val _SettingsTextMain = Color(0xFFE2E2E2)
 private val _SettingsPrimaryGrad = Brush.horizontalGradient(listOf(Color(0xFF4556EB), Color(0xFF273085)))
 
 private val langOptions    = listOf("Русский", "English")
-private val qualityOptions = listOf("Авто", "480p", "720p", "1080p")
+private val qualityOptions = listOf("Авто", "1080", "720", "360")
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
-    var savedLang     by remember { mutableStateOf("Русский") }
-    var savedQuality  by remember { mutableStateOf("Авто") }
-    var currentLang    by remember { mutableStateOf("Русский") }
-    var currentQuality by remember { mutableStateOf("Авто") }
+    var savedLang     by remember { mutableStateOf(SettingsManager.language()) }
+    var savedQuality  by remember { mutableStateOf(SettingsManager.quality()) }
+    var currentLang    by remember { mutableStateOf(savedLang) }
+    var currentQuality by remember { mutableStateOf(savedQuality) }
     val hasChanges = currentLang != savedLang || currentQuality != savedQuality
     var openMenu by remember { mutableIntStateOf(-1) }
 
@@ -131,7 +132,7 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                     .background(if (hasChanges) _SettingsPrimaryGrad else Brush.horizontalGradient(listOf(_SettingsKeyBg, _SettingsKeyBg)))
             ) {
                 Surface(
-                    onClick  = { if (hasChanges) { savedLang = currentLang; savedQuality = currentQuality } },
+                    onClick  = { if (hasChanges) { SettingsManager.save(currentLang, currentQuality); savedLang = currentLang; savedQuality = currentQuality } },
                     modifier = Modifier.fillMaxSize(),
                     shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
                     colors   = ClickableSurfaceDefaults.colors(containerColor = Color.Transparent, focusedContainerColor = Color.Transparent),

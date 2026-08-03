@@ -77,9 +77,13 @@
       if (data.status === 'activated') show(success);
       else showError('QR-код уже истёк. Создайте новый код на телевизоре.');
     } catch (requestError) {
-      showError(requestError.status === 410
-        ? 'Время действия QR-кода истекло. Создайте новый код на телевизоре.'
-        : 'Не удалось активировать телевизор. Попробуйте ещё раз.');
+      if (requestError.status === 410) {
+        showError('Время действия QR-кода истекло. Создайте новый код на телевизоре.');
+      } else if (requestError.status === 409 && requestError.data.status === 'device_limit') {
+        showError('К этому аккаунту уже подключены 3 телевизора. Отключите один из них в разделе «Мои устройства» и попробуйте снова.');
+      } else {
+        showError('Не удалось активировать телевизор. Попробуйте ещё раз.');
+      }
     } finally {
       submit.disabled = false;
       submit.textContent = selectedPlan ? 'Оплатить и активировать' : 'Активировать телевизор';

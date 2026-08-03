@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const { neon } = require('@neondatabase/serverless');
+const DEVICE_LIMIT = 3;
 
 const PLANS = {
   month_1: { id: 'month_1', title: '1 месяц', price: '9,99 BYN / мес', total: null, days: 30 },
@@ -84,8 +85,21 @@ module.exports = async function handler(req, res) {
         if (!subscriptions[0]) return send(res, 402, { error: 'active subscription not found' });
         until = subscriptions[0].active_until;
       }
-      await sql`INSERT INTO device_subscriptions (device_id, email, active_until) VALUES (${session.device_id}, ${email}, ${until})
-        ON CONFLICT (device_id) DO UPDATE SET email = EXCLUDED.email, active_until = EXCLUDED.active_until, updated_at = NOW()`;
+      const linked = await sql`WITH account_lock AS (
+          SELECT pg_advisory_xact_lock(hashtext(${email}))
+        ), active_devices AS (
+          SELECT COUNT(*)::int AS count FROM device_subscriptions, account_lock
+          WHERE email = ${email} AND active_until > NOW() AND device_id <> ${session.device_id}
+        )
+        INSERT INTO device_subscriptions (device_id, email, active_until)
+        SELECT ${session.device_id}, ${email}, ${until} FROM active_devices
+        WHERE count < ${DEVICE_LIMIT}
+        ON CONFLICT (device_id) DO UPDATE SET email = EXCLUDED.email, active_until = EXCLUDED.active_until, updated_at = NOW()
+        RETURNING device_id`;
+      if (!linked[0]) {
+        await sql`UPDATE activation_sessions SET status = 'device_limit', email = ${email} WHERE session_id = ${sessionId}`;
+        return send(res, 409, { status: 'device_limit', error: 'maximum of 3 TVs per subscription' });
+      }
       await sql`UPDATE activation_sessions SET status = 'activated', email = ${email}
         WHERE session_id = ${sessionId} AND status = 'waiting'`;
       return send(res, 200, { status: 'activated' });

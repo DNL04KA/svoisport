@@ -15,6 +15,7 @@ internal object ActivationEndpoint {
     fun parseStatus(value: String?): ActivationStatus = when (value?.lowercase()) {
         "activated" -> ActivationStatus.ACTIVATED
         "expired" -> ActivationStatus.EXPIRED
+        "device_limit" -> ActivationStatus.DEVICE_LIMIT
         else -> ActivationStatus.WAITING
     }
 

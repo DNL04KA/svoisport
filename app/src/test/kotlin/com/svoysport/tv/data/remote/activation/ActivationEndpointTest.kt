@@ -15,6 +15,11 @@ class ActivationEndpointTest {
     }
 
     @Test
+    fun `maps account TV limit status`() {
+        assertEquals(ActivationStatus.DEVICE_LIMIT, ActivationEndpoint.parseStatus("device_limit"))
+    }
+
+    @Test
     fun `encodes query parameter values`() {
         assertEquals(
             "https://example.test/api/check-activation-session.php?sessionId=id+with%2Fsymbols%3F",

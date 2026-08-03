@@ -10,6 +10,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.svoysport.tv.session.SettingsManager
 
 @Singleton
 class PlayerManager @Inject constructor(
@@ -31,7 +32,14 @@ class PlayerManager @Inject constructor(
             _player = ExoPlayer.Builder(context)
                 .setMediaSourceFactory(DefaultMediaSourceFactory(httpFactory))
                 .build()
-                .apply { playWhenReady = true }
+                .apply {
+                    playWhenReady = true
+                    SettingsManager.maxVideoHeight()?.let { height ->
+                        trackSelectionParameters = trackSelectionParameters.buildUpon()
+                            .setMaxVideoSize(Int.MAX_VALUE, height)
+                            .build()
+                    }
+                }
         }
         return _player!!
     }

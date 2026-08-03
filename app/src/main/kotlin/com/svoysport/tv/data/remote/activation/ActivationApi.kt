@@ -1,7 +1,7 @@
 package com.svoysport.tv.data.remote.activation
 
 /** Статус сессии активации (совпадает со значениями бэкенда sport-tv.by). */
-enum class ActivationStatus { WAITING, ACTIVATED, EXPIRED }
+enum class ActivationStatus { WAITING, ACTIVATED, EXPIRED, DEVICE_LIMIT }
 
 /** Ответ create-activation-session: id сессии + ссылка для QR. */
 data class ActivationSession(val sessionId: String, val qrUrl: String)

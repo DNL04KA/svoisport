@@ -21,3 +21,11 @@ test('Vercel routes activation endpoints to a persistent Neon handler', () => {
   assert.match(handler, /activation_sessions/);
   assert.doesNotMatch(handler, /new Map\(/);
 });
+
+test('activation enforces a maximum of three TVs per account', () => {
+  const handler = fs.readFileSync(path.join(root, 'api', 'activation.js'), 'utf8');
+  assert.match(handler, /DEVICE_LIMIT\s*=\s*3/);
+  assert.match(handler, /device_limit/);
+  assert.match(handler, /COUNT\(\*\).*device_subscriptions/s);
+  assert.match(handler, /pg_advisory_xact_lock/);
+});

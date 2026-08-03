@@ -78,6 +78,10 @@ class ActivationViewModel @Inject constructor(
                             _state.value = ActivationUi.Error("Время сессии истекло. Попробуйте снова.")
                             return
                         }
+                        ActivationStatus.DEVICE_LIMIT -> {
+                            _state.value = ActivationUi.Error("К аккаунту уже подключены 3 телевизора. Отключите один из них в разделе «Мои устройства» и попробуйте снова.")
+                            return
+                        }
                         ActivationStatus.WAITING -> { /* продолжаем опрос */ }
                     }
                 }
