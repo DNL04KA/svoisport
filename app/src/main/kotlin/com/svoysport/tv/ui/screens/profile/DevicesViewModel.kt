@@ -23,4 +23,10 @@ class DevicesViewModel @Inject constructor(private val repository: ActivationRep
     fun disconnect(target: String? = null, allOthers: Boolean = false) = viewModelScope.launch {
         repository.disconnect(SubscriptionManager.deviceId.value, target, allOthers).onSuccess { refresh() }
     }
+
+    fun disconnectCurrent(onComplete: () -> Unit) = viewModelScope.launch {
+        val currentDeviceId = SubscriptionManager.deviceId.value
+        repository.disconnect(currentDeviceId, currentDeviceId)
+        onComplete()
+    }
 }

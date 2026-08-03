@@ -135,9 +135,11 @@ fun ProfileScreen(
                     modifier = Modifier.offset(x = (640f * scale).dp, y = (940f * scale).dp).width(itemW).height(exitBtnH),
                     fontSize = (28f * scale).coerceAtLeast(12f).sp,
                     onClick  = {
-                        SessionManager.isLoggedIn.value = false
-                        com.svoysport.tv.session.SubscriptionManager.clear()   // отвязка этого ТВ
-                        onLogout()
+                        devicesViewModel.disconnectCurrent {
+                            SessionManager.isLoggedIn.value = false
+                            com.svoysport.tv.session.SubscriptionManager.clear()
+                            onLogout()
+                        }
                     }
                 )
         }
