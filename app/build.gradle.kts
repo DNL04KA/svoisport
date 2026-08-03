@@ -18,9 +18,16 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "ACTIVATION_API_BASE_URL", "\"https://svoisport.vercel.app/api\"")
     }
 
     buildTypes {
+        debug {
+            val activationApiBaseUrl = providers.gradleProperty("activationApiBaseUrl")
+                .orElse("https://svoisport.vercel.app/api")
+                .get()
+            buildConfigField("String", "ACTIVATION_API_BASE_URL", "\"$activationApiBaseUrl\"")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -36,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -94,4 +102,5 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation("junit:junit:4.13.2")
 }

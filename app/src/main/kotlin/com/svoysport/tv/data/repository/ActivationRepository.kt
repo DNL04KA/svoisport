@@ -12,8 +12,8 @@ import javax.inject.Singleton
 class ActivationRepository @Inject constructor(
     private val api: ActivationApi
 ) {
-    suspend fun startSession(deviceId: String): Result<ActivationSession> =
-        runCatching { api.createSession(deviceId) }
+    suspend fun startSession(deviceId: String, planId: String? = null): Result<ActivationSession> =
+        runCatching { api.createSession(deviceId, planId) }
 
     suspend fun pollStatus(sessionId: String): Result<ActivationStatus> =
         runCatching { api.checkSession(sessionId) }

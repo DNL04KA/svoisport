@@ -2,8 +2,10 @@ package com.svoysport.tv.navigation
 
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.session.SubscriptionManager
 import com.svoysport.tv.ui.screens.activation.ActivationRequiredScreen
@@ -36,7 +38,9 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object About : Screen("about")
     object ActivationRequired : Screen("activation_required")
-    object Activation : Screen("activation")
+    object Activation : Screen("activation?planId={planId}") {
+        fun createRoute(planId: String? = null) = "activation?planId=${planId ?: "existing"}"
+    }
     object Subscription : Screen("subscription")
     object Settings : Screen("settings")
     object Devices : Screen("devices")
@@ -139,14 +143,22 @@ fun AppNavGraph(navController: NavHostController) {
 
         composable(Screen.ActivationRequired.route) {
             ActivationRequiredScreen(
-                onActivate = { navController.navigate(Screen.Activation.route) },
+                onActivate = { navController.navigate(Screen.Activation.createRoute()) },
                 onBuy      = { navController.navigate(Screen.Subscription.route) },
                 onBack     = { navController.popBackStack() }
             )
         }
 
-        composable(Screen.Activation.route) {
+        composable(
+            route = Screen.Activation.route,
+            arguments = listOf(navArgument("planId") {
+                type = NavType.StringType
+                defaultValue = "existing"
+            })
+        ) { backStackEntry ->
+            val planId = backStackEntry.arguments?.getString("planId").takeUnless { it == "existing" }
             ActivationScreen(
+                planId = planId,
                 onFinished = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
@@ -157,7 +169,10 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         composable(Screen.Subscription.route) {
-            SubscriptionScreen(onBack = { navController.popBackStack() })
+            SubscriptionScreen(
+                onBack = { navController.popBackStack() },
+                onSubscribe = { plan -> navController.navigate(Screen.Activation.createRoute(plan.id)) }
+            )
         }
 
         composable(Screen.Settings.route) {

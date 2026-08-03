@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 sealed interface ActivationUi {
     data object Loading : ActivationUi
-    data class Qr(val qrUrl: String) : ActivationUi
+    data class Qr(val qrUrl: String, val planId: String?) : ActivationUi
     data class Success(val until: String) : ActivationUi
     data class Error(val message: String) : ActivationUi
 }
@@ -37,17 +37,17 @@ class ActivationViewModel @Inject constructor(
     val state: StateFlow<ActivationUi> = _state.asStateFlow()
 
     private var pollJob: Job? = null
+    private var currentPlanId: String? = null
 
-    init { start() }
-
-    fun start() {
+    fun start(planId: String? = currentPlanId) {
+        currentPlanId = planId
         pollJob?.cancel()
         _state.value = ActivationUi.Loading
         viewModelScope.launch {
             val deviceId = SubscriptionManager.deviceId.value
-            repo.startSession(deviceId)
+            repo.startSession(deviceId, planId)
                 .onSuccess { session ->
-                    _state.value = ActivationUi.Qr(session.qrUrl)
+                    _state.value = ActivationUi.Qr(session.qrUrl, planId)
                     pollJob = launch { pollLoop(session.sessionId, deviceId) }
                 }
                 .onFailure { e ->
@@ -58,8 +58,10 @@ class ActivationViewModel @Inject constructor(
 
     private suspend fun pollLoop(sessionId: String, deviceId: String) {
         var failures = 0
-        while (true) {
+        var polls = 0
+        while (polls < MAX_POLLS) {
             delay(POLL_INTERVAL_MS)
+            polls++
             repo.pollStatus(sessionId)
                 .onSuccess { status ->
                     failures = 0
@@ -87,6 +89,7 @@ class ActivationViewModel @Inject constructor(
                     }
                 }
         }
+        _state.value = ActivationUi.Error("Время сессии истекло. Создайте новый QR-код.")
     }
 
     override fun onCleared() {
@@ -101,5 +104,6 @@ class ActivationViewModel @Inject constructor(
     private companion object {
         const val POLL_INTERVAL_MS = 3_000L
         const val MAX_FAILURES = 5
+        const val MAX_POLLS = 15 * 60 * 1000 / POLL_INTERVAL_MS.toInt()
     }
 }

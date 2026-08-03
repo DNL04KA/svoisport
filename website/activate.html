@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Активация устройства — Свой Спорт</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
+</head>
+<body class="activation-page">
+  <main class="activation-shell">
+    <a class="activation-logo" href="./" aria-label="Свой Спорт — на главную">
+      <img src="img/logo.png" alt="" width="42" height="42">
+      <span>СВОЙ <strong>СПОРТ</strong></span>
+    </a>
+
+    <section class="activation-card" aria-label="Активация устройства" aria-live="polite">
+      <div id="activationLoading">
+        <div class="activation-spinner" aria-hidden="true"></div>
+        <h1 id="activationTitle">Проверяем QR-код</h1>
+        <p>Подождите несколько секунд.</p>
+      </div>
+
+      <div id="activationConfirm" hidden>
+        <p class="activation-kicker" id="activationKicker">Активация Smart TV</p>
+        <h1 id="activationHeading">Подтвердить активацию</h1>
+        <p id="activationDescription">После подтверждения этот телевизор получит доступ к вашей подписке.</p>
+        <div class="activation-plan" id="activationPlan" hidden>
+          <span id="activationPlanTitle"></span>
+          <strong id="activationPlanPrice"></strong>
+          <small id="activationPlanTotal"></small>
+        </div>
+        <form id="activationForm">
+          <label class="field">
+            <span>E-mail аккаунта</span>
+            <input id="activationEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <label class="activation-consent">
+            <input id="activationConsent" type="checkbox" required>
+            <span>Я подтверждаю активацию подписки на телевизоре</span>
+          </label>
+          <button class="btn btn-filled btn-wide activation-submit" id="activationSubmit" type="submit">Активировать телевизор</button>
+        </form>
+        <p class="activation-security">Не подтверждайте активацию, если вы не открывали приложение «Свой Спорт» на телевизоре.</p>
+      </div>
+
+      <div id="activationSuccess" hidden>
+        <div class="activation-success-mark" aria-hidden="true">✓</div>
+        <h1>Телевизор активирован</h1>
+        <p>Можно вернуться к телевизору — доступ включится автоматически.</p>
+      </div>
+
+      <div id="activationError" hidden>
+        <h1>Ссылка недействительна</h1>
+        <p id="activationErrorMessage">Проверьте QR-код на телевизоре и попробуйте снова.</p>
+      </div>
+    </section>
+  </main>
+  <script src="js/activate.js"></script>
+</body>
+</html>

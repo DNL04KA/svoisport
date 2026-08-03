@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
@@ -29,6 +30,7 @@ import com.svoysport.tv.util.QrCodeGenerator
  */
 @Composable
 fun ActivationScreen(
+    planId: String?,
     onFinished: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -36,6 +38,7 @@ fun ActivationScreen(
 ) {
     BackHandler(onBack = onBack)
     val state by viewModel.state.collectAsState()
+    LaunchedEffect(planId) { viewModel.start(planId) }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize().background(Background)) {
         val scale = minOf(maxWidth.value / 1920f, maxHeight.value / 1080f, 1f).coerceAtLeast(0.4f)
@@ -44,100 +47,118 @@ fun ActivationScreen(
             is ActivationUi.Success -> SuccessContent(until = s.until, scale = scale, onFinished = onFinished)
             is ActivationUi.Error   -> ErrorContent(message = s.message, scale = scale, onRetry = viewModel::start, onBack = onBack)
             is ActivationUi.Loading -> CenterMessage("Готовим активацию…", scale)
-            is ActivationUi.Qr      -> QrContent(qrUrl = s.qrUrl, scale = scale, onBack = onBack)
+            is ActivationUi.Qr      -> QrContent(qrUrl = s.qrUrl, planId = s.planId, scale = scale, onBack = onBack)
         }
     }
 }
 
 @Composable
-private fun QrContent(qrUrl: String, scale: Float, onBack: () -> Unit) {
-    val qrPx = (360f * scale).dp
+private fun QrContent(qrUrl: String, planId: String?, scale: Float, onBack: () -> Unit) {
+    val qrPx = (294f * scale).dp
     val qrBitmap: ImageBitmap? = remember(qrUrl) { QrCodeGenerator.generate(qrUrl, 512) }
 
-    Row(
-        modifier = Modifier.fillMaxSize().padding((56f * scale).dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy((56f * scale).dp)
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF050506)),
+        contentAlignment = Alignment.Center
     ) {
-        // QR на белой карточке (нужна светлая «тихая зона»)
-        Box(
-            modifier = Modifier.size(qrPx + (32f * scale).dp)
-                .clip(RoundedCornerShape((20f * scale).dp)).background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            if (qrBitmap != null) {
-                Image(bitmap = qrBitmap, contentDescription = "QR-код активации", modifier = Modifier.size(qrPx))
-            } else {
-                Text("QR", color = Color.Black, fontSize = (40f * scale).sp)
-            }
-        }
+        Text(
+            text = "Подписка",
+            color = Color.White.copy(alpha = 0.12f),
+            fontSize = (48f * scale).sp,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = (62f * scale).dp)
+        )
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Активация устройства",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = (42f * scale).sp, fontWeight = FontWeight.SemiBold, color = Color.White
+        Box(
+            modifier = Modifier
+                .size(width = (1320f * scale).dp, height = (828f * scale).dp)
+                .clip(RoundedCornerShape((28f * scale).dp))
+                .background(Color(0xFF202123))
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(
+                    start = (182f * scale).dp,
+                    top = (82f * scale).dp,
+                    end = (182f * scale).dp
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (planId == null) "Активация подписки по QR" else "Оформление подписки по QR",
+                    color = Color.White,
+                    fontSize = (36f * scale).sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-            )
-            Spacer(Modifier.height((24f * scale).dp))
-            listOf(
-                "Отсканируйте QR-код камерой телефона",
-                "Введите e-mail, на который оформлена подписка",
-                "Вам придёт код — введите его на сайте",
-                "Телевизор активируется автоматически"
-            ).forEachIndexed { i, step ->
-                Row(
-                    modifier = Modifier.padding(vertical = (7f * scale).dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy((14f * scale).dp)
+                Spacer(Modifier.height((30f * scale).dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy((16f * scale).dp)
                 ) {
-                    Box(
-                        modifier = Modifier.size((30f * scale).dp)
-                            .background(Color(0xFF4556EB), RoundedCornerShape(50)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("${i + 1}", color = Color.White, fontSize = (16f * scale).sp, fontWeight = FontWeight.Bold)
+                    val steps = if (planId == null) listOf(
+                        "1. Наведите камеру телефона на QR-код",
+                        "2. Авторизуйтесь и подтвердите активацию подписки",
+                        "3. После подтверждения доступ на ТВ включится автоматически"
+                    ) else listOf(
+                        "1. Наведите камеру телефона на QR-код",
+                        "2. На открывшейся странице выберите тариф и оплатите",
+                        "3. После успешного оформления доступ на ТВ включится автоматически"
+                    )
+                    steps.forEach { step ->
+                        Text(step, color = Color(0xFFD2D2D4), fontSize = (27f * scale).sp)
                     }
-                    Text(step, color = Color(0xFFE2E2E2), fontSize = (22f * scale).sp)
+                }
+                Spacer(Modifier.height((112f * scale).dp))
+                Box(
+                    modifier = Modifier
+                        .size(width = (400f * scale).dp, height = (505f * scale).dp)
+                        .clip(RoundedCornerShape((42f * scale).dp))
+                        .background(Color(0xFF303239))
+                        .border((4f * scale).dp, Color.White, RoundedCornerShape((42f * scale).dp)),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    if (qrBitmap != null) {
+                        Image(
+                            bitmap = qrBitmap,
+                            contentDescription = "QR-код для оформления подписки",
+                            modifier = Modifier.padding(top = (50f * scale).dp).size(qrPx)
+                        )
+                    } else {
+                        Text("QR", color = Color.Black, fontSize = (40f * scale).sp)
+                    }
                 }
             }
-            Spacer(Modifier.height((20f * scale).dp))
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10f * scale).dp)) {
-                PulsingDot(scale)
-                Text("Ожидаем подтверждение…", color = Gray3, fontSize = (18f * scale).sp)
+            Button(
+                onClick = onBack,
+                modifier = Modifier.align(Alignment.TopEnd).padding((32f * scale).dp)
+                    .size((80f * scale).dp),
+                shape = ButtonDefaults.shape(RoundedCornerShape(50)),
+                colors = ButtonDefaults.colors(containerColor = Color(0xFF4A4D68))
+            ) {
+                Text("×", color = Color(0xFFD2D2D4), fontSize = (38f * scale).sp)
             }
-            Spacer(Modifier.height((28f * scale).dp))
-            ActionButton(text = "Назад", icon = R.drawable.ic_arrow_left, primary = false, scale = scale, onClick = onBack)
         }
     }
 }
 
 @Composable
 private fun SuccessContent(until: String, scale: Float, onFinished: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding((48f * scale).dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier.size((96f * scale).dp).background(Success, RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("✓", color = Color.White, fontSize = (56f * scale).sp, fontWeight = FontWeight.Bold)
-        }
-        Spacer(Modifier.height((28f * scale).dp))
-        Text(
-            "Активация выполнена",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = (44f * scale).sp, fontWeight = FontWeight.SemiBold, color = Color.White
-            )
-        )
-        Spacer(Modifier.height((12f * scale).dp))
-        Text("Ваша подписка активна до $until", color = Gray3, fontSize = (24f * scale).sp)
-        Spacer(Modifier.height((36f * scale).dp))
+    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.85f))) {
         val fr = remember { androidx.compose.ui.focus.FocusRequester() }
         LaunchedEffect(Unit) { runCatching { fr.requestFocus() } }
-        ActionButton(text = "На главную", icon = null, primary = true, scale = scale, focusRequester = fr, onClick = onFinished)
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .padding(bottom = (48f * scale).dp)
+                .size(width = (1824f * scale).dp, height = (224f * scale).dp)
+                .background(Color(0xFF1E1F20), RoundedCornerShape((32f * scale).dp))
+                .padding(horizontal = (68f * scale).dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text("Подписка успешно оформлена", color = Color.White, fontSize = (48f * scale).sp, fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height((12f * scale).dp))
+                Text("Теперь вы можете смотреть любую трансляцию", color = Gray3, fontSize = (28f * scale).sp)
+            }
+            ActionButton(text = "Перейти на главную", icon = null, primary = true, scale = scale, focusRequester = fr, onClick = onFinished)
+        }
     }
 }
 

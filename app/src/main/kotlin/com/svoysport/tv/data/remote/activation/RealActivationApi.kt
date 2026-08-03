@@ -2,6 +2,7 @@ package com.svoysport.tv.data.remote.activation
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.svoysport.tv.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.OutputStreamWriter
@@ -13,16 +14,13 @@ import javax.inject.Singleton
 /**
  * Боевая реализация активации против PHP-эндпоинтов sport-tv.by.
  *
- * НЕ забиндена по умолчанию — чтобы включить, поменяйте биндинг в AppModule
- * с [MockActivationApi] на [RealActivationApi]. Эндпоинты должны существовать
- * на сервере (см. контракт в [ActivationApi]).
+ * Используется по умолчанию и обращается к опубликованным Vercel-эндпоинтам.
  */
 @Singleton
 class RealActivationApi @Inject constructor() : ActivationApi {
 
     private val gson = Gson()
 
-    private data class CreateReq(@SerializedName("device_id") val deviceId: String)
     private data class CreateRes(
         @SerializedName("sessionId") val sessionId: String?,
         @SerializedName("qrUrl")     val qrUrl: String?
@@ -33,26 +31,22 @@ class RealActivationApi @Inject constructor() : ActivationApi {
         @SerializedName("until")  val until: String? = null
     )
 
-    override suspend fun createSession(deviceId: String): ActivationSession = withContext(Dispatchers.IO) {
-        val body = gson.toJson(CreateReq(deviceId))
-        val json = post("$BASE/create-activation-session.php", body)
+    override suspend fun createSession(deviceId: String, planId: String?): ActivationSession = withContext(Dispatchers.IO) {
+        val body = gson.toJson(ActivationEndpoint.createRequest(deviceId, planId))
+        val json = post("$baseUrl/create-activation-session.php", body)
         val res  = gson.fromJson(json, CreateRes::class.java)
         val sid  = res.sessionId ?: error("Пустой sessionId от сервера")
-        val qr   = res.qrUrl ?: "$SITE/activate?session=$sid"
+        val qr   = res.qrUrl ?: error("Пустой qrUrl от сервера")
         ActivationSession(sid, qr)
     }
 
     override suspend fun checkSession(sessionId: String): ActivationStatus = withContext(Dispatchers.IO) {
-        val json = get("$BASE/check-activation-session.php?sessionId=$sessionId")
-        when (gson.fromJson(json, StatusRes::class.java).status?.lowercase()) {
-            "activated" -> ActivationStatus.ACTIVATED
-            "expired"   -> ActivationStatus.EXPIRED
-            else        -> ActivationStatus.WAITING
-        }
+        val json = get(ActivationEndpoint.statusUrl(baseUrl, sessionId))
+        ActivationEndpoint.parseStatus(gson.fromJson(json, StatusRes::class.java).status)
     }
 
     override suspend fun checkSubscription(deviceId: String): SubscriptionInfo = withContext(Dispatchers.IO) {
-        val json = get("$BASE/check-subscription.php?device_id=$deviceId")
+        val json = get(ActivationEndpoint.subscriptionUrl(baseUrl, deviceId))
         val res  = gson.fromJson(json, SubRes::class.java)
         SubscriptionInfo(res.active, res.until)
     }
@@ -78,8 +72,5 @@ class RealActivationApi @Inject constructor() : ActivationApi {
             setRequestProperty("User-Agent", "SvoySportTV/1.0 (Android TV)")
         }
 
-    private companion object {
-        const val SITE = "https://sport-tv.by"
-        const val BASE = "$SITE/api"
-    }
+    private val baseUrl = BuildConfig.ACTIVATION_API_BASE_URL.trimEnd('/')
 }

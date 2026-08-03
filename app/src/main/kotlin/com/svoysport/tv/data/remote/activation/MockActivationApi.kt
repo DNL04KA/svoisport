@@ -13,18 +13,18 @@ import javax.inject.Singleton
  *
  * Имитирует сценарий: пользователь сканирует QR и подтверждает подписку на
  * телефоне — на 4-м опросе сессия становится ACTIVATED. Чтобы переключиться на
- * реальные эндпоинты sport-tv.by, замените биндинг в AppModule на
- * [RealActivationApi] — контракт [ActivationApi] тот же.
+ * офлайн-режим, замените биндинг в AppModule с [RealActivationApi] на этот
+ * класс — контракт [ActivationApi] тот же.
  */
 @Singleton
 class MockActivationApi @Inject constructor() : ActivationApi {
 
-    private var polls = 0
+    private val pollsBySession = mutableMapOf<String, Int>()
 
-    override suspend fun createSession(deviceId: String): ActivationSession {
+    override suspend fun createSession(deviceId: String, planId: String?): ActivationSession {
         delay(500)
-        polls = 0
         val sid = "mock-" + System.currentTimeMillis().toString(36)
+        pollsBySession[sid] = 0
         return ActivationSession(
             sessionId = sid,
             qrUrl     = "https://sport-tv.by/activate?session=$sid"
@@ -33,7 +33,8 @@ class MockActivationApi @Inject constructor() : ActivationApi {
 
     override suspend fun checkSession(sessionId: String): ActivationStatus {
         delay(400)
-        polls++
+        val polls = (pollsBySession[sessionId] ?: 0) + 1
+        pollsBySession[sessionId] = polls
         return if (polls >= 4) ActivationStatus.ACTIVATED else ActivationStatus.WAITING
     }
 

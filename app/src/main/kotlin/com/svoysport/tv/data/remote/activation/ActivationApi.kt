@@ -18,10 +18,10 @@ data class SubscriptionInfo(val active: Boolean, val until: String?)
  *  - checkSubscription→ GET подписки по device_id                        → {active, until}
  *
  * Клиент опрашивает checkSession каждые ~3 сек, пока не придёт ACTIVATED.
- * Реализации: [MockActivationApi] (по умолчанию) и [RealActivationApi].
+ * Реализации: [RealActivationApi] (по умолчанию) и [MockActivationApi] для офлайн-разработки.
  */
 interface ActivationApi {
-    suspend fun createSession(deviceId: String): ActivationSession
+    suspend fun createSession(deviceId: String, planId: String? = null): ActivationSession
     suspend fun checkSession(sessionId: String): ActivationStatus
     suspend fun checkSubscription(deviceId: String): SubscriptionInfo
 }

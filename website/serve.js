@@ -8,12 +8,15 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { ActivationSessionStore } = require('./activation-session-store');
 
 const ROOT = __dirname;
 const PORT = Number(process.argv[2]) || 4173;
 const ORIGIN = 'https://sport-tv.by';
 const UA = 'SportTvWebsite/1.0 (+redesign)';
 const CACHE_TTL_MS = 60_000;
+const ACTIVATION_PUBLIC_ORIGIN = process.env.ACTIVATION_PUBLIC_ORIGIN || '';
+const activationSessions = new ActivationSessionStore();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -189,12 +192,55 @@ const PAGE_WHITELIST = new Set(['/oferta/', '/payment/', '/informatsiya-dlya-pra
 
 async function handleApi(req, res, urlObj) {
   const send = (code, data) => {
-    res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.writeHead(code, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    });
     res.end(JSON.stringify(data));
   };
 
   try {
     const p = urlObj.pathname;
+
+    if (p === '/api/create-activation-session.php' && req.method === 'POST') {
+      const body = await readJsonBody(req);
+      if (!body.device_id || typeof body.device_id !== 'string') {
+        return send(400, { error: 'device_id is required' });
+      }
+      const publicOrigin = ACTIVATION_PUBLIC_ORIGIN || `${urlObj.protocol}//${urlObj.host}`;
+      return send(201, activationSessions.createSession(body.device_id, publicOrigin, body.plan_id || null));
+    }
+
+    if (p === '/api/check-activation-session.php' && req.method === 'GET') {
+      const sessionId = urlObj.searchParams.get('sessionId') || '';
+      const status = activationSessions.getStatus(sessionId);
+      return status ? send(200, { status }) : send(404, { error: 'session not found' });
+    }
+
+    if (p === '/api/activation-session.php' && req.method === 'GET') {
+      const sessionId = urlObj.searchParams.get('session') || '';
+      const session = activationSessions.getPublicSession(sessionId);
+      return session ? send(200, session) : send(404, { error: 'session not found' });
+    }
+
+    if (p === '/api/activate-session.php' && req.method === 'POST') {
+      const body = await readJsonBody(req);
+      const currentStatus = activationSessions.getStatus(body.session || '');
+      if (!currentStatus) return send(404, { error: 'session not found' });
+      if (currentStatus === 'expired') return send(410, { status: currentStatus });
+      if (typeof body.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim())) {
+        return send(400, { error: 'valid email is required' });
+      }
+      const status = activationSessions.activateSession(body.session || '');
+      return send(200, { status });
+    }
+
+    if (p === '/api/check-subscription.php' && req.method === 'GET') {
+      const deviceId = urlObj.searchParams.get('device_id') || '';
+      if (!deviceId) return send(400, { error: 'device_id is required' });
+      return send(200, activationSessions.getSubscription(deviceId));
+    }
 
     if (p === '/api/listing') return send(200, JSON.parse(await upstream('/list2.php')));
     if (p === '/api/archive') return send(200, JSON.parse(await upstream('/list2.php?archive=1')));
@@ -241,6 +287,30 @@ async function handleApi(req, res, urlObj) {
   }
 }
 
+function readJsonBody(req, maxBytes = 16 * 1024) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        reject(new Error('request body too large'));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      try {
+        resolve(JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'));
+      } catch {
+        reject(new Error('invalid JSON'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 /* ---------- статика ---------- */
 function serveStatic(req, res, urlObj) {
   const safe = path.normalize(decodeURIComponent(urlObj.pathname)).replace(/^(\.\.[/\\])+/, '');
@@ -253,13 +323,26 @@ function serveStatic(req, res, urlObj) {
       res.end('404 Not Found');
       return;
     }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+    const headers = {
+      'Content-Type': MIME[path.extname(file)] || 'application/octet-stream',
+      'X-Content-Type-Options': 'nosniff',
+    };
+    if (path.basename(file) === 'activate.html') headers['Cache-Control'] = 'no-store';
+    res.writeHead(200, headers);
     res.end(data);
   });
 }
 
-http.createServer((req, res) => {
-  const urlObj = new URL(req.url, `http://localhost:${PORT}`);
-  if (urlObj.pathname.startsWith('/api/')) handleApi(req, res, urlObj);
-  else serveStatic(req, res, urlObj);
-}).listen(PORT, () => console.log(`SPORT TV website on http://localhost:${PORT}`));
+function createAppServer() {
+  return http.createServer((req, res) => {
+    const urlObj = new URL(req.url, `http://${req.headers.host || `localhost:${PORT}`}`);
+    if (urlObj.pathname.startsWith('/api/')) handleApi(req, res, urlObj);
+    else serveStatic(req, res, urlObj);
+  });
+}
+
+if (require.main === module) {
+  createAppServer().listen(PORT, () => console.log(`SPORT TV website on http://localhost:${PORT}`));
+}
+
+module.exports = { createAppServer };
