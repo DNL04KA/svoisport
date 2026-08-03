@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.*
+import kotlinx.coroutines.delay
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Background
 import com.svoysport.tv.ui.theme.Gray3
@@ -141,6 +142,10 @@ private fun QrContent(qrUrl: String, planId: String?, scale: Float, onBack: () -
 
 @Composable
 private fun SuccessContent(until: String, scale: Float, onFinished: () -> Unit) {
+    LaunchedEffect(Unit) {
+        delay(5_000)
+        onFinished()
+    }
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.85f))) {
         val fr = remember { androidx.compose.ui.focus.FocusRequester() }
         LaunchedEffect(Unit) { runCatching { fr.requestFocus() } }
