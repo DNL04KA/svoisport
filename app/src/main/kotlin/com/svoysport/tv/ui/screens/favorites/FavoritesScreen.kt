@@ -1,10 +1,9 @@
 package com.svoysport.tv.ui.screens.favorites
 
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +34,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+internal fun initialFavoriteFocusIndex(count: Int): Int? = if (count > 0) 0 else null
+
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val repository: MatchRepository
@@ -58,11 +59,11 @@ fun FavoritesContent(
     val favIds = FavoritesManager.favoriteIds.value
     val favorites = remember(all, favIds) { all.filter { it.id in favIds } }
 
-    // Фокус сразу в контент — чтобы сайдбар-оверлей свернулся и избранное было видно
-    val contentFr = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
+    val firstCardFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(favorites.size) {
+        if (initialFavoriteFocusIndex(favorites.size) == null) return@LaunchedEffect
         kotlinx.coroutines.delay(120)
-        runCatching { contentFr.requestFocus() }
+        runCatching { firstCardFocusRequester.requestFocus() }
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -71,8 +72,7 @@ fun FavoritesContent(
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
         val pad: Dp = (48f * scale).dp
 
-        Column(modifier = Modifier.fillMaxSize().padding(pad)
-            .focusRequester(contentFr).focusable()) {
+        Column(modifier = Modifier.fillMaxSize().padding(pad)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((14f * scale).dp)) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_bookmark_active),
@@ -115,8 +115,17 @@ fun FavoritesContent(
                     verticalArrangement   = Arrangement.spacedBy((16f * scale).dp),
                     contentPadding = PaddingValues(bottom = (24f * scale).dp)
                 ) {
-                    items(favorites, key = { it.id }) { match ->
-                        MatchCard(match = match, onClick = onMatchClick, scale = scale)
+                    itemsIndexed(favorites, key = { _, match -> match.id }) { index, match ->
+                        MatchCard(
+                            match = match,
+                            onClick = onMatchClick,
+                            scale = scale,
+                            modifier = if (index == 0) {
+                                Modifier.focusRequester(firstCardFocusRequester)
+                            } else {
+                                Modifier
+                            }
+                        )
                     }
                 }
             }

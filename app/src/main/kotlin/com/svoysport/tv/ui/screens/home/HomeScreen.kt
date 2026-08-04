@@ -36,6 +36,7 @@ import com.svoysport.tv.ui.screens.favorites.FavoritesContent
 import com.svoysport.tv.ui.screens.schedule.ScheduleScreen
 import com.svoysport.tv.ui.screens.search.SearchContent
 import com.svoysport.tv.ui.theme.Gray4
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
@@ -50,6 +51,8 @@ private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     else -> NavTab.HOME
 }
 
+internal fun shouldHideHomeTopBar(scrollOffset: Int): Boolean = scrollOffset > 0
+
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
 @Composable
@@ -63,6 +66,13 @@ fun HomeScreen(
     var selectedTab     by remember { mutableStateOf(NavTab.HOME) }
     var selectedSport   by remember { mutableStateOf<SidebarItem?>(null) }
     var sidebarMode     by remember { mutableStateOf(SidebarMode.NONE) }
+    var topBarHidden    by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedTab, sidebarMode) {
+        if (selectedTab != NavTab.HOME || sidebarMode != SidebarMode.NONE) {
+            topBarHidden = false
+        }
+    }
 
     LaunchedEffect(initialSidebarItem) {
         when (initialSidebarItem) {
@@ -93,6 +103,7 @@ fun HomeScreen(
         isLoggedIn          = SessionManager.isLoggedIn.value ||
                               com.svoysport.tv.session.SubscriptionManager.isSubscribed.value,
         onAuthClick         = onAuthClick,
+        topBarHidden        = topBarHidden,
         selectedSidebarItem = selectedSport,
         onSidebarItemSelected = { item ->
             when (item) {
@@ -120,7 +131,8 @@ fun HomeScreen(
                         selectedTab = if (sectionTitle.contains("архив", ignoreCase = true)) NavTab.ARCHIVE else NavTab.SCHEDULE
                         sidebarMode = SidebarMode.NONE
                     },
-                    onRetry      = { viewModel.loadHomeContent() }
+                    onRetry      = { viewModel.loadHomeContent() },
+                    onTopBarHiddenChange = { topBarHidden = it }
                 )
             }
         }
@@ -135,7 +147,8 @@ private fun HomeContent(
     selectedSport: SidebarItem?,
     onMatchClick: (String) -> Unit,
     onWatchMore: (String) -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onTopBarHiddenChange: (Boolean) -> Unit
 ) {
     when (uiState) {
         is HomeUiState.Loading -> HomeLoadingState()
@@ -149,12 +162,20 @@ private fun HomeContent(
             val sections = filterBySport(uiState.content.sections, selectedSport)
 
             if (sections.isEmpty()) {
+                LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
                 EmptyState()
             } else {
                 // Figma BG: обложка главной/выбранной трансляции на заднем фоне —
                 // 70% прозрачности, blur всего фрейма, градиентное затемнение сверху
                 var focusedMatch by remember { mutableStateOf<MatchItem?>(null) }
                 val bgMatch = focusedMatch ?: uiState.content.featuredMatch
+                val scrollState = rememberScrollState()
+
+                LaunchedEffect(scrollState) {
+                    snapshotFlow { shouldHideHomeTopBar(scrollState.value) }
+                        .distinctUntilChanged()
+                        .collect(onTopBarHiddenChange)
+                }
 
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     // HomeContent находится внутри отступов TvScaffold. Компенсируем их,
@@ -204,7 +225,7 @@ private fun HomeContent(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(scrollState)
                     ) {
                         // HeroBanner — featured матч вверху
                         HeroBanner(

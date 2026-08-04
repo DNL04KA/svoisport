@@ -3,6 +3,13 @@ package com.svoysport.tv.ui.components
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -59,6 +66,7 @@ fun TvScaffold(
     onTabSelected: (NavTab) -> Unit = {},
     isLoggedIn: Boolean = false,
     onAuthClick: () -> Unit = {},
+    topBarHidden: Boolean = false,
     selectedSidebarItem: SidebarItem? = null,
     onSidebarItemSelected: (SidebarItem) -> Unit = {},
     content: @Composable () -> Unit
@@ -81,13 +89,21 @@ fun TvScaffold(
     ) {
         AppBackground()
         Column(modifier = Modifier.fillMaxSize()) {
-            TopNavigationBar(
-                selectedTab   = selectedTab,
-                onTabSelected = onTabSelected,
-                isLoggedIn    = isLoggedIn,
-                onAuthClick   = onAuthClick,
-                logoExpanded  = sidebarExpanded
-            )
+            AnimatedVisibility(
+                visible = !topBarHidden,
+                enter = slideInVertically(tween(220)) { -it } +
+                    expandVertically(tween(220), expandFrom = Alignment.Top) + fadeIn(tween(160)),
+                exit = slideOutVertically(tween(180)) { -it } +
+                    shrinkVertically(tween(180), shrinkTowards = Alignment.Top) + fadeOut(tween(120))
+            ) {
+                TopNavigationBar(
+                    selectedTab   = selectedTab,
+                    onTabSelected = onTabSelected,
+                    isLoggedIn    = isLoggedIn,
+                    onAuthClick   = onAuthClick,
+                    logoExpanded  = sidebarExpanded
+                )
+            }
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 Box(modifier = Modifier.fillMaxSize().padding(start = contentStart)) {
                     content()
