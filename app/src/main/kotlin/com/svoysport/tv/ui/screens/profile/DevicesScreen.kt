@@ -28,6 +28,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.PrimaryPressed
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +41,8 @@ private val _ExitRed  = Color(0xFFEE3232)
 private val _PrimaryGrad = Brush.horizontalGradient(listOf(Color(0xFF4556EB), Color(0xFF273085)))
 
 data class DeviceItem(val id: String, val name: String, val lastLogin: String, val isCurrent: Boolean = false)
+
+internal fun shouldShowExitAllDevices(deviceCount: Int): Boolean = deviceCount >= 3
 
 // ─── DevicesScreen ────────────────────────────────────────────────────────────
 // Figma 578:18689 — 1920×1080 full-screen (без сайдбара)
@@ -58,9 +61,8 @@ fun DevicesScreen(
 
     BackHandler { if (dialogState != null) dialogState = null else onBack() }
 
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize().background(Color(0xFF0F0F10))
-    ) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        AppBackground()
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
@@ -152,8 +154,9 @@ fun DevicesScreen(
             }
 
             // ── Exit all button — bottom center ──────────────────────────────
-            Spacer(Modifier.height((20f * scale).dp))
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            if (shouldShowExitAllDevices(devices.size)) {
+                Spacer(Modifier.height((20f * scale).dp))
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 var exitFocused by remember { mutableStateOf(false) }
                 val exitSc by animateFloatAsState(if (exitFocused) 1.08f else 1f, tween(150), label = "exitAll")
                 Surface(
@@ -169,6 +172,7 @@ fun DevicesScreen(
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = (28f * scale).sp, fontWeight = FontWeight.Medium, color = _ExitRed))
                     }
+                }
                 }
             }
         }
@@ -288,10 +292,10 @@ private fun DeviceRow(
             .onFocusChanged { isFocused = it.isFocused }.scale(sc),
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
         colors = ClickableSurfaceDefaults.colors(containerColor = _PanelBg, focusedContainerColor = _PanelBg),
-        border = if (!device.isCurrent) ClickableSurfaceDefaults.border(
+        border = ClickableSurfaceDefaults.border(
             focusedBorder = Border(border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF4556EB)),
                 shape = RoundedCornerShape(20.dp))
-        ) else ClickableSurfaceDefaults.border(),
+        ),
         scale = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
     ) {
         Row(
@@ -316,19 +320,18 @@ private fun DeviceRow(
                 }
             }
             val indicatorSz = iconSz
-            if (device.isCurrent) {
-                Box(modifier = Modifier.size(indicatorSz).clip(RoundedCornerShape(indicatorSz / 2))
-                    .background(Color(0xFF4556EB).copy(alpha = 0.25f)), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.size(indicatorSz * 0.29f).clip(RoundedCornerShape(indicatorSz))
-                        .background(Color(0xFF4CAF50)))
-                }
-            } else {
-                Box(modifier = Modifier.size(indicatorSz).clip(RoundedCornerShape(12.dp))
-                    .background(_KeyBg), contentAlignment = Alignment.Center) {
-                    Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_close),
-                        contentDescription = "Завершить сессию", tint = _ExitRed,
-                        modifier = Modifier.size(indicatorSz * 0.48f))
-                }
+            Box(
+                modifier = Modifier.size(indicatorSz).clip(RoundedCornerShape(indicatorSz / 2))
+                    .background(Color(0x66565A80)),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(indicatorSz * 0.48f)
+                        .height(3.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(_TextMain.copy(alpha = 0.82f))
+                )
             }
         }
     }

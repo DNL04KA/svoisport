@@ -37,6 +37,7 @@ import coil3.compose.AsyncImage
 import com.svoysport.tv.R
 import com.svoysport.tv.domain.model.MatchItem
 import com.svoysport.tv.domain.repository.MatchRepository
+import com.svoysport.tv.ui.components.softHorizontalEdges
 import com.svoysport.tv.ui.theme.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -202,7 +203,11 @@ private fun ArchiveDateGroupRow(
                 color      = Color(0xFFE2E2E2)
             )
         )
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(cardGap)) {
+        LazyRow(
+            modifier = Modifier.softHorizontalEdges(),
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(cardGap)
+        ) {
             items(group.matches, key = { it.id }) { match ->
                 ArchiveCard(match = match, cardW = cardW, cardH = cardH, onMatchClick = onMatchClick)
             }
@@ -298,9 +303,13 @@ private fun ArchiveCard(
                 Text(
                     text     = match.title,
                     style    = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.SemiBold, fontSize = (cardH.value * 0.093f).sp, color = Color.White
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 26.sp,
+                        lineHeight = 32.sp,
+                        letterSpacing = 0.sp,
+                        color = Color.White
                     ),
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                    maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text     = match.competition,

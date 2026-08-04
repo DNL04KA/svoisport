@@ -21,9 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -137,7 +141,10 @@ fun SectionHeader(
 // ─── MatchCard ───────────────────────────────────────────────────────────────
 
 internal object MatchCardVisualSpec {
-    const val heightDp = 193f
+    const val widthDp = 400f
+    const val heightDp = 237f
+    const val titleSizeSp = 26f
+    const val titleLineHeightSp = 32f
     const val bottomScrimAlpha = 0.95f
 }
 
@@ -153,7 +160,7 @@ fun MatchCard(
     onFocused: (MatchItem) -> Unit = {},
     modifier : Modifier = Modifier
 ) {
-    val cardW     = (240f * scale).dp
+    val cardW     = (MatchCardVisualSpec.widthDp * scale).dp
     val cardH     = (MatchCardVisualSpec.heightDp * scale).dp
     val corner    = 12.dp
     var isFocused by remember { mutableStateOf(false) }
@@ -219,7 +226,9 @@ fun MatchCard(
                     text = match.title,
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = (13f * scale).sp,
+                        fontSize = (MatchCardVisualSpec.titleSizeSp * scale).sp,
+                        lineHeight = (MatchCardVisualSpec.titleLineHeightSp * scale).sp,
+                        letterSpacing = 0.sp,
                         color = Color.White
                     ),
                     maxLines = 2,
@@ -229,7 +238,7 @@ fun MatchCard(
                 Text(
                     text = cardSportLabel(match.competition.name),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = (11f * scale).sp,
+                        fontSize = (17f * scale).sp,
                         color = Gray3
                     ),
                     maxLines = 1,
@@ -305,6 +314,7 @@ fun ContentRow(
         Column {
             SectionHeader(title = title, modifier = Modifier.padding(start = pad))
             LazyRow(
+                modifier = Modifier.softHorizontalEdges(),
                 contentPadding        = PaddingValues(horizontal = pad),
                 horizontalArrangement = Arrangement.spacedBy(gap)
             ) {
@@ -328,8 +338,8 @@ fun WatchMoreCard(
     scale    : Float    = 1f,
     modifier : Modifier = Modifier
 ) {
-    val cardW  = (240f * scale).dp
-    val cardH  = (193f * scale).dp   // 135 thumb + 58 info
+    val cardW  = (MatchCardVisualSpec.widthDp * scale).dp
+    val cardH  = (MatchCardVisualSpec.heightDp * scale).dp
     val corner = 12.dp
     var isFocused by remember { mutableStateOf(false) }
 
@@ -359,10 +369,26 @@ fun WatchMoreCard(
             Text(
                 text  = "Смотреть ещё",
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = (13f * scale).sp,
+                    fontSize = (20f * scale).sp,
                     color    = Color.White.copy(alpha = if (isFocused) 1f else 0.45f)
                 )
             )
         }
     }
 }
+
+fun Modifier.softHorizontalEdges(): Modifier = this
+    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+    .drawWithContent {
+        drawContent()
+        val edge = 42.dp.toPx().coerceAtMost(size.width * 0.12f)
+        drawRect(
+            brush = Brush.horizontalGradient(
+                0f to Color.Transparent,
+                edge / size.width to Color.Black,
+                1f - edge / size.width to Color.Black,
+                1f to Color.Transparent
+            ),
+            blendMode = BlendMode.DstIn
+        )
+    }

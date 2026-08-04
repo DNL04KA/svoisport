@@ -84,8 +84,8 @@ fun LeftSidebar(
             .fillMaxHeight()
             .background(
                 Brush.horizontalGradient(
-                    0.00f to Color.Black.copy(alpha = 0.88f),
-                    0.55f to Color.Black.copy(alpha = 0.58f),
+                    0.00f to Color.Black.copy(alpha = 0.76f),
+                    0.55f to Color.Black.copy(alpha = 0.40f),
                     1.00f to Color.Transparent
                 )
             )

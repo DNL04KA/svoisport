@@ -6,7 +6,10 @@ import org.junit.Test
 class MatchCardVisualSpecTest {
     @Test
     fun `match card is one image with transparent description overlay`() {
-        assertEquals(193f, MatchCardVisualSpec.heightDp)
+        assertEquals(400f, MatchCardVisualSpec.widthDp)
+        assertEquals(237f, MatchCardVisualSpec.heightDp)
+        assertEquals(26f, MatchCardVisualSpec.titleSizeSp)
+        assertEquals(32f, MatchCardVisualSpec.titleLineHeightSp)
         assertEquals(0.95f, MatchCardVisualSpec.bottomScrimAlpha)
         assertEquals("Футбол", cardSportLabel("Футбол. Чемпионат Колумбии"))
         assertEquals("Хоккей", cardSportLabel("Хоккей, Кубок Салея"))

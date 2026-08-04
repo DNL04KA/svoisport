@@ -5,8 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,7 +55,8 @@ private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     else -> NavTab.HOME
 }
 
-internal fun shouldHideHomeTopBar(scrollOffset: Int): Boolean = scrollOffset > 0
+internal fun shouldHideHomeTopBar(firstVisibleItem: Int, scrollOffset: Int): Boolean =
+    firstVisibleItem > 0 || scrollOffset > 0
 
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
@@ -172,10 +174,15 @@ private fun HomeContent(
                 // 70% прозрачности, blur всего фрейма, градиентное затемнение сверху
                 var focusedMatch by remember { mutableStateOf<MatchItem?>(null) }
                 val bgMatch = focusedMatch ?: uiState.content.featuredMatch
-                val scrollState = rememberScrollState()
+                val scrollState = rememberLazyListState()
 
                 LaunchedEffect(scrollState) {
-                    snapshotFlow { shouldHideHomeTopBar(scrollState.value) }
+                    snapshotFlow {
+                        shouldHideHomeTopBar(
+                            scrollState.firstVisibleItemIndex,
+                            scrollState.firstVisibleItemScrollOffset
+                        )
+                    }
                         .distinctUntilChanged()
                         .collect(onTopBarHiddenChange)
                 }
@@ -218,7 +225,8 @@ private fun HomeContent(
                             modifier = Modifier.fillMaxSize().background(
                                 Brush.verticalGradient(
                                     0.00f to androidx.compose.ui.graphics.Color.Transparent,
-                                    0.29f to androidx.compose.ui.graphics.Color.Transparent,
+                                    0.20f to androidx.compose.ui.graphics.Color.Transparent,
+                                    0.68f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.22f),
                                     1.00f to androidx.compose.ui.graphics.Color.Black.copy(
                                         alpha = HOME_BACKGROUND_GRADIENT_ALPHA
                                     )
@@ -239,22 +247,21 @@ private fun HomeContent(
                         )
                     }
 
-                    Column(
+                    LazyColumn(
+                        state = scrollState,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
-                        // HeroBanner — featured матч вверху
-                        HeroBanner(
-                            match          = uiState.content.featuredMatch,
-                            onWatchClick   = onMatchClick,
-                            onMatchFocused = { focusedMatch = it }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Горизонтальные секции: Онлайн, Предстоящие, Архив...
-                        sections.forEach { section ->
+                        item(key = "hero") {
+                            HeroBanner(
+                                match          = uiState.content.featuredMatch,
+                                onWatchClick   = onMatchClick,
+                                onMatchFocused = { focusedMatch = it }
+                            )
+                        }
+                        item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
+                        items(sections, key = { it.title }) { section ->
                             ContentRow(
                                 title          = section.title,
                                 matches        = section.matches,
@@ -264,8 +271,6 @@ private fun HomeContent(
                                 modifier       = Modifier.padding(bottom = 28.dp)
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(32.dp))
                     }
                 }
             }
