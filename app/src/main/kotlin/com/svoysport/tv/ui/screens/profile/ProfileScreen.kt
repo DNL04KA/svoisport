@@ -48,6 +48,7 @@ fun ProfileScreen(
 ) {
     val email by remember { derivedStateOf { SessionManager.userEmail.value } }
     val linkedDevices by devicesViewModel.devices.collectAsState()
+    var sidebarExpanded by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val sw = maxWidth.value
@@ -145,19 +146,36 @@ fun ProfileScreen(
         }
 
         // Шапка как на главной: лого по центру рельсы сайдбара (60dp)
-        androidx.compose.foundation.Image(
-            painter            = androidx.compose.ui.res.painterResource(R.drawable.logo_icon),
-            contentDescription = "Свой Спорт",
-            modifier           = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = (40f * scale).dp, top = (30f * scale).dp)
-                .size((80f * scale).dp)
-        )
+        Row(
+            modifier = Modifier.align(Alignment.TopStart)
+                .padding(start = (40f * scale).dp, top = (30f * scale).dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(R.drawable.logo_icon),
+                contentDescription = "Свой Спорт",
+                modifier = Modifier.size((80f * scale).dp)
+            )
+            if (sidebarExpanded) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width((16f * scale).dp))
+                    Text(
+                        text = "СВОЙ СПОРТ",
+                        color = Color.White,
+                        fontSize = (32f * scale).coerceAtLeast(16f).sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (2f * scale).sp,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
 
         // Боковое меню поверх контента — на профиле оно тоже есть (Figma)
         com.svoysport.tv.ui.components.nav.LeftSidebar(
             selectedItem   = null,
             onItemSelected = onSidebarItem,
+            onExpandedChange = { sidebarExpanded = it },
             modifier       = Modifier.align(Alignment.TopStart).padding(top = (160f * scale).dp)
         )
     }
