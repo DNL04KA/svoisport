@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,6 +50,7 @@ fun HeroBanner(
     match: MatchItem,
     onWatchClick: (String) -> Unit,
     onMatchFocused: (MatchItem) -> Unit = {},
+    downFocusRequester: FocusRequester? = null,
     modifier: Modifier = Modifier
 ) {
     val focusRequester    = remember { FocusRequester() }
@@ -80,6 +82,9 @@ fun HeroBanner(
             onClick = { onWatchClick(match.id) },
             modifier = Modifier.fillMaxWidth().height(bannerH)
                 .focusRequester(focusRequester)
+                .focusProperties {
+                    if (downFocusRequester != null) down = downFocusRequester
+                }
                 .onFocusChanged {
                     isButtonFocused = it.isFocused
                     if (it.isFocused) onMatchFocused(match)

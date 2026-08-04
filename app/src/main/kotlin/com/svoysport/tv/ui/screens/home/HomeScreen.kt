@@ -1,6 +1,5 @@
 package com.svoysport.tv.ui.screens.home
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,7 +8,7 @@ import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.*
@@ -19,6 +18,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +57,6 @@ internal fun visibleSidebarSelection(
 private const val HOME_BACKGROUND_BLUR_DP = 210f
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
-private const val HOME_BACKGROUND_EDGE_SCRIM_ALPHA = 0.48f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
 private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 56f
 
@@ -66,6 +65,8 @@ internal fun homeBackgroundWidth(contentWidthDp: Float): Float =
 
 internal fun homeBackgroundHeight(contentHeightDp: Float): Float =
     contentHeightDp + SCAFFOLD_TOP_BAR_HEIGHT_DP
+
+internal fun firstHomeContentCardIndex(): Int = 0
 
 private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     SidebarItem.SEARCH, SidebarItem.BOOKMARKS -> null
@@ -198,15 +199,14 @@ private fun HomeContent(
                 LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
                 EmptyState()
             } else {
-                // Figma BG: обложка главной/выбранной трансляции на заднем фоне —
-                // 70% прозрачности, blur всего фрейма, градиентное затемнение сверху
-                var focusedMatch by remember { mutableStateOf<MatchItem?>(null) }
-                val bgMatch = focusedMatch ?: uiState.content.featuredMatch
+                // Один цельный фон главной: обложка hero не перемещается и не
+                // меняется при навигации по карточкам ниже.
+                val bgMatch = uiState.content.featuredMatch
                 val scrollState = rememberLazyListState()
+                val firstContentCardFocusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(selectedSport) {
                     scrollState.scrollToItem(0)
-                    focusedMatch = null
                     onTopBarHiddenChange(false)
                 }
 
@@ -236,24 +236,18 @@ private fun HomeContent(
                             )
                             .clipToBounds()
                     ) {
-                        Crossfade(
-                            targetState = bgMatch.backgroundUrl ?: bgMatch.thumbnailUrl,
-                            animationSpec = tween(400),
-                            label = "homeBg"
-                        ) { url ->
-                            AsyncImage(
-                                model = url,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
-                                    .blur(
-                                        radius = HOME_BACKGROUND_BLUR_DP.dp,
-                                        edgeTreatment = BlurredEdgeTreatment.Unbounded
-                                    ),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                        AsyncImage(
+                            model = bgMatch.backgroundUrl ?: bgMatch.thumbnailUrl,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
+                                .blur(
+                                    radius = HOME_BACKGROUND_BLUR_DP.dp,
+                                    edgeTreatment = BlurredEdgeTreatment.Unbounded
+                                ),
+                            contentScale = ContentScale.Crop
+                        )
 
                         Box(
                             modifier = Modifier.fillMaxSize().background(
@@ -264,18 +258,6 @@ private fun HomeContent(
                                     1.00f to androidx.compose.ui.graphics.Color.Black.copy(
                                         alpha = HOME_BACKGROUND_GRADIENT_ALPHA
                                     )
-                                )
-                            )
-                        )
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(
-                                Brush.horizontalGradient(
-                                    0.00f to androidx.compose.ui.graphics.Color.Black.copy(
-                                        alpha = HOME_BACKGROUND_EDGE_SCRIM_ALPHA
-                                    ),
-                                    0.42f to androidx.compose.ui.graphics.Color.Transparent,
-                                    0.76f to androidx.compose.ui.graphics.Color.Transparent,
-                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.34f)
                                 )
                             )
                         )
@@ -291,16 +273,16 @@ private fun HomeContent(
                                 HeroBanner(
                                     match          = uiState.content.featuredMatch,
                                     onWatchClick   = onMatchClick,
-                                    onMatchFocused = { focusedMatch = it }
+                                    downFocusRequester = firstContentCardFocusRequester
                                 )
                             }
                             item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
-                            items(sections, key = { it.id }) { section ->
+                            itemsIndexed(sections, key = { _, section -> section.id }) { sectionIndex, section ->
                                 ContentRow(
                                     title          = section.title,
                                     matches        = section.matches,
                                     onMatchClick   = onMatchClick,
-                                    onMatchFocused = { focusedMatch = it },
+                                    firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
                                     onWatchMore    = { onWatchMore(section.title) },
                                     modifier       = Modifier.padding(bottom = 28.dp)
                                 )

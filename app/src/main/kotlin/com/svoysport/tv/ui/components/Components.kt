@@ -14,12 +14,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -305,6 +307,7 @@ fun ContentRow(
     onMatchClick  : (String) -> Unit,
     onMatchFocused: (MatchItem) -> Unit = {},
     onWatchMore   : (() -> Unit)? = null,
+    firstCardFocusRequester: FocusRequester? = null,
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -319,8 +322,16 @@ fun ContentRow(
                 contentPadding        = PaddingValues(horizontal = pad),
                 horizontalArrangement = Arrangement.spacedBy(gap)
             ) {
-                items(items = matches, key = { it.id }) { match ->
-                    MatchCard(match = match, onClick = onMatchClick, scale = scale, onFocused = onMatchFocused)
+                itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
+                    MatchCard(
+                        match = match,
+                        onClick = onMatchClick,
+                        scale = scale,
+                        onFocused = onMatchFocused,
+                        modifier = if (index == 0 && firstCardFocusRequester != null) {
+                            Modifier.focusRequester(firstCardFocusRequester)
+                        } else Modifier
+                    )
                 }
                 if (onWatchMore != null) item {
                     WatchMoreCard(onClick = onWatchMore, scale = scale)
