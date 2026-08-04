@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.*
 import coil3.compose.AsyncImage
@@ -163,13 +165,24 @@ private fun DetailsContent(
         }
 
         if (showSubDialog) {
-            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.60f)))
-            Box(modifier = Modifier.align(Alignment.Center)) {
-                SubscriptionDialog(
-                    onLogin   = { showSubDialog = false; onLoginClick() },
-                    onDismiss = { showSubDialog = false },
-                    scale     = scale
+            Dialog(
+                onDismissRequest = { showSubDialog = false },
+                properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = false,
+                    usePlatformDefaultWidth = false
                 )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.60f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SubscriptionDialog(
+                        onLogin   = { showSubDialog = false; onLoginClick() },
+                        onDismiss = { showSubDialog = false },
+                        scale     = scale
+                    )
+                }
             }
         }
     }

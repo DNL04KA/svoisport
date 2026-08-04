@@ -11,6 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,6 +52,11 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
     var currentQuality by remember { mutableStateOf(savedQuality) }
     val hasChanges = currentLang != savedLang || currentQuality != savedQuality
     var openMenu by remember { mutableIntStateOf(-1) }
+    val menuFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(openMenu) {
+        if (openMenu >= 0) menuFocusRequester.requestFocus()
+    }
 
     BackHandler { if (openMenu >= 0) openMenu = -1 else onBack() }
 
@@ -75,7 +83,9 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
 
         // Main layout
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = pad, vertical = pad)
+            modifier = Modifier.fillMaxSize()
+                .focusProperties { canFocus = openMenu < 0 }
+                .padding(horizontal = pad, vertical = pad)
         ) {
             // ── Back button + Title row ──────────────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically,
@@ -166,12 +176,13 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                     .zIndex(10f)
             ) {
                 Column(modifier = Modifier.padding(horizontal = (24f * scale).dp, vertical = (16f * scale).dp)) {
-                    options.forEach { option ->
+                    options.forEachIndexed { index, option ->
                         SettingsDropdownItem(
                             label      = option,
                             isSelected = option == selected,
                             height     = dropItemH,
                             textSp     = dropTextSp,
+                            modifier   = if (index == 0) Modifier.focusRequester(menuFocusRequester) else Modifier,
                             onClick    = {
                                 if (openMenu == 0) currentLang = option else currentQuality = option
                                 openMenu = -1
@@ -242,6 +253,7 @@ private fun SettingsDropdownItem(
     isSelected: Boolean,
     height    : Dp       = 80.dp,
     textSp    : TextUnit = 28.sp,
+    modifier  : Modifier = Modifier,
     onClick   : () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -249,7 +261,7 @@ private fun SettingsDropdownItem(
     val bgBrush: Brush = if (isSelected || isFocused) _SettingsPrimaryGrad
         else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent))
     Box(
-        modifier = Modifier.fillMaxWidth().height(height)
+        modifier = modifier.fillMaxWidth().height(height)
             .onFocusChanged { isFocused = it.isFocused }.scale(sc)
             .clip(RoundedCornerShape(16.dp)).background(bgBrush)
     ) {
