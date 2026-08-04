@@ -41,6 +41,7 @@ import com.svoysport.tv.ui.theme.Gray4
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
 
 private const val HOME_BACKGROUND_HEIGHT_DP = 476f
+private const val HOME_BACKGROUND_BLUR_DP = 8f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
 private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
 
@@ -178,7 +179,10 @@ private fun HomeContent(
                             AsyncImage(
                                 model = url,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize().alpha(0.70f).blur(105.dp),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(0.48f)
+                                    .blur(HOME_BACKGROUND_BLUR_DP.dp),
                                 contentScale = ContentScale.Crop
                             )
                         }
