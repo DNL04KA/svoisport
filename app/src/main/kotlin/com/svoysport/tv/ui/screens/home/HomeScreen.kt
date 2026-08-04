@@ -43,7 +43,16 @@ import com.svoysport.tv.ui.theme.Gray4
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
-private enum class SidebarMode { NONE, SEARCH, FAVORITES }
+internal enum class SidebarMode { NONE, SEARCH, FAVORITES }
+
+internal fun visibleSidebarSelection(
+    mode: SidebarMode,
+    selectedSport: SidebarItem?
+): SidebarItem? = when (mode) {
+    SidebarMode.SEARCH -> SidebarItem.SEARCH
+    SidebarMode.FAVORITES -> SidebarItem.BOOKMARKS
+    SidebarMode.NONE -> selectedSport
+}
 
 private const val HOME_BACKGROUND_HEIGHT_DP = 476f
 private const val HOME_BACKGROUND_BLUR_DP = 210f
@@ -122,7 +131,7 @@ fun HomeScreen(
                               com.svoysport.tv.session.SubscriptionManager.isSubscribed.value,
         onAuthClick         = onAuthClick,
         topBarHidden        = topBarHidden,
-        selectedSidebarItem = selectedSport,
+        selectedSidebarItem = visibleSidebarSelection(sidebarMode, selectedSport),
         onSidebarItemSelected = { item ->
             when (item) {
                 SidebarItem.SEARCH    -> sidebarMode = SidebarMode.SEARCH
