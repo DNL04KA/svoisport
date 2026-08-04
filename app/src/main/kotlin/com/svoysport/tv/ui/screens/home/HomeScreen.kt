@@ -42,7 +42,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
 
 private const val HOME_BACKGROUND_HEIGHT_DP = 476f
-private const val HOME_BACKGROUND_BLUR_DP = 105f
+private const val HOME_BACKGROUND_BLUR_DP = 210f
+private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
+private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
+private const val HOME_BACKGROUND_EDGE_SCRIM_ALPHA = 0.48f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
 private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
 
@@ -202,7 +205,7 @@ private fun HomeContent(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .alpha(0.70f)
+                                    .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
                                     .blur(
                                         radius = HOME_BACKGROUND_BLUR_DP.dp,
                                         edgeTreatment = BlurredEdgeTreatment.Unbounded
@@ -216,7 +219,21 @@ private fun HomeContent(
                                 Brush.verticalGradient(
                                     0.00f to androidx.compose.ui.graphics.Color.Transparent,
                                     0.29f to androidx.compose.ui.graphics.Color.Transparent,
-                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.70f)
+                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(
+                                        alpha = HOME_BACKGROUND_GRADIENT_ALPHA
+                                    )
+                                )
+                            )
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(
+                                Brush.horizontalGradient(
+                                    0.00f to androidx.compose.ui.graphics.Color.Black.copy(
+                                        alpha = HOME_BACKGROUND_EDGE_SCRIM_ALPHA
+                                    ),
+                                    0.42f to androidx.compose.ui.graphics.Color.Transparent,
+                                    0.76f to androidx.compose.ui.graphics.Color.Transparent,
+                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.34f)
                                 )
                             )
                         )

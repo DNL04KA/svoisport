@@ -41,9 +41,6 @@ import com.svoysport.tv.ui.components.nav.NavTab
 import com.svoysport.tv.ui.components.nav.SidebarItem
 import com.svoysport.tv.ui.components.nav.TopNavigationBar
 import com.svoysport.tv.ui.theme.*
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 // ─── TvScaffold ──────────────────────────────────────────────────────────────
 
@@ -138,7 +135,14 @@ fun SectionHeader(
 }
 
 // ─── MatchCard ───────────────────────────────────────────────────────────────
-// Figma: 240×(135+58)dp r=12 — масштабируется через scale от родителя BoxWithConstraints
+
+internal object MatchCardVisualSpec {
+    const val heightDp = 193f
+    const val bottomScrimAlpha = 0.95f
+}
+
+internal fun cardSportLabel(competitionName: String): String =
+    competitionName.substringBefore('.').substringBefore(',').trim().ifEmpty { competitionName }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -150,7 +154,7 @@ fun MatchCard(
     modifier : Modifier = Modifier
 ) {
     val cardW     = (240f * scale).dp
-    val thumbH    = (135f * scale).dp
+    val cardH     = (MatchCardVisualSpec.heightDp * scale).dp
     val corner    = 12.dp
     var isFocused by remember { mutableStateOf(false) }
 
@@ -161,61 +165,80 @@ fun MatchCard(
             if (it.isFocused) onFocused(match)
         }.tvFocusScale(isFocused),
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(corner)),
-        colors = ClickableSurfaceDefaults.colors(containerColor = CardBg, focusedContainerColor = CardBg),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent
+        ),
         border = ClickableSurfaceDefaults.border(
             border        = Border(border = androidx.compose.foundation.BorderStroke(0.dp, Color.Transparent), shape = RoundedCornerShape(corner)),
             focusedBorder = Border(border = androidx.compose.foundation.BorderStroke(2.dp, Primary), shape = RoundedCornerShape(corner))
         ),
         scale = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
     ) {
-        Column {
-            Box(modifier = Modifier.height(thumbH).fillMaxWidth()) {
-                AsyncImage(
-                    model = match.thumbnailUrl, contentDescription = null,
-                    modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
-                )
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(thumbH * 0.385f).align(Alignment.BottomCenter)
-                        .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.40f))))
-                )
-                if (match.isLive) {
-                    LiveBadge(modifier = Modifier.align(Alignment.TopStart).padding((8f * scale).dp))
-                }
-                val isFav = match.id in FavoritesManager.favoriteIds.value
-                Box(
-                    modifier = Modifier.align(Alignment.TopEnd).padding((8f * scale).dp)
-                        .size((24f * scale).dp).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(6.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector        = ImageVector.vectorResource(
-                            if (isFav) R.drawable.ic_bookmark_active else R.drawable.ic_bookmark
-                        ),
-                        contentDescription = if (isFav) "В избранном" else "Закладка",
-                        tint               = if (isFav) Primary else if (isFocused) Color.White else Color.White.copy(alpha = 0.7f),
-                        modifier           = Modifier.size((13f * scale).dp)
+        Box(modifier = Modifier.fillMaxWidth().height(cardH)) {
+            AsyncImage(
+                model = match.thumbnailUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.verticalGradient(
+                        0.00f to Color.Transparent,
+                        0.38f to Color.Transparent,
+                        0.72f to Color.Black.copy(alpha = 0.58f),
+                        1.00f to Color.Black.copy(alpha = MatchCardVisualSpec.bottomScrimAlpha)
                     )
-                }
-                if (match.isSubscriptionRequired) {
-                    SubscriptionBadge(modifier = Modifier.align(Alignment.BottomEnd).padding((8f * scale).dp))
-                }
-            }
-
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = (10f * scale).dp, vertical = (8f * scale).dp)) {
-                Text(
-                    text     = match.title,
-                    style    = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.SemiBold, fontSize = (13f * scale).sp, color = Color.White
-                    ),
-                    maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height((3f * scale).dp))
-                val subtitle = if (match.isLive) match.competition.name
-                    else "${match.competition.name}  ·  ${SimpleDateFormat("d MMM, HH:mm", Locale("ru")).format(Date(match.startTimeMs))}"
+            )
+            if (match.isLive) {
+                LiveBadge(modifier = Modifier.align(Alignment.TopStart).padding((8f * scale).dp))
+            }
+            val isFav = match.id in FavoritesManager.favoriteIds.value
+            Box(
+                modifier = Modifier.align(Alignment.TopEnd).padding((8f * scale).dp)
+                    .size((24f * scale).dp).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(
+                        if (isFav) R.drawable.ic_bookmark_active else R.drawable.ic_bookmark
+                    ),
+                    contentDescription = if (isFav) "В избранном" else "Закладка",
+                    tint = if (isFav) Primary else if (isFocused) Color.White else Color.White.copy(alpha = 0.7f),
+                    modifier = Modifier.size((13f * scale).dp)
+                )
+            }
+            Column(
+                modifier = Modifier.align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .padding(horizontal = (10f * scale).dp, vertical = (9f * scale).dp)
+            ) {
                 Text(
-                    text     = subtitle,
-                    style    = MaterialTheme.typography.labelSmall.copy(fontSize = (11f * scale).sp, color = Gray3),
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                    text = match.title,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = (13f * scale).sp,
+                        color = Color.White
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height((4f * scale).dp))
+                Text(
+                    text = cardSportLabel(match.competition.name),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = (11f * scale).sp,
+                        color = Gray3
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (match.isSubscriptionRequired) {
+                SubscriptionBadge(
+                    modifier = Modifier.align(Alignment.BottomEnd).padding((8f * scale).dp)
                 )
             }
         }
