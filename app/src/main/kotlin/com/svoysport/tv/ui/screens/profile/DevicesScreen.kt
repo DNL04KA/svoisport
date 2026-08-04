@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,7 +24,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Primary
@@ -181,57 +185,80 @@ fun DevicesScreen(
             val dlgTitleSp: TextUnit = (54f * scale).coerceAtLeast(18f).sp
             val dlgTextSp : TextUnit = (32f * scale).coerceAtLeast(14f).sp
             val dlgBtnH  : Dp       = (80f  * scale).dp
+            val cancelFocusRequester = remember { FocusRequester() }
+            val confirmFocusRequester = remember { FocusRequester() }
 
-            Box(modifier = Modifier.fillMaxSize().background(Color(0x80000000)).zIndex(20f))
-            Box(
-                modifier         = Modifier.fillMaxSize().zIndex(21f),
-                contentAlignment = Alignment.Center
+            LaunchedEffect(dialogState) {
+                cancelFocusRequester.requestFocus()
+            }
+
+            Dialog(
+                onDismissRequest = { dialogState = null },
+                properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = false,
+                    usePlatformDefaultWidth = false
+                )
             ) {
                 Box(
-                    modifier = Modifier
-                        .width(dlgW).wrapContentHeight()
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(Color(0xFF1E1F20))
-                        .padding(horizontal = (48f * scale).dp, vertical = (48f * scale).dp)
+                    modifier = Modifier.fillMaxSize().background(Color(0x80000000)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        modifier            = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy((32f * scale).dp)
+                    Box(
+                        modifier = Modifier
+                            .width(dlgW).wrapContentHeight()
+                            .clip(RoundedCornerShape(32.dp))
+                            .background(Color(0xFF1E1F20))
+                            .padding(horizontal = (48f * scale).dp, vertical = (48f * scale).dp)
                     ) {
-                        Text(
-                            text  = if (isExitAll) "Выйти из аккаунта на всех устройствах?" else "Отключить устройство?",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = dlgTitleSp, fontWeight = FontWeight.Medium, color = _TextMain)
-                        )
-                        Text(
-                            text  = if (isExitAll)
-                                "Выход будет выполнен на всех устройствах, включая этот телевизор.\nЧтобы использовать аккаунт снова, потребуется повторная авторизация."
-                            else
-                                "Вы уверены, что хотите выйти из аккаунта на устройстве ${targetDevice?.name ?: ""}?\nЕсли оно сейчас используется, просмотр прекратится.",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = dlgTextSp, fontWeight = FontWeight.Normal, color = Color(0xFFC4C7C5))
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy((24f * scale).dp)) {
-                            DevDialogButton(label = "Отмена",
-                                width = (171f * scale).dp, height = dlgBtnH, useGrad = true,
-                                fontSize = (28f * scale).sp, onClick = { dialogState = null })
-                            DevDialogButton(
-                                label   = if (isExitAll) "Выйти на всех" else "Отключить",
-                                width   = if (isExitAll) (263f * scale).dp else (219f * scale).dp,
-                                height  = dlgBtnH, useGrad = false,
-                                fontSize = (28f * scale).sp,
-                                onClick  = {
-                                    if (isExitAll) {
-                                        viewModel.disconnectAll {
-                                            com.svoysport.tv.session.SubscriptionManager.clear()
-                                            onLogout()
-                                        }
-                                    } else {
-                                        viewModel.disconnect(target = dialogState!!.removePrefix("disconnect:"))
-                                    }
-                                    dialogState = null
-                                }
+                        Column(
+                            modifier            = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy((32f * scale).dp)
+                        ) {
+                            Text(
+                                text  = if (isExitAll) "Выйти из аккаунта на всех устройствах?" else "Отключить устройство?",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = dlgTitleSp, fontWeight = FontWeight.Medium, color = _TextMain)
                             )
+                            Text(
+                                text  = if (isExitAll)
+                                    "Выход будет выполнен на всех устройствах, включая этот телевизор.\nЧтобы использовать аккаунт снова, потребуется повторная авторизация."
+                                else
+                                    "Вы уверены, что хотите выйти из аккаунта на устройстве ${targetDevice?.name ?: ""}?\nЕсли оно сейчас используется, просмотр прекратится.",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = dlgTextSp, fontWeight = FontWeight.Normal, color = Color(0xFFC4C7C5))
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy((24f * scale).dp)) {
+                                DevDialogButton(
+                                    label = "Отмена",
+                                    width = (171f * scale).dp,
+                                    height = dlgBtnH,
+                                    useGrad = true,
+                                    fontSize = (28f * scale).sp,
+                                    focusRequester = cancelFocusRequester,
+                                    rightFocusRequester = confirmFocusRequester,
+                                    onClick = { dialogState = null }
+                                )
+                                DevDialogButton(
+                                    label   = if (isExitAll) "Выйти на всех" else "Отключить",
+                                    width   = if (isExitAll) (263f * scale).dp else (219f * scale).dp,
+                                    height  = dlgBtnH, useGrad = false,
+                                    fontSize = (28f * scale).sp,
+                                    focusRequester = confirmFocusRequester,
+                                    leftFocusRequester = cancelFocusRequester,
+                                    onClick  = {
+                                        if (isExitAll) {
+                                            viewModel.disconnectAll {
+                                                com.svoysport.tv.session.SubscriptionManager.clear()
+                                                onLogout()
+                                            }
+                                        } else {
+                                            viewModel.disconnect(target = dialogState!!.removePrefix("disconnect:"))
+                                        }
+                                        dialogState = null
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -317,6 +344,9 @@ private fun DevDialogButton(
     height : Dp       = 80.dp,
     useGrad: Boolean,
     fontSize: TextUnit = 28.sp,
+    focusRequester: FocusRequester,
+    leftFocusRequester: FocusRequester? = null,
+    rightFocusRequester: FocusRequester? = null,
     onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -329,7 +359,12 @@ private fun DevDialogButton(
     ) {
         Surface(
             onClick  = onClick,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .focusRequester(focusRequester)
+                .focusProperties {
+                    leftFocusRequester?.let { left = it }
+                    rightFocusRequester?.let { right = it }
+                },
             shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
             colors   = ClickableSurfaceDefaults.colors(
                 containerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
