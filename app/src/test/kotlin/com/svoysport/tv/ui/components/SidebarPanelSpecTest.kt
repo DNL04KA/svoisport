@@ -8,7 +8,7 @@ class SidebarPanelSpecTest {
     @Test
     fun `sidebar uses one continuous translucent panel`() {
         assertEquals(0.92f, sidebarPanelStartAlpha)
-        assertEquals(0.58f, sidebarPanelEndAlpha)
+        assertEquals(0.12f, sidebarPanelEndAlpha)
     }
 
     @Test

@@ -68,7 +68,7 @@ private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
 }
 
 internal fun shouldHideHomeTopBar(firstVisibleItem: Int, scrollOffset: Int): Boolean =
-    firstVisibleItem > 0 || scrollOffset > 0
+    firstVisibleItem >= 2
 
 internal fun homeFocusScrollDistance(offset: Float, itemSize: Float, viewportSize: Float): Float {
     val targetOffset = viewportSize * 0.20f

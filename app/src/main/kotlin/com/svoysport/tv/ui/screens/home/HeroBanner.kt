@@ -34,6 +34,16 @@ private val HeroGradientColors = listOf(Color(0xFF4556EB), Color(0xFF273185))
 private val HeroImageShape     = RoundedCornerShape(16.dp)
 private val WatchButtonShape   = RoundedCornerShape(28.dp)
 
+internal object HeroVisualSpec {
+    const val heightDp = 340f
+    const val titleSizeSp = 36f
+    const val titleLineHeightSp = 44f
+    const val bookmarkSizeDp = 40f
+}
+
+internal fun heroVisualScale(availableWidthDp: Float): Float =
+    minOf(availableWidthDp / 1760f, 1f).coerceAtLeast(0.65f)
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun HeroBanner(
@@ -55,17 +65,17 @@ fun HeroBanner(
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val sw = maxWidth.value
-        val scale = minOf(sw / 1760f, 1f).coerceAtLeast(0.35f)
+        val scale = heroVisualScale(sw)
 
-        val bannerH  : Dp = (296f * scale).dp
+        val bannerH  : Dp = (HeroVisualSpec.heightDp * scale).dp
         val padH     : Dp = (20f  * scale).dp
         val padEnd   : Dp = (32f  * scale).dp
         val imgGap   : Dp = (28f  * scale).dp
         val leagueFs      = (13f  * scale).coerceAtLeast(10f).sp
-        val titleFs       = (32f  * scale).coerceAtLeast(14f).sp
-        val lineH         = (40f  * scale).coerceAtLeast(18f).sp
-        val badgeSz  : Dp = (28f  * scale).dp
-        val badgeIco : Dp = (14f  * scale).dp
+        val titleFs       = (HeroVisualSpec.titleSizeSp * scale).coerceAtLeast(18f).sp
+        val lineH         = (HeroVisualSpec.titleLineHeightSp * scale).coerceAtLeast(22f).sp
+        val badgeSz  : Dp = (HeroVisualSpec.bookmarkSizeDp * scale).dp
+        val badgeIco : Dp = (22f  * scale).dp
         val btnSpGap : Dp = (24f  * scale).dp
 
         Row(
@@ -128,8 +138,9 @@ fun HeroBanner(
                     Box(
                         modifier = Modifier.size(badgeSz)
                             .background(
-                                if (isButtonFocused) Primary.copy(alpha = 0.25f) else White20,
-                                RoundedCornerShape(6.dp)
+                                if (isButtonFocused) Primary.copy(alpha = 0.40f)
+                                else Color.White.copy(alpha = 0.16f),
+                                RoundedCornerShape(8.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {

@@ -44,7 +44,7 @@ private data class SidebarIconData(
 )
 
 internal const val sidebarPanelStartAlpha = 0.92f
-internal const val sidebarPanelEndAlpha = 0.58f
+internal const val sidebarPanelEndAlpha = 0.12f
 private val SIDEBAR_COLLAPSED = 60.dp
 private val SIDEBAR_EXPANDED  = 220.dp
 private val ICON_SIZE         = 22.dp
