@@ -107,7 +107,9 @@ private fun QrContent(qrUrl: String, planId: String?, scale: Float, onBack: () -
                         Text(step, color = Color(0xFFD2D2D4), fontSize = (27f * scale).sp)
                     }
                 }
-                Spacer(Modifier.height((112f * scale).dp))
+                // Оставляем QR внутри карточки с заметным нижним воздухом:
+                // прежние 112dp прижимали и обрезали блок у нижней границы.
+                Spacer(Modifier.height((16f * scale).dp))
                 Box(
                     modifier = Modifier
                         .size(width = (400f * scale).dp, height = (505f * scale).dp)
