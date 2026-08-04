@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
@@ -14,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
@@ -40,7 +43,8 @@ private data class SidebarIconData(
     val label:      String
 )
 
-internal const val sidebarPanelAlpha = 0.78f
+internal const val sidebarPanelStartAlpha = 0.92f
+internal const val sidebarPanelEndAlpha = 0.58f
 private val SIDEBAR_COLLAPSED = 60.dp
 private val SIDEBAR_EXPANDED  = 220.dp
 private val ICON_SIZE         = 22.dp
@@ -52,7 +56,7 @@ fun LeftSidebar(
     selectedItem: SidebarItem?,
     onItemSelected: (SidebarItem) -> Unit,
     onExpandedChange: (Boolean) -> Unit = {},
-    contentTopPadding: Dp = 64.dp,
+    contentTopPadding: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     val topItems = listOf(
@@ -84,7 +88,13 @@ fun LeftSidebar(
         modifier = modifier
             .width(sidebarWidth)
             .fillMaxHeight()
-            .background(Color.Black.copy(alpha = sidebarPanelAlpha))
+            .background(
+                Brush.horizontalGradient(
+                    0f to Color.Black.copy(alpha = sidebarPanelStartAlpha),
+                    0.72f to Color.Black.copy(alpha = 0.76f),
+                    1f to Color.Black.copy(alpha = sidebarPanelEndAlpha)
+                )
+            )
             .padding(start = 8.dp, end = 8.dp, top = contentTopPadding + 12.dp, bottom = 12.dp)
             .onFocusChanged {
                 sidebarFocused = it.hasFocus
@@ -93,6 +103,37 @@ fun LeftSidebar(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
+        Row(
+            modifier = Modifier.height(40.dp).fillMaxWidth().padding(start = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.logo_icon),
+                contentDescription = "Свой Спорт",
+                modifier = Modifier.size(36.dp)
+            )
+            AnimatedVisibility(
+                visible = sidebarFocused,
+                enter = fadeIn(tween(180)),
+                exit = fadeOut(tween(120))
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        text = "СВОЙ СПОРТ",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            letterSpacing = 0.sp,
+                            color = Color.White
+                        ),
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+
         topItems.forEach { item ->
             SidebarRow(
                 item      = item,
@@ -133,13 +174,7 @@ private fun SidebarRow(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val isActive = isSelected || isFocused
-    // Figma NAVBAR: покой — серый контур; фокус — светлая плашка + тёмный контент;
-    // выбран — синяя плашка + белый контент.
-    val contentColor = when {
-        isFocused  -> Color(0xFF171717)
-        isSelected -> Color.White
-        else       -> Gray3
-    }
+    val contentColor = if (isActive) Color.White else Gray3
 
     Surface(
         onClick  = onClick,
@@ -149,8 +184,8 @@ private fun SidebarRow(
             .onFocusChanged { isFocused = it.isFocused },
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(10.dp)),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor        = if (isSelected) Primary else Color.Transparent,
-            focusedContainerColor = Color(0xFFE2E2E2)
+            containerColor        = sidebarItemContainerColor(isSelected, false),
+            focusedContainerColor = sidebarItemContainerColor(isSelected, true)
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)
     ) {
@@ -186,4 +221,10 @@ private fun SidebarRow(
             }
         }
     }
+}
+
+internal fun sidebarItemContainerColor(isSelected: Boolean, isFocused: Boolean): Color = when {
+    isFocused -> Primary
+    isSelected -> Color(0xFF343B4B)
+    else -> Color.Transparent
 }

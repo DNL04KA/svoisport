@@ -82,7 +82,7 @@ fun ProfileScreen(
             selectedItem   = null,
             onItemSelected = onSidebarItem,
             onExpandedChange = { sidebarExpanded = it },
-            contentTopPadding = 64.dp,
+            contentTopPadding = 0.dp,
             modifier       = Modifier.align(Alignment.TopStart)
         )
         Box(modifier = Modifier.fillMaxSize().offset(x = contentShift)) {
@@ -163,32 +163,6 @@ fun ProfileScreen(
                         }
                     }
                 )
-        }
-
-        // Шапка как на главной: лого по центру рельсы сайдбара (60dp)
-        Row(
-            modifier = Modifier.align(Alignment.TopStart)
-                .padding(start = 12.dp, top = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(R.drawable.logo_icon),
-                contentDescription = "Свой Спорт",
-                modifier = Modifier.size(36.dp)
-            )
-            if (sidebarExpanded) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = "СВОЙ СПОРТ",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.sp,
-                        maxLines = 1
-                    )
-                }
-            }
         }
 
     }

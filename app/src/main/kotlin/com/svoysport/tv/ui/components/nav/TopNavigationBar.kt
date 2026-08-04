@@ -46,33 +46,7 @@ fun TopNavigationBar(
             .padding(start = 12.dp, end = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Логотип: иконка всегда, текст «СВОЙ СПОРТ» появляется при раскрытии сайдбара
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter            = painterResource(R.drawable.logo_icon),
-                contentDescription = "Свой Спорт",
-                modifier           = Modifier.size(36.dp)
-            )
-            androidx.compose.animation.AnimatedVisibility(
-                visible = logoExpanded,
-                enter   = androidx.compose.animation.fadeIn(tween(200)) +
-                          androidx.compose.animation.expandHorizontally(tween(250)),
-                exit    = androidx.compose.animation.fadeOut(tween(150)) +
-                          androidx.compose.animation.shrinkHorizontally(tween(200))
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text  = "СВОЙ СПОРТ",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.SemiBold, fontSize = 20.sp,
-                            letterSpacing = 0.sp, color = Color.White
-                        ),
-                        maxLines = 1
-                    )
-                }
-            }
-        }
+        Spacer(modifier = Modifier.width(if (logoExpanded) 196.dp else 36.dp))
 
         Spacer(modifier = Modifier.weight(1f))
 
