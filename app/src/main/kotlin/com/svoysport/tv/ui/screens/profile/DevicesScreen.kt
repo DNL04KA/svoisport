@@ -75,21 +75,18 @@ fun DevicesScreen(
         val deviceRowH: Dp       = (126f * scale).dp
         val exitBtnH  : Dp       = (80f  * scale).dp
         val exitBtnW  : Dp       = (500f * scale).dp
-        val deviceIconSz: Dp     = (42f  * scale).dp
         val nameSp    : TextUnit = (36f  * scale).coerceAtLeast(14f).sp
         val subtitleSp: TextUnit = (20f  * scale).coerceAtLeast(11f).sp
         val rowGap    : Dp       = (40f  * scale).dp
-        val contentGap: Dp       = (140f * scale).dp
 
-        Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = pad, vertical = pad)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             // ── Back button ──────────────────────────────────────────────────
             var backFocused by remember { mutableStateOf(false) }
             val backSc by animateFloatAsState(if (backFocused) 1.08f else 1f, tween(150), label = "back")
             Surface(
                 onClick   = onBack,
-                modifier  = Modifier.size(closeSz).onFocusChanged { backFocused = it.isFocused }.scale(backSc),
+                modifier  = Modifier.offset(x = pad, y = pad).size(closeSz)
+                    .onFocusChanged { backFocused = it.isFocused }.scale(backSc),
                 shape     = ClickableSurfaceDefaults.shape(RoundedCornerShape(200.dp)),
                 colors    = ClickableSurfaceDefaults.colors(
                     containerColor        = _PanelBg,
@@ -106,57 +103,50 @@ fun DevicesScreen(
                 }
             }
 
-            Spacer(Modifier.height((65f * scale).dp))
-
-            // ── Two-column content ───────────────────────────────────────────
-            Row(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                verticalAlignment = Alignment.Top
+            Text(
+                text  = "Мои устройства",
+                modifier = Modifier.offset(x = (200f * scale).dp, y = (70f * scale).dp),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = titleSp, fontWeight = FontWeight.Medium, color = _TextMain
+                )
+            )
+            Column(
+                modifier = Modifier.offset(x = (200f * scale).dp, y = (160f * scale).dp)
+                    .width((625f * scale).dp),
+                verticalArrangement = Arrangement.spacedBy((42f * scale).dp)
             ) {
-                // Left: title + description (Figma: x=200 w=625 → weight 625)
-                Column(
-                    modifier            = Modifier.weight(625f),
-                    verticalArrangement = Arrangement.spacedBy((16f * scale).dp)
-                ) {
                     Text(
-                        text  = "Мои устройства",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = titleSp, fontWeight = FontWeight.Medium, color = _TextMain
-                        )
-                    )
-                    Text(
-                        text  = "Здесь отображаются все устройства, где выполнен вход в аккаунт.\nОдновременно можно использовать до трёх устройств. При необходимости из любого устройства можно выйти",
+                        text  = "Здесь отображаются все устройства, где\nвыполнен вход в аккаунт.\nОдновременно можно использовать до трёх\nустройств.",
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = textSp, fontWeight = FontWeight.Medium, color = _Gray3
                         )
                     )
-                }
-
-                // Gap between panels (Figma: 965-200-625=140dp)
-                Spacer(Modifier.width(contentGap))
-
-                // Right: device list (Figma: w=795 → weight 795)
-                Column(
-                    modifier            = Modifier.weight(795f),
-                    verticalArrangement = Arrangement.spacedBy(rowGap)
-                ) {
+                    Text(
+                        text = "При необходимости из любого устройства\nможно выйти",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = textSp, fontWeight = FontWeight.Medium, color = _Gray3
+                        )
+                    )
+            }
+            Column(
+                modifier = Modifier.offset(x = (960f * scale).dp, y = (147f * scale).dp)
+                    .width((805f * scale).dp),
+                verticalArrangement = Arrangement.spacedBy(rowGap)
+            ) {
                     devices.forEach { device ->
                         DeviceRow(
                             device       = device,
                             height       = deviceRowH,
-                            iconSz       = deviceIconSz,
                             nameSp       = nameSp,
                             subtitleSp   = subtitleSp,
                             onDisconnect = { dialogState = "disconnect:${device.id}" }
                         )
                     }
-                }
             }
 
             // ── Exit all button — bottom center ──────────────────────────────
             if (shouldShowExitAllDevices(devices.size)) {
-                Spacer(Modifier.height((20f * scale).dp))
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = pad)) {
                 var exitFocused by remember { mutableStateOf(false) }
                 val exitSc by animateFloatAsState(if (exitFocused) 1.08f else 1f, tween(150), label = "exitAll")
                 Surface(
@@ -172,7 +162,6 @@ fun DevicesScreen(
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = (28f * scale).sp, fontWeight = FontWeight.Medium, color = _ExitRed))
                     }
-                }
                 }
             }
         }
@@ -270,6 +259,7 @@ fun DevicesScreen(
         }
     }
 }
+}
 
 // ─── DeviceRow ────────────────────────────────────────────────────────────────
 
@@ -278,7 +268,6 @@ fun DevicesScreen(
 private fun DeviceRow(
     device      : DeviceItem,
     height      : Dp       = 126.dp,
-    iconSz      : Dp       = 42.dp,
     nameSp      : TextUnit = 36.sp,
     subtitleSp  : TextUnit = 20.sp,
     onDisconnect: () -> Unit
@@ -303,11 +292,7 @@ private fun DeviceRow(
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_monitor),
-                    contentDescription = null, tint = _TextMain, modifier = Modifier.size(iconSz))
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(text = device.name, style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = nameSp, fontWeight = FontWeight.SemiBold, color = _TextMain))
                     if (device.isCurrent) {
@@ -317,9 +302,8 @@ private fun DeviceRow(
                         Text(text = device.lastLogin, style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = subtitleSp, fontWeight = FontWeight.Medium, color = _Gray3))
                     }
-                }
             }
-            val indicatorSz = iconSz
+            val indicatorSz = 42.dp
             Box(
                 modifier = Modifier.size(indicatorSz).clip(RoundedCornerShape(indicatorSz / 2))
                     .background(Color(0x66565A80)),

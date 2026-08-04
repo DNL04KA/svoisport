@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
@@ -51,6 +52,7 @@ fun LeftSidebar(
     selectedItem: SidebarItem?,
     onItemSelected: (SidebarItem) -> Unit,
     onExpandedChange: (Boolean) -> Unit = {},
+    contentTopPadding: Dp = 64.dp,
     modifier: Modifier = Modifier
 ) {
     val topItems = listOf(
@@ -83,7 +85,7 @@ fun LeftSidebar(
             .width(sidebarWidth)
             .fillMaxHeight()
             .background(Color.Black.copy(alpha = sidebarPanelAlpha))
-            .padding(vertical = 12.dp, horizontal = 8.dp)
+            .padding(start = 8.dp, end = 8.dp, top = contentTopPadding + 12.dp, bottom = 12.dp)
             .onFocusChanged {
                 sidebarFocused = it.hasFocus
                 onExpandedChange(it.hasFocus)

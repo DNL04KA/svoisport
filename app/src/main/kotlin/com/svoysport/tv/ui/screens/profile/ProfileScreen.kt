@@ -78,6 +78,13 @@ fun ProfileScreen(
         val subtitleSp : TextUnit = (20f  * scale).coerceAtLeast(12f).sp
         val itemGap    : Dp       = (20f  * scale).dp
         AppBackground()
+        com.svoysport.tv.ui.components.nav.LeftSidebar(
+            selectedItem   = null,
+            onItemSelected = onSidebarItem,
+            onExpandedChange = { sidebarExpanded = it },
+            contentTopPadding = 64.dp,
+            modifier       = Modifier.align(Alignment.TopStart)
+        )
         Box(modifier = Modifier.fillMaxSize().offset(x = contentShift)) {
                 // User info
                 Column(
@@ -161,36 +168,29 @@ fun ProfileScreen(
         // Шапка как на главной: лого по центру рельсы сайдбара (60dp)
         Row(
             modifier = Modifier.align(Alignment.TopStart)
-                .padding(start = (40f * scale).dp, top = (30f * scale).dp),
+                .padding(start = 12.dp, top = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             androidx.compose.foundation.Image(
                 painter = androidx.compose.ui.res.painterResource(R.drawable.logo_icon),
                 contentDescription = "Свой Спорт",
-                modifier = Modifier.size((80f * scale).dp)
+                modifier = Modifier.size(36.dp)
             )
             if (sidebarExpanded) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Spacer(Modifier.width((16f * scale).dp))
+                    Spacer(Modifier.width(10.dp))
                     Text(
                         text = "СВОЙ СПОРТ",
                         color = Color.White,
-                        fontSize = (32f * scale).coerceAtLeast(16f).sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = (2f * scale).sp,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 0.sp,
                         maxLines = 1
                     )
                 }
             }
         }
 
-        // Боковое меню поверх контента — на профиле оно тоже есть (Figma)
-        com.svoysport.tv.ui.components.nav.LeftSidebar(
-            selectedItem   = null,
-            onItemSelected = onSidebarItem,
-            onExpandedChange = { sidebarExpanded = it },
-            modifier       = Modifier.align(Alignment.TopStart).padding(top = (160f * scale).dp)
-        )
     }
 }
 

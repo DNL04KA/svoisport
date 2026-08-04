@@ -65,8 +65,8 @@ fun TopNavigationBar(
                     Text(
                         text  = "СВОЙ СПОРТ",
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold, fontSize = 18.sp,
-                            letterSpacing = 1.5.sp, color = Color.White
+                            fontWeight = FontWeight.SemiBold, fontSize = 20.sp,
+                            letterSpacing = 0.sp, color = Color.White
                         ),
                         maxLines = 1
                     )

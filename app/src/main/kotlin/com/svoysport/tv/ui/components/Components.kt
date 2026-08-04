@@ -89,6 +89,12 @@ fun TvScaffold(
             .background(Background)
     ) {
         AppBackground()
+        LeftSidebar(
+            selectedItem     = selectedSidebarItem,
+            onItemSelected   = onSidebarItemSelected,
+            onExpandedChange = { sidebarExpanded = it },
+            modifier         = Modifier.align(Alignment.TopStart)
+        )
         Column(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(
                 visible = !topBarHidden,
@@ -109,12 +115,6 @@ fun TvScaffold(
                 Box(modifier = Modifier.fillMaxSize().padding(start = contentStart)) {
                     content()
                 }
-                LeftSidebar(
-                    selectedItem     = selectedSidebarItem,
-                    onItemSelected   = onSidebarItemSelected,
-                    onExpandedChange = { sidebarExpanded = it },
-                    modifier         = Modifier.align(Alignment.TopStart)
-                )
             }
         }
     }
@@ -147,6 +147,8 @@ internal object MatchCardVisualSpec {
     const val titleLineHeightSp = 32f
     const val bottomScrimAlpha = 0.95f
 }
+
+internal fun contentCardScale(availableWidthDp: Float): Float = 1f
 
 internal fun cardSportLabel(competitionName: String): String =
     competitionName.substringBefore('.').substringBefore(',').trim().ifEmpty { competitionName }
@@ -306,8 +308,7 @@ fun ContentRow(
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val sw    = maxWidth.value
-        val scale = minOf(sw / 1760f, 1f).coerceAtLeast(0.35f)
+        val scale = contentCardScale(maxWidth.value)
         val pad   = (20f * scale).dp
         val gap   = (14f * scale).dp
 

@@ -275,7 +275,7 @@ private fun HomeContent(
                                 )
                             }
                             item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
-                            items(sections, key = { it.title }) { section ->
+                            items(sections, key = { it.id }) { section ->
                                 ContentRow(
                                     title          = section.title,
                                     matches        = section.matches,
@@ -321,17 +321,38 @@ private val SPORT_KEYWORDS = mapOf(
     SidebarItem.HANDBALL   to "Гандбол"
 )
 
+private val ALL_NAMED_SPORTS = SPORT_KEYWORDS.values
+
+internal fun sectionTitleForSport(title: String, sport: SidebarItem?): String {
+    if (sport == null || ALL_NAMED_SPORTS.none { title.contains(it, ignoreCase = true) }) return title
+    return if (sport == SidebarItem.OTHER) "Другой спорт" else SPORT_KEYWORDS[sport] ?: title
+}
+
+internal fun sportMatchesSelection(
+    competition: String,
+    title: String,
+    sport: SidebarItem?
+): Boolean {
+    val searchable = "$competition $title"
+    if (sport == null) return true
+    if (sport == SidebarItem.OTHER) {
+        return ALL_NAMED_SPORTS.none { searchable.contains(it, ignoreCase = true) }
+    }
+    val keyword = SPORT_KEYWORDS[sport] ?: return false
+    return searchable.contains(keyword, ignoreCase = true)
+}
+
 private fun filterBySport(
     sections: List<HomeSection>,
     sport: SidebarItem?
 ): List<HomeSection> {
-    val keyword = SPORT_KEYWORDS[sport] ?: return sections
+    if (sport == null) return sections
     return sections
         .map { section ->
             section.copy(
+                title = sectionTitleForSport(section.title, sport),
                 matches = section.matches.filter { match ->
-                    match.competition.name.contains(keyword, ignoreCase = true) ||
-                    match.title.contains(keyword, ignoreCase = true)
+                    sportMatchesSelection(match.competition.name, match.title, sport)
                 }
             )
         }
