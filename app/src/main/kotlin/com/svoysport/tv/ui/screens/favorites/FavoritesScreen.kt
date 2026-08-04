@@ -1,6 +1,5 @@
 package com.svoysport.tv.ui.screens.favorites
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -27,7 +26,6 @@ import com.svoysport.tv.domain.model.MatchItem
 import com.svoysport.tv.domain.repository.MatchRepository
 import com.svoysport.tv.session.FavoritesManager
 import com.svoysport.tv.ui.components.MatchCard
-import com.svoysport.tv.ui.theme.Background
 import com.svoysport.tv.ui.theme.Gray3
 import com.svoysport.tv.ui.theme.Gray4
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,7 +65,7 @@ fun FavoritesContent(
         runCatching { contentFr.requestFocus() }
     }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Background)) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)

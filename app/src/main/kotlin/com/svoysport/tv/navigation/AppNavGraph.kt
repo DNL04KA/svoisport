@@ -25,7 +25,11 @@ import com.svoysport.tv.ui.components.nav.SidebarItem
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
-    object Home : Screen("home")
+    object Home : Screen("home") {
+        const val routeWithArgs = "home?sidebar={sidebar}"
+        fun createRoute(item: SidebarItem? = null): String =
+            if (item == null) route else "$route?sidebar=${item.name}"
+    }
     object Auth : Screen("auth")
     object CodeVerification : Screen("code_verification/{email}") {
         fun createRoute(email: String) = "code_verification/${email}"
@@ -49,8 +53,6 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
-    var requestedSidebarItem by remember { mutableStateOf<SidebarItem?>(null) }
-
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
 
         composable(Screen.Splash.route) {
@@ -63,9 +65,18 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Screen.Home.route) {
+        composable(
+            route = Screen.Home.routeWithArgs,
+            arguments = listOf(navArgument("sidebar") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
             HomeScreen(
-                initialSidebarItem = requestedSidebarItem,
+                initialSidebarItem = sidebarItemFromRoute(
+                    backStackEntry.arguments?.getString("sidebar")
+                ),
                 onMatchClick = { matchId ->
                     navController.navigate(Screen.Details.createRoute(matchId))
                 },
@@ -132,8 +143,7 @@ fun AppNavGraph(navController: NavHostController) {
                     }
                 },
                 onSidebarItem = { item ->
-                    requestedSidebarItem = item
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.Home.createRoute(item)) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 }
@@ -195,3 +205,6 @@ fun AppNavGraph(navController: NavHostController) {
         }
     }
 }
+
+internal fun sidebarItemFromRoute(value: String?): SidebarItem? =
+    value?.let { raw -> SidebarItem.entries.firstOrNull { it.name == raw } }

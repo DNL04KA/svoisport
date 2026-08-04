@@ -1,6 +1,8 @@
 package com.svoysport.tv.ui.screens.profile
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.session.SessionManager
+import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.theme.Primary
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -49,6 +52,15 @@ fun ProfileScreen(
     val email by remember { derivedStateOf { SessionManager.userEmail.value } }
     val linkedDevices by devicesViewModel.devices.collectAsState()
     var sidebarExpanded by remember { mutableStateOf(false) }
+    val contentShift by animateDpAsState(
+        targetValue = if (sidebarExpanded) 160.dp else 0.dp,
+        animationSpec = tween(
+            durationMillis = if (sidebarExpanded) 300 else 200,
+            easing = if (sidebarExpanded) CubicBezierEasing(0f, 0f, 0.58f, 1f)
+            else CubicBezierEasing(0.42f, 0f, 1f, 1f)
+        ),
+        label = "profileSidebarContentShift"
+    )
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val sw = maxWidth.value
@@ -65,7 +77,8 @@ fun ProfileScreen(
         val titleSp    : TextUnit = (36f  * scale).coerceAtLeast(14f).sp
         val subtitleSp : TextUnit = (20f  * scale).coerceAtLeast(12f).sp
         val itemGap    : Dp       = (20f  * scale).dp
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0F0F10))) {
+        AppBackground()
+        Box(modifier = Modifier.fillMaxSize().offset(x = contentShift)) {
                 // User info
                 Column(
                     modifier = Modifier.offset(x = (847f * scale).dp, y = (100f * scale).dp).width((386f * scale).dp),

@@ -1,5 +1,8 @@
 package com.svoysport.tv.ui.components
 
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -37,6 +40,19 @@ import java.util.Locale
 
 // ─── TvScaffold ──────────────────────────────────────────────────────────────
 
+internal const val sidebarExpansionDeltaDp = 160
+internal fun sidebarContentStartDp(expanded: Boolean): Int = if (expanded) 220 else 60
+
+@Composable
+fun AppBackground(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(R.drawable.bg_app),
+        contentDescription = null,
+        modifier = modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
+}
+
 @Composable
 fun TvScaffold(
     selectedTab: NavTab = NavTab.HOME,
@@ -47,21 +63,23 @@ fun TvScaffold(
     onSidebarItemSelected: (SidebarItem) -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    // Сайдбар раскрывается ПОВЕРХ контента (как в Figma): контент не сдвигается,
-    // а логотип в шапке разворачивается синхронно с сайдбаром.
     var sidebarExpanded by remember { mutableStateOf(false) }
+    val contentStart by animateDpAsState(
+        targetValue = sidebarContentStartDp(sidebarExpanded).dp,
+        animationSpec = tween(
+            durationMillis = if (sidebarExpanded) 300 else 200,
+            easing = if (sidebarExpanded) CubicBezierEasing(0f, 0f, 0.58f, 1f)
+            else CubicBezierEasing(0.42f, 0f, 1f, 1f)
+        ),
+        label = "sidebarContentStart"
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
     ) {
-        Image(
-            painter = painterResource(R.drawable.bg_app),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        AppBackground()
         Column(modifier = Modifier.fillMaxSize()) {
             TopNavigationBar(
                 selectedTab   = selectedTab,
@@ -71,11 +89,9 @@ fun TvScaffold(
                 logoExpanded  = sidebarExpanded
             )
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // Контент занимает всю ширину, оставляя слева место под свёрнутый сайдбар
-                Box(modifier = Modifier.fillMaxSize().padding(start = 60.dp)) {
+                Box(modifier = Modifier.fillMaxSize().padding(start = contentStart)) {
                     content()
                 }
-                // Сайдбар-оверлей
                 LeftSidebar(
                     selectedItem     = selectedSidebarItem,
                     onItemSelected   = onSidebarItemSelected,

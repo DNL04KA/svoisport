@@ -35,7 +35,6 @@ import com.svoysport.tv.ui.screens.archive.ArchiveScreen
 import com.svoysport.tv.ui.screens.favorites.FavoritesContent
 import com.svoysport.tv.ui.screens.schedule.ScheduleScreen
 import com.svoysport.tv.ui.screens.search.SearchContent
-import com.svoysport.tv.ui.theme.Background
 import com.svoysport.tv.ui.theme.Gray4
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
@@ -157,7 +156,7 @@ private fun HomeContent(
                 var focusedMatch by remember { mutableStateOf<MatchItem?>(null) }
                 val bgMatch = focusedMatch ?: uiState.content.featuredMatch
 
-                BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Background)) {
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     // HomeContent находится внутри отступов TvScaffold. Компенсируем их,
                     // чтобы BG совпадал с Figma: x=0, y=0, 1920×476.
                     Box(

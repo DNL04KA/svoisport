@@ -24,7 +24,6 @@ import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.components.MatchCard
 import com.svoysport.tv.ui.screens.auth.TvKeyboard
-import com.svoysport.tv.ui.theme.Background
 import com.svoysport.tv.ui.theme.Gray3
 import com.svoysport.tv.ui.theme.Gray4
 
@@ -50,7 +49,7 @@ fun SearchContent(
         runCatching { kbFr.requestFocus() }
     }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Background)) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
