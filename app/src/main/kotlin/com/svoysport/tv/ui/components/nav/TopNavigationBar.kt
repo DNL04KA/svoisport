@@ -29,6 +29,14 @@ enum class NavTab { HOME, SCHEDULE, ARCHIVE }
 // Активный таб — тёмный непрозрачный чип (как на Figma: #1E2030)
 private val ActiveTabBg = Color(0xFF1E2235)
 
+internal fun topNavigationLeadingSpaceDp(sidebarExpanded: Boolean): Float = 36f
+
+internal fun topTabContainerColor(selected: Boolean, focused: Boolean): Color = when {
+    focused -> Primary
+    selected -> Color(0xFF414654)
+    else -> Color.Transparent
+}
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopNavigationBar(
@@ -42,19 +50,19 @@ fun TopNavigationBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(56.dp)
             .padding(start = 12.dp, end = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(if (logoExpanded) 196.dp else 36.dp))
+        Spacer(modifier = Modifier.width(topNavigationLeadingSpaceDp(logoExpanded).dp))
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Центральные табы — на полупрозрачной полосе-подложке (Figma)
         Row(
             modifier = Modifier
-                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-                .padding(4.dp),
+                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(14.dp))
+                .padding(3.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
@@ -83,9 +91,9 @@ fun TopNavigationBar(
             Surface(
                 onClick  = onAuthClick,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(36.dp)
                     .onFocusChanged { isFocused = it.isFocused },
-                shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
+                shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(18.dp)),
                 colors = ClickableSurfaceDefaults.colors(
                     containerColor        = White20,
                     focusedContainerColor = Primary
@@ -97,7 +105,7 @@ fun TopNavigationBar(
                         imageVector        = ImageVector.vectorResource(R.drawable.ic_user),
                         contentDescription = "Профиль",
                         tint               = Color.White,
-                        modifier           = Modifier.size(20.dp)
+                        modifier           = Modifier.size(18.dp)
                     )
                 }
             }
@@ -124,8 +132,8 @@ private fun NavTabItem(
         // Figma BUTTONS/Tabs: selected (не в фокусе) — серый чип «мы на этой
         // странице», фокус — accent (синий), нажатие — тёмный accent
         colors   = ClickableSurfaceDefaults.colors(
-            containerColor        = if (selected) Color(0xFF343B4B) else Color.Transparent,
-            focusedContainerColor = Primary,
+            containerColor        = topTabContainerColor(selected, false),
+            focusedContainerColor = topTabContainerColor(selected, true),
             pressedContainerColor = PrimaryPressed
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.0f)
@@ -134,10 +142,10 @@ private fun NavTabItem(
             text  = title,
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = if (isHighlighted) FontWeight.SemiBold else FontWeight.Normal,
-                fontSize   = 18.sp,
+                fontSize   = 16.sp,
                 color      = if (isHighlighted) Color.White else Color.White.copy(alpha = 0.45f)
             ),
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp)
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
         )
     }
 }

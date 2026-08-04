@@ -9,9 +9,9 @@ class HomeBackgroundGeometryTest {
         val screenClass = Class.forName("com.svoysport.tv.ui.screens.home.HomeScreenKt")
 
         assertEquals(1880f, homeBackgroundWidth(1760f))
-        assertEquals(1080f, homeBackgroundHeight(1016f))
+        assertEquals(1072f, homeBackgroundHeight(1016f))
         assertEquals(60f, screenClass.privateFloat("SCAFFOLD_RAIL_WIDTH_DP"))
-        assertEquals(64f, screenClass.privateFloat("SCAFFOLD_TOP_BAR_HEIGHT_DP"))
+        assertEquals(56f, screenClass.privateFloat("SCAFFOLD_TOP_BAR_HEIGHT_DP"))
         assertEquals(210f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))
         assertEquals(0.30f, screenClass.privateFloat("HOME_BACKGROUND_IMAGE_ALPHA"))
         assertEquals(0.30f, screenClass.privateFloat("HOME_BACKGROUND_GRADIENT_ALPHA"))

@@ -12,6 +12,11 @@ class SidebarPanelSpecTest {
     }
 
     @Test
+    fun `sidebar icons stay compact`() {
+        assertEquals(20f, sidebarIconSizeDp)
+    }
+
+    @Test
     fun `selected item is gray and focused item is blue`() {
         assertEquals(Color(0xFF343B4B), sidebarItemContainerColor(isSelected = true, isFocused = false))
         assertEquals(Color(0xFF4556EB), sidebarItemContainerColor(isSelected = true, isFocused = true))

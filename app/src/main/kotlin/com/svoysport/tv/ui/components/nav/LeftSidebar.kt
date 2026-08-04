@@ -47,7 +47,8 @@ internal const val sidebarPanelStartAlpha = 0.74f
 internal const val sidebarPanelEndAlpha = 0.04f
 private val SIDEBAR_COLLAPSED = 60.dp
 private val SIDEBAR_EXPANDED  = 220.dp
-private val ICON_SIZE         = 22.dp
+internal const val sidebarIconSizeDp = 20f
+private val ICON_SIZE         = sidebarIconSizeDp.dp
 private val ITEM_HEIGHT       = 44.dp
 
 @OptIn(ExperimentalTvMaterial3Api::class)

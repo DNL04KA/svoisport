@@ -32,7 +32,6 @@ import com.svoysport.tv.ui.theme.*
 
 private val HeroGradientColors = listOf(Color(0xFF4556EB), Color(0xFF273185))
 private val HeroImageShape     = RoundedCornerShape(16.dp)
-private val WatchButtonShape   = RoundedCornerShape(28.dp)
 
 internal object HeroVisualSpec {
     const val heightDp = 340f
@@ -76,16 +75,27 @@ fun HeroBanner(
         val lineH         = (HeroVisualSpec.titleLineHeightSp * scale).coerceAtLeast(22f).sp
         val badgeSz  : Dp = (HeroVisualSpec.bookmarkSizeDp * scale).dp
         val badgeIco : Dp = (22f  * scale).dp
-        val btnSpGap : Dp = (24f  * scale).dp
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(bannerH)
-                .padding(start = padH, end = padEnd, top = padH, bottom = (8f * scale).dp),
-            horizontalArrangement = Arrangement.spacedBy(imgGap),
-            verticalAlignment     = Alignment.CenterVertically
+        Surface(
+            onClick = { onWatchClick(match.id) },
+            modifier = Modifier.fillMaxWidth().height(bannerH)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isButtonFocused = it.isFocused
+                    if (it.isFocused) onMatchFocused(match)
+                },
+            colors = ClickableSurfaceDefaults.colors(
+                containerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent
+            ),
+            scale = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
         ) {
+            Row(
+                modifier = Modifier.fillMaxSize()
+                    .padding(start = padH, end = padEnd, top = padH, bottom = (8f * scale).dp),
+                horizontalArrangement = Arrangement.spacedBy(imgGap),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             // ── Картинка слева (~42%) ─────────────────────────────────────────
             Box(modifier = Modifier.weight(0.42f).fillMaxHeight()) {
                 if (isButtonFocused) {
@@ -156,77 +166,8 @@ fun HeroBanner(
                     }
                 }
 
-                Spacer(Modifier.height(btnSpGap))
-
-                WatchButton(
-                    focusRequester = focusRequester,
-                    isFocused      = isButtonFocused,
-                    onFocusChanged = {
-                        isButtonFocused = it
-                        if (it) onMatchFocused(match)
-                    },
-                    scale          = scale,
-                    onClick        = { onWatchClick(match.id) }
-                )
             }
         }
     }
 }
-
-// ─── WatchButton ─────────────────────────────────────────────────────────────
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun WatchButton(
-    focusRequester: FocusRequester,
-    isFocused: Boolean,
-    onFocusChanged: (Boolean) -> Unit,
-    scale: Float,
-    onClick: () -> Unit
-) {
-    val btnScale by animateFloatAsState(
-        targetValue   = if (isFocused) 1.08f else 1.0f,
-        animationSpec = tween(150),
-        label         = "watchBtnScale"
-    )
-
-    Button(
-        onClick  = onClick,
-        modifier = Modifier
-            .focusRequester(focusRequester)
-            .onFocusChanged { onFocusChanged(it.isFocused) }
-            .scale(btnScale),
-        shape  = ButtonDefaults.shape(shape = WatchButtonShape),
-        scale  = ButtonDefaults.scale(scale = 1.0f, focusedScale = 1.0f),
-        // Figma UI kit: default — тёмный Blue/100, focused — accent
-        colors = ButtonDefaults.colors(
-            containerColor         = Blue100,
-            focusedContainerColor  = Primary,
-            pressedContainerColor  = PrimaryPressed,
-            disabledContainerColor = PrimaryDisabled
-        )
-    ) {
-        Row(
-            verticalAlignment     = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy((8f * scale).dp),
-            modifier              = Modifier.padding(
-                horizontal = (20f * scale).dp, vertical = (4f * scale).dp
-            )
-        ) {
-            Icon(
-                imageVector        = ImageVector.vectorResource(R.drawable.ic_arrow_right),
-                contentDescription = null,
-                tint               = Color.White,
-                modifier           = Modifier.size((16f * scale).dp)
-            )
-            Text(
-                text  = "Смотреть",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize   = (16f * scale).sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color      = Color.White
-                )
-            )
-        }
-    }
 }

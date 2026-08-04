@@ -59,7 +59,7 @@ private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
 private const val HOME_BACKGROUND_EDGE_SCRIM_ALPHA = 0.48f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
-private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
+private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 56f
 
 internal fun homeBackgroundWidth(contentWidthDp: Float): Float =
     contentWidthDp + SCAFFOLD_RAIL_WIDTH_DP * 2f
@@ -192,7 +192,7 @@ private fun HomeContent(
         )
 
         is HomeUiState.Success -> {
-            val sections = filterBySport(uiState.content.sections, selectedSport)
+            val sections = orderedVisibleSections(filterBySport(uiState.content.sections, selectedSport))
 
             if (sections.isEmpty()) {
                 LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
@@ -378,3 +378,14 @@ private fun filterBySport(
         }
         .filter { it.matches.isNotEmpty() }
 }
+
+internal fun orderedVisibleSections(sections: List<HomeSection>): List<HomeSection> =
+    sections.filter { it.matches.isNotEmpty() }.sortedBy { section ->
+        when {
+            section.id.equals("live", ignoreCase = true) ||
+                section.title.equals("Онлайн", ignoreCase = true) -> 0
+            section.id.equals("upcoming", ignoreCase = true) ||
+                section.title.contains("Предстоящ", ignoreCase = true) -> 1
+            else -> 2
+        }
+    }

@@ -141,10 +141,10 @@ fun SectionHeader(
 // ─── MatchCard ───────────────────────────────────────────────────────────────
 
 internal object MatchCardVisualSpec {
-    const val widthDp = 250f
-    const val heightDp = 148f
-    const val titleSizeSp = 17f
-    const val titleLineHeightSp = 21f
+    const val widthDp = 230f
+    const val heightDp = 136f
+    const val titleSizeSp = 16f
+    const val titleLineHeightSp = 20f
     const val bottomScrimAlpha = 0.95f
 }
 
