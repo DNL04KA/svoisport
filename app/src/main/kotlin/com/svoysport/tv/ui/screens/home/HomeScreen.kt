@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +42,7 @@ import com.svoysport.tv.ui.theme.Gray4
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
 
 private const val HOME_BACKGROUND_HEIGHT_DP = 476f
-private const val HOME_BACKGROUND_BLUR_DP = 8f
+private const val HOME_BACKGROUND_BLUR_DP = 105f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
 private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
 
@@ -166,7 +167,7 @@ private fun HomeContent(
                                 y = (-SCAFFOLD_TOP_BAR_HEIGHT_DP).dp
                             )
                             .requiredSize(
-                                width = maxWidth + SCAFFOLD_RAIL_WIDTH_DP.dp,
+                                width = maxWidth + (SCAFFOLD_RAIL_WIDTH_DP * 2f).dp,
                                 height = HOME_BACKGROUND_HEIGHT_DP.dp
                             )
                             .clipToBounds()
@@ -181,8 +182,11 @@ private fun HomeContent(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .alpha(0.48f)
-                                    .blur(HOME_BACKGROUND_BLUR_DP.dp),
+                                    .alpha(0.70f)
+                                    .blur(
+                                        radius = HOME_BACKGROUND_BLUR_DP.dp,
+                                        edgeTreatment = BlurredEdgeTreatment.Unbounded
+                                    ),
                                 contentScale = ContentScale.Crop
                             )
                         }

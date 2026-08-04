@@ -11,7 +11,7 @@ class HomeBackgroundGeometryTest {
         assertEquals(476f, screenClass.privateFloat("HOME_BACKGROUND_HEIGHT_DP"))
         assertEquals(60f, screenClass.privateFloat("SCAFFOLD_RAIL_WIDTH_DP"))
         assertEquals(64f, screenClass.privateFloat("SCAFFOLD_TOP_BAR_HEIGHT_DP"))
-        assertEquals(8f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))
+        assertEquals(105f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))
     }
 
     private fun Class<*>.privateFloat(name: String): Float =

@@ -2,6 +2,7 @@ package com.svoysport.tv.ui.components.nav
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -22,7 +24,6 @@ import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.theme.Gray3
 import com.svoysport.tv.ui.theme.Primary
-import com.svoysport.tv.ui.theme.SidebarBg
 
 enum class SidebarItem {
     SEARCH, BOOKMARKS,
@@ -71,8 +72,8 @@ fun LeftSidebar(
         targetValue   = if (sidebarFocused) SIDEBAR_EXPANDED else SIDEBAR_COLLAPSED,
         animationSpec = tween(
             durationMillis = if (sidebarFocused) 300 else 200,
-            easing         = if (sidebarFocused) androidx.compose.animation.core.FastOutSlowInEasing
-                             else androidx.compose.animation.core.FastOutLinearInEasing
+            easing         = if (sidebarFocused) CubicBezierEasing(0f, 0f, 0.58f, 1f)
+                             else CubicBezierEasing(0.42f, 0f, 1f, 1f)
         ),
         label = "sidebarWidth"
     )
@@ -81,7 +82,13 @@ fun LeftSidebar(
         modifier = modifier
             .width(sidebarWidth)
             .fillMaxHeight()
-            .background(SidebarBg)
+            .background(
+                Brush.horizontalGradient(
+                    0.00f to Color.Black.copy(alpha = 0.88f),
+                    0.55f to Color.Black.copy(alpha = 0.58f),
+                    1.00f to Color.Transparent
+                )
+            )
             .padding(vertical = 12.dp, horizontal = 8.dp)
             .onFocusChanged {
                 sidebarFocused = it.hasFocus
