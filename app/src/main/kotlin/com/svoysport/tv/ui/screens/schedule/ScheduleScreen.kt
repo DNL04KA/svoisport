@@ -139,7 +139,7 @@ fun ScheduleScreen(
 
     // Матч в фокусе — для боковой кнопки «В избранное» (выравнивается по строке)
     var focusedMatch by remember { mutableStateOf<ScheduleMatch?>(null) }
-    var focusedRowY  by remember { mutableStateOf(0f) }
+    var focusedRowY  by remember { mutableStateOf<Float?>(null) }
     val favIds = com.svoysport.tv.session.FavoritesManager.favoriteIds.value
 
     // Снекбар
@@ -252,24 +252,25 @@ private fun FavoriteAction(
     isFav: Boolean,
     scale: Float,
     rowH: Dp,
-    rowY: Float,
+    rowY: Float?,
     modifier: Modifier = Modifier,
     onToggle: (ScheduleMatch) -> Unit
 ) {
-    if (match == null) {
+    if (match == null || rowY == null) {
         Box(modifier) {}
         return
     }
     var isFocused by remember { mutableStateOf(false) }
-    var colY by remember { mutableStateOf(0f) }
+    var colY by remember { mutableStateOf<Float?>(null) }
     Box(
         modifier = modifier.onGloballyPositioned { colY = it.positionInRoot().y },
         contentAlignment = Alignment.TopStart
     ) {
+        if (!isFavoriteActionPositionReady(match, rowY, colY)) return@Box
         Surface(
             onClick  = { onToggle(match) },
             modifier = Modifier.fillMaxWidth().height(rowH)
-                .offset { IntOffset(0, (rowY - colY).coerceAtLeast(0f).toInt()) }
+                .offset { IntOffset(0, (rowY - colY!!).coerceAtLeast(0f).toInt()) }
                 .onFocusChanged { isFocused = it.isFocused },
             shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape((16f * scale).dp)),
             colors = ClickableSurfaceDefaults.colors(
@@ -307,6 +308,12 @@ private fun FavoriteAction(
         }
     }
 }
+
+internal fun isFavoriteActionPositionReady(
+    match: ScheduleMatch?,
+    rowY: Float?,
+    columnY: Float?
+): Boolean = match != null && rowY != null && columnY != null
 
 // ─── DaysPanel ───────────────────────────────────────────────────────────────
 
@@ -499,15 +506,18 @@ private fun ScheduleMatchRow(
     onFocused: (ScheduleMatch, Float) -> Unit = { _, _ -> }
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    var rowWinY by remember { mutableStateOf(0f) }
+    var rowWinY by remember { mutableStateOf<Float?>(null) }
 
     Surface(
         onClick  = { onMatchClick(match.id) },
         modifier = Modifier.fillMaxWidth().height(rowH)
-            .onGloballyPositioned { rowWinY = it.positionInRoot().y }
+            .onGloballyPositioned {
+                rowWinY = it.positionInRoot().y
+                if (isFocused) onFocused(match, rowWinY!!)
+            }
             .onFocusChanged {
                 isFocused = it.isFocused
-                if (it.isFocused) onFocused(match, rowWinY)
+                if (it.isFocused) rowWinY?.let { y -> onFocused(match, y) }
             },
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
         // Figma: строка в фокусе — тёмная, чуть светлее остальных, с синей
