@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +39,10 @@ import com.svoysport.tv.ui.theme.Gray4
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
 private enum class SidebarMode { NONE, SEARCH, FAVORITES }
+
+private const val HOME_BACKGROUND_HEIGHT_DP = 476f
+private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
+private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
 
 private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     SidebarItem.SEARCH, SidebarItem.BOOKMARKS -> null
@@ -150,32 +155,44 @@ private fun HomeContent(
                 var focusedMatch by remember { mutableStateOf<MatchItem?>(null) }
                 val bgMatch = focusedMatch ?: uiState.content.featuredMatch
 
-                Box(modifier = Modifier.fillMaxSize().background(Background)) {
-                    Crossfade(
-                        targetState   = bgMatch.backgroundUrl ?: bgMatch.thumbnailUrl,
-                        animationSpec = tween(400),
-                        label         = "homeBg"
-                    ) { url ->
-                        AsyncImage(
-                            model              = url,
-                            contentDescription = null,
-                            modifier           = Modifier.fillMaxSize().alpha(0.30f).blur(60.dp),
-                            contentScale       = ContentScale.Crop
-                        )
-                    }
-
-                    // Градиентный скрим: тёплое свечение остаётся только сверху,
-                    // нижняя часть затемняется к фону #0F0F10 (как в макете)
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Background)) {
+                    // HomeContent находится внутри отступов TvScaffold. Компенсируем их,
+                    // чтобы BG совпадал с Figma: x=0, y=0, 1920×476.
                     Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.verticalGradient(
-                                0.00f to Background.copy(alpha = 0.10f),
-                                0.45f to Background.copy(alpha = 0.65f),
-                                0.80f to Background,
-                                1.00f to Background
+                        modifier = Modifier
+                            .offset(
+                                x = (-SCAFFOLD_RAIL_WIDTH_DP).dp,
+                                y = (-SCAFFOLD_TOP_BAR_HEIGHT_DP).dp
+                            )
+                            .requiredSize(
+                                width = maxWidth + SCAFFOLD_RAIL_WIDTH_DP.dp,
+                                height = HOME_BACKGROUND_HEIGHT_DP.dp
+                            )
+                            .clipToBounds()
+                    ) {
+                        Crossfade(
+                            targetState = bgMatch.backgroundUrl ?: bgMatch.thumbnailUrl,
+                            animationSpec = tween(400),
+                            label = "homeBg"
+                        ) { url ->
+                            AsyncImage(
+                                model = url,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize().alpha(0.70f).blur(105.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(
+                                Brush.verticalGradient(
+                                    0.00f to androidx.compose.ui.graphics.Color.Transparent,
+                                    0.29f to androidx.compose.ui.graphics.Color.Transparent,
+                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.70f)
+                                )
                             )
                         )
-                    )
+                    }
 
                     Column(
                         modifier = Modifier
