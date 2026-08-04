@@ -43,8 +43,8 @@ private data class SidebarIconData(
     val label:      String
 )
 
-internal const val sidebarPanelStartAlpha = 0.92f
-internal const val sidebarPanelEndAlpha = 0.12f
+internal const val sidebarPanelStartAlpha = 0.74f
+internal const val sidebarPanelEndAlpha = 0.04f
 private val SIDEBAR_COLLAPSED = 60.dp
 private val SIDEBAR_EXPANDED  = 220.dp
 private val ICON_SIZE         = 22.dp
@@ -91,7 +91,7 @@ fun LeftSidebar(
             .background(
                 Brush.horizontalGradient(
                     0f to Color.Black.copy(alpha = sidebarPanelStartAlpha),
-                    0.72f to Color.Black.copy(alpha = 0.76f),
+                    0.58f to Color.Black.copy(alpha = 0.42f),
                     1f to Color.Black.copy(alpha = sidebarPanelEndAlpha)
                 )
             )

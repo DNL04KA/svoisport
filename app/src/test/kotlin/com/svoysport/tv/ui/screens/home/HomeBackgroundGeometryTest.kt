@@ -5,10 +5,11 @@ import org.junit.Test
 
 class HomeBackgroundGeometryTest {
     @Test
-    fun `home background spans scaffold width and matches figma height`() {
+    fun `home background spans the complete scaffold`() {
         val screenClass = Class.forName("com.svoysport.tv.ui.screens.home.HomeScreenKt")
 
-        assertEquals(476f, screenClass.privateFloat("HOME_BACKGROUND_HEIGHT_DP"))
+        assertEquals(1880f, homeBackgroundWidth(1760f))
+        assertEquals(1080f, homeBackgroundHeight(1016f))
         assertEquals(60f, screenClass.privateFloat("SCAFFOLD_RAIL_WIDTH_DP"))
         assertEquals(64f, screenClass.privateFloat("SCAFFOLD_TOP_BAR_HEIGHT_DP"))
         assertEquals(210f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))

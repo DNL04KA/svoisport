@@ -54,13 +54,18 @@ internal fun visibleSidebarSelection(
     SidebarMode.NONE -> selectedSport
 }
 
-private const val HOME_BACKGROUND_HEIGHT_DP = 476f
 private const val HOME_BACKGROUND_BLUR_DP = 210f
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
 private const val HOME_BACKGROUND_EDGE_SCRIM_ALPHA = 0.48f
 private const val SCAFFOLD_RAIL_WIDTH_DP = 60f
 private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 64f
+
+internal fun homeBackgroundWidth(contentWidthDp: Float): Float =
+    contentWidthDp + SCAFFOLD_RAIL_WIDTH_DP * 2f
+
+internal fun homeBackgroundHeight(contentHeightDp: Float): Float =
+    contentHeightDp + SCAFFOLD_TOP_BAR_HEIGHT_DP
 
 private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     SidebarItem.SEARCH, SidebarItem.BOOKMARKS -> null
@@ -199,6 +204,12 @@ private fun HomeContent(
                 val bgMatch = focusedMatch ?: uiState.content.featuredMatch
                 val scrollState = rememberLazyListState()
 
+                LaunchedEffect(selectedSport) {
+                    scrollState.scrollToItem(0)
+                    focusedMatch = null
+                    onTopBarHiddenChange(false)
+                }
+
                 LaunchedEffect(scrollState) {
                     snapshotFlow {
                         shouldHideHomeTopBar(
@@ -211,8 +222,8 @@ private fun HomeContent(
                 }
 
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    // HomeContent находится внутри отступов TvScaffold. Компенсируем их,
-                    // чтобы BG совпадал с Figma: x=0, y=0, 1920×476.
+                    // Компенсируем отступы scaffold: динамическая обложка является
+                    // единым фоном всей главной, а не отдельной полосой сверху.
                     Box(
                         modifier = Modifier
                             .offset(
@@ -220,8 +231,8 @@ private fun HomeContent(
                                 y = (-SCAFFOLD_TOP_BAR_HEIGHT_DP).dp
                             )
                             .requiredSize(
-                                width = maxWidth + (SCAFFOLD_RAIL_WIDTH_DP * 2f).dp,
-                                height = HOME_BACKGROUND_HEIGHT_DP.dp
+                                width = homeBackgroundWidth(maxWidth.value).dp,
+                                height = homeBackgroundHeight(maxHeight.value).dp
                             )
                             .clipToBounds()
                     ) {

@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.Color
 class SidebarPanelSpecTest {
     @Test
     fun `sidebar uses one continuous translucent panel`() {
-        assertEquals(0.92f, sidebarPanelStartAlpha)
-        assertEquals(0.12f, sidebarPanelEndAlpha)
+        assertEquals(0.74f, sidebarPanelStartAlpha)
+        assertEquals(0.04f, sidebarPanelEndAlpha)
     }
 
     @Test
