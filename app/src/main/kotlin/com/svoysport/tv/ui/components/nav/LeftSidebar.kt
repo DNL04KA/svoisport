@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -40,6 +39,7 @@ private data class SidebarIconData(
     val label:      String
 )
 
+internal const val sidebarPanelAlpha = 0.78f
 private val SIDEBAR_COLLAPSED = 60.dp
 private val SIDEBAR_EXPANDED  = 220.dp
 private val ICON_SIZE         = 22.dp
@@ -82,13 +82,7 @@ fun LeftSidebar(
         modifier = modifier
             .width(sidebarWidth)
             .fillMaxHeight()
-            .background(
-                Brush.horizontalGradient(
-                    0.00f to Color.Black.copy(alpha = 0.76f),
-                    0.55f to Color.Black.copy(alpha = 0.40f),
-                    1.00f to Color.Transparent
-                )
-            )
+            .background(Color.Black.copy(alpha = sidebarPanelAlpha))
             .padding(vertical = 12.dp, horizontal = 8.dp)
             .onFocusChanged {
                 sidebarFocused = it.hasFocus

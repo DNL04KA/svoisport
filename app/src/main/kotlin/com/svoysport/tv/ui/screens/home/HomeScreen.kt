@@ -4,6 +4,9 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.BringIntoViewSpec
+import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -57,6 +60,16 @@ private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
 
 internal fun shouldHideHomeTopBar(firstVisibleItem: Int, scrollOffset: Int): Boolean =
     firstVisibleItem > 0 || scrollOffset > 0
+
+internal fun homeFocusScrollDistance(offset: Float, itemSize: Float, viewportSize: Float): Float {
+    val targetOffset = viewportSize * 0.20f
+    return if (kotlin.math.abs(offset - targetOffset) < 1f) 0f else offset - targetOffset
+}
+
+private object HomeBringIntoViewSpec : BringIntoViewSpec {
+    override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float =
+        homeFocusScrollDistance(offset, size, containerSize)
+}
 
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
@@ -147,6 +160,7 @@ fun HomeScreen(
 // ─── HomeContent ─────────────────────────────────────────────────────────────
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun HomeContent(
     uiState: HomeUiState,
     selectedSport: SidebarItem?,
@@ -247,29 +261,30 @@ private fun HomeContent(
                         )
                     }
 
-                    LazyColumn(
-                        state = scrollState,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 32.dp)
-                    ) {
-                        item(key = "hero") {
-                            HeroBanner(
-                                match          = uiState.content.featuredMatch,
-                                onWatchClick   = onMatchClick,
-                                onMatchFocused = { focusedMatch = it }
-                            )
-                        }
-                        item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
-                        items(sections, key = { it.title }) { section ->
-                            ContentRow(
-                                title          = section.title,
-                                matches        = section.matches,
-                                onMatchClick   = onMatchClick,
-                                onMatchFocused = { focusedMatch = it },
-                                onWatchMore    = { onWatchMore(section.title) },
-                                modifier       = Modifier.padding(bottom = 28.dp)
-                            )
+                    CompositionLocalProvider(LocalBringIntoViewSpec provides HomeBringIntoViewSpec) {
+                        LazyColumn(
+                            state = scrollState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 32.dp)
+                        ) {
+                            item(key = "hero") {
+                                HeroBanner(
+                                    match          = uiState.content.featuredMatch,
+                                    onWatchClick   = onMatchClick,
+                                    onMatchFocused = { focusedMatch = it }
+                                )
+                            }
+                            item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
+                            items(sections, key = { it.title }) { section ->
+                                ContentRow(
+                                    title          = section.title,
+                                    matches        = section.matches,
+                                    onMatchClick   = onMatchClick,
+                                    onMatchFocused = { focusedMatch = it },
+                                    onWatchMore    = { onWatchMore(section.title) },
+                                    modifier       = Modifier.padding(bottom = 28.dp)
+                                )
+                            }
                         }
                     }
                 }
