@@ -1,5 +1,6 @@
 package com.svoysport.tv.ui.screens.profile
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.CubicBezierEasing
@@ -12,6 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -20,6 +24,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.*
 import com.svoysport.tv.R
 import com.svoysport.tv.session.SessionManager
@@ -52,6 +58,8 @@ fun ProfileScreen(
     val email by remember { derivedStateOf { SessionManager.userEmail.value } }
     val linkedDevices by devicesViewModel.devices.collectAsState()
     var sidebarExpanded by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    BackHandler(enabled = showLogoutDialog) { showLogoutDialog = false }
     val contentShift by animateDpAsState(
         targetValue = if (sidebarExpanded) 160.dp else 0.dp,
         animationSpec = tween(
@@ -62,7 +70,9 @@ fun ProfileScreen(
         label = "profileSidebarContentShift"
     )
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize().focusProperties { canFocus = !showLogoutDialog }
+    ) {
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
@@ -155,16 +165,88 @@ fun ProfileScreen(
                 ExitButton(
                     modifier = Modifier.offset(x = (640f * scale).dp, y = (940f * scale).dp).width(itemW).height(exitBtnH),
                     fontSize = (28f * scale).coerceAtLeast(12f).sp,
-                    onClick  = {
-                        devicesViewModel.disconnectCurrent {
-                            SessionManager.isLoggedIn.value = false
-                            com.svoysport.tv.session.SubscriptionManager.clear()
-                            onLogout()
-                        }
-                    }
+                    onClick  = { showLogoutDialog = true }
                 )
         }
 
+        if (showLogoutDialog) {
+            ProfileLogoutDialog(
+                scale = scale,
+                onCancel = { showLogoutDialog = false },
+                onConfirm = {
+                    showLogoutDialog = false
+                    devicesViewModel.disconnectCurrent {
+                        SessionManager.isLoggedIn.value = false
+                        com.svoysport.tv.session.SubscriptionManager.clear()
+                        onLogout()
+                    }
+                }
+            )
+        }
+
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun ProfileLogoutDialog(
+    scale: Float,
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    val cancelFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { cancelFocusRequester.requestFocus() }
+
+    Dialog(
+        onDismissRequest = onCancel,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.82f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.width((760f * scale).dp)
+                    .background(Color(0xFF1E1F20), RoundedCornerShape(28.dp))
+                    .padding((44f * scale).dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Выйти из аккаунта?",
+                    color = TextMain,
+                    fontSize = (42f * scale).coerceAtLeast(20f).sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height((16f * scale).dp))
+                Text(
+                    "Для повторного входа потребуется снова активировать телевизор.",
+                    color = TextMain.copy(alpha = 0.68f),
+                    fontSize = (22f * scale).coerceAtLeast(14f).sp
+                )
+                Spacer(Modifier.height((36f * scale).dp))
+                Row(horizontalArrangement = Arrangement.spacedBy((20f * scale).dp)) {
+                    Button(
+                        onClick = onCancel,
+                        modifier = Modifier.focusRequester(cancelFocusRequester),
+                        colors = ButtonDefaults.colors(
+                            containerColor = Color(0xFF343B4B),
+                            focusedContainerColor = Primary
+                        )
+                    ) { Text("Отмена", fontSize = (20f * scale).coerceAtLeast(14f).sp) }
+                    Button(
+                        onClick = onConfirm,
+                        colors = ButtonDefaults.colors(
+                            containerColor = Color(0xFF343B4B),
+                            focusedContainerColor = ExitRed
+                        )
+                    ) { Text("Выйти", fontSize = (20f * scale).coerceAtLeast(14f).sp) }
+                }
+            }
+        }
     }
 }
 

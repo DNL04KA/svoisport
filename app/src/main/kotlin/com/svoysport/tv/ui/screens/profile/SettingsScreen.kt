@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.PrimaryPressed
 import com.svoysport.tv.session.SettingsManager
@@ -60,9 +61,8 @@ fun SettingsScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
 
     BackHandler { if (openMenu >= 0) openMenu = -1 else onBack() }
 
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize().background(Color(0xFF0F0F10))
-    ) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        AppBackground()
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)

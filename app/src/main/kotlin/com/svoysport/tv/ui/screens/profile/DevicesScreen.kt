@@ -79,7 +79,7 @@ fun DevicesScreen(
         val subtitleSp: TextUnit = (20f  * scale).coerceAtLeast(11f).sp
         val rowGap    : Dp       = (40f  * scale).dp
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().focusProperties { canFocus = dialogState == null }) {
             // ── Back button ──────────────────────────────────────────────────
             var backFocused by remember { mutableStateOf(false) }
             val backSc by animateFloatAsState(if (backFocused) 1.08f else 1f, tween(150), label = "back")
@@ -194,7 +194,7 @@ fun DevicesScreen(
                 )
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().background(Color(0x80000000)),
+                    modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.82f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(

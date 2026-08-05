@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
 import com.svoysport.tv.R
+import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.theme.Primary
 import com.svoysport.tv.ui.theme.PrimaryPressed
 
@@ -36,9 +37,8 @@ private val _AboutPrimary = Color(0xFF4556EB)
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize().background(_AboutBg)
-    ) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        AppBackground()
         val sw = maxWidth.value
         val sh = maxHeight.value
         val scale = minOf(sw / 1920f, sh / 1080f, 1f).coerceAtLeast(0.35f)
