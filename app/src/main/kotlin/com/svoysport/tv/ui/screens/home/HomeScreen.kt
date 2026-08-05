@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -64,6 +66,30 @@ internal fun visibleSidebarSelection(
     SidebarMode.FAVORITES -> SidebarItem.BOOKMARKS
     SidebarMode.NONE -> selectedSport
 }
+
+internal fun sidebarItemStateKey(item: SidebarItem?): String = item?.name.orEmpty()
+
+internal fun sidebarItemFromStateKey(key: String): SidebarItem? =
+    SidebarItem.entries.firstOrNull { it.name == key }
+
+private val navTabStateSaver = Saver<MutableState<NavTab>, String>(
+    save = { it.value.name },
+    restore = { key ->
+        mutableStateOf(NavTab.entries.firstOrNull { it.name == key } ?: NavTab.HOME)
+    }
+)
+
+private val sidebarItemStateSaver = Saver<MutableState<SidebarItem?>, String>(
+    save = { sidebarItemStateKey(it.value) },
+    restore = { key -> mutableStateOf(sidebarItemFromStateKey(key)) }
+)
+
+private val sidebarModeStateSaver = Saver<MutableState<SidebarMode>, String>(
+    save = { it.value.name },
+    restore = { key ->
+        mutableStateOf(SidebarMode.entries.firstOrNull { it.name == key } ?: SidebarMode.NONE)
+    }
+)
 
 internal const val HOME_BACKGROUND_BLUR_DP = 48f
 internal const val HOME_BACKGROUND_CROSSFADE_MS = 180
@@ -121,9 +147,15 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState         by viewModel.uiState.collectAsState()
-    var selectedTab     by remember { mutableStateOf(NavTab.HOME) }
-    var selectedSport   by remember { mutableStateOf<SidebarItem?>(null) }
-    var sidebarMode     by remember { mutableStateOf(SidebarMode.NONE) }
+    var selectedTab     by rememberSaveable(saver = navTabStateSaver) {
+        mutableStateOf(NavTab.HOME)
+    }
+    var selectedSport   by rememberSaveable(saver = sidebarItemStateSaver) {
+        mutableStateOf<SidebarItem?>(null)
+    }
+    var sidebarMode     by rememberSaveable(saver = sidebarModeStateSaver) {
+        mutableStateOf(SidebarMode.NONE)
+    }
     var topBarHidden    by remember { mutableStateOf(false) }
     var expandedSection by remember { mutableStateOf<String?>(null) }
     var focusedHomeMatch by remember { mutableStateOf<MatchItem?>(null) }

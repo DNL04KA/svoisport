@@ -20,4 +20,16 @@ class SidebarSelectionStateTest {
             visibleSidebarSelection(SidebarMode.NONE, SidebarItem.HOCKEY)
         )
     }
+
+    @Test
+    fun `basketball selection is restored after opening and closing a match`() {
+        val savedState = sidebarItemStateKey(SidebarItem.BASKETBALL)
+
+        assertEquals(SidebarItem.BASKETBALL, sidebarItemFromStateKey(savedState))
+    }
+
+    @Test
+    fun `empty saved state restores no sport filter`() {
+        assertEquals(null, sidebarItemFromStateKey(""))
+    }
 }
