@@ -72,6 +72,7 @@ fun TvScaffold(
     topBarHidden: Boolean = false,
     selectedSidebarItem: SidebarItem? = null,
     onSidebarItemSelected: (SidebarItem) -> Unit = {},
+    background: @Composable BoxScope.() -> Unit = { AppBackground() },
     content: @Composable () -> Unit
 ) {
     var sidebarExpanded by remember { mutableStateOf(false) }
@@ -90,7 +91,7 @@ fun TvScaffold(
             .fillMaxSize()
             .background(Background)
     ) {
-        AppBackground()
+        background()
         LeftSidebar(
             selectedItem     = selectedSidebarItem,
             onItemSelected   = onSidebarItemSelected,

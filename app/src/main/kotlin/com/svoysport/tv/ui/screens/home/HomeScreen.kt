@@ -38,6 +38,7 @@ import com.svoysport.tv.domain.model.HomeSection
 import com.svoysport.tv.domain.model.MatchItem
 import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.ui.components.ContentRow
+import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.components.TvScaffold
 import com.svoysport.tv.ui.components.nav.NavTab
 import com.svoysport.tv.ui.components.nav.SidebarItem
@@ -65,14 +66,9 @@ internal fun visibleSidebarSelection(
 private const val HOME_BACKGROUND_BLUR_DP = 210f
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
-private const val SCAFFOLD_RAIL_WIDTH_DP = 220f
-private const val SCAFFOLD_TOP_BAR_HEIGHT_DP = 56f
+internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
 
-internal fun homeBackgroundWidth(contentWidthDp: Float): Float =
-    contentWidthDp + SCAFFOLD_RAIL_WIDTH_DP
-
-internal fun homeBackgroundHeight(contentHeightDp: Float): Float =
-    contentHeightDp + SCAFFOLD_TOP_BAR_HEIGHT_DP
+internal fun homeBackgroundHeight(screenHeightDp: Float): Float = screenHeightDp
 
 internal fun firstHomeContentCardIndex(): Int = 0
 
@@ -92,7 +88,9 @@ internal fun homeFocusScrollDistance(offset: Float, itemSize: Float, viewportSiz
 internal fun firstHomeRowScrollDistance(): Float = 0f
 
 internal fun shouldScrollForHomeFocusTransition(previousSection: Int, nextSection: Int): Boolean =
-    nextSection > 0 || (nextSection == 0 && previousSection > 0)
+    nextSection > 0 ||
+        (nextSection == 0 && previousSection > 0) ||
+        (nextSection == -1 && previousSection >= 0)
 
 private class HomeBringIntoViewSpec(
     private val shouldScroll: () -> Boolean
@@ -158,6 +156,16 @@ fun HomeScreen(
         onAuthClick         = onAuthClick,
         topBarHidden        = topBarHidden,
         selectedSidebarItem = visibleSidebarSelection(sidebarMode, selectedSport),
+        background = {
+            AppBackground()
+            val homeMatch = (uiState as? HomeUiState.Success)?.content?.featuredMatch
+            if (
+                homeMatch != null && selectedTab == NavTab.HOME &&
+                sidebarMode == SidebarMode.NONE && expandedSection == null
+            ) {
+                HomeBackground(match = homeMatch)
+            }
+        },
         onSidebarItemSelected = { item ->
             expandedSection = null
             when (item) {
@@ -228,9 +236,6 @@ private fun HomeContent(
                 LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
                 EmptyState()
             } else {
-                // Один цельный фон главной: обложка hero не перемещается и не
-                // меняется при навигации по карточкам ниже.
-                val bgMatch = uiState.content.featuredMatch
                 val scrollState = rememberLazyListState()
                 val firstContentCardFocusRequester = remember { FocusRequester() }
                 var focusedSectionIndex by remember { mutableIntStateOf(-1) }
@@ -257,48 +262,7 @@ private fun HomeContent(
                         .collect(onTopBarHiddenChange)
                 }
 
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    // Компенсируем отступы scaffold: динамическая обложка является
-                    // единым фоном всей главной, а не отдельной полосой сверху.
-                    Box(
-                        modifier = Modifier
-                            .offset(
-                                x = (-SCAFFOLD_RAIL_WIDTH_DP).dp,
-                                y = (-SCAFFOLD_TOP_BAR_HEIGHT_DP).dp
-                            )
-                            .requiredSize(
-                                width = homeBackgroundWidth(maxWidth.value).dp,
-                                height = homeBackgroundHeight(maxHeight.value).dp
-                            )
-                            .clipToBounds()
-                    ) {
-                        AsyncImage(
-                            model = bgMatch.backgroundUrl ?: bgMatch.thumbnailUrl,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
-                                .blur(
-                                    radius = HOME_BACKGROUND_BLUR_DP.dp,
-                                    edgeTreatment = BlurredEdgeTreatment.Unbounded
-                                ),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(
-                                Brush.verticalGradient(
-                                    0.00f to androidx.compose.ui.graphics.Color.Transparent,
-                                    0.20f to androidx.compose.ui.graphics.Color.Transparent,
-                                    0.68f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.22f),
-                                    1.00f to androidx.compose.ui.graphics.Color.Black.copy(
-                                        alpha = HOME_BACKGROUND_GRADIENT_ALPHA
-                                    )
-                                )
-                            )
-                        )
-                    }
-
+                Box(modifier = Modifier.fillMaxSize()) {
                     CompositionLocalProvider(LocalBringIntoViewSpec provides bringIntoViewSpec) {
                         LazyColumn(
                             state = scrollState,
@@ -310,8 +274,11 @@ private fun HomeContent(
                                     match          = uiState.content.featuredMatch,
                                     onWatchClick   = onMatchClick,
                                     onMatchFocused = {
+                                        shouldScrollFocusedSection = shouldScrollForHomeFocusTransition(
+                                            previousSection = focusedSectionIndex,
+                                            nextSection = -1
+                                        )
                                         focusedSectionIndex = -1
-                                        shouldScrollFocusedSection = false
                                     },
                                     downFocusRequester = firstContentCardFocusRequester
                                 )
@@ -339,6 +306,33 @@ private fun HomeContent(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun HomeBackground(match: MatchItem) {
+    Box(Modifier.fillMaxSize().clipToBounds()) {
+        AsyncImage(
+            model = match.backgroundUrl ?: match.thumbnailUrl,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+                .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
+                .blur(
+                    radius = HOME_BACKGROUND_BLUR_DP.dp,
+                    edgeTreatment = BlurredEdgeTreatment.Unbounded
+                ),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0.00f to Color.Transparent,
+                    0.20f to Color.Transparent,
+                    0.68f to Color.Black.copy(alpha = 0.22f),
+                    1.00f to Color.Black.copy(alpha = HOME_BACKGROUND_GRADIENT_ALPHA)
+                )
+            )
+        )
     }
 }
 

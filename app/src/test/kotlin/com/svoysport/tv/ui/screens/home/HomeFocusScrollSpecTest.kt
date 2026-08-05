@@ -9,6 +9,7 @@ class HomeFocusScrollSpecTest {
         assertEquals(false, shouldScrollForHomeFocusTransition(previousSection = -1, nextSection = 0))
         assertEquals(true, shouldScrollForHomeFocusTransition(previousSection = 0, nextSection = 1))
         assertEquals(true, shouldScrollForHomeFocusTransition(previousSection = 1, nextSection = 0))
+        assertEquals(true, shouldScrollForHomeFocusTransition(previousSection = 0, nextSection = -1))
     }
 
     @Test
