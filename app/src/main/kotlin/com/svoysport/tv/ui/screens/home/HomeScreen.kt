@@ -91,6 +91,9 @@ internal fun homeFocusScrollDistance(offset: Float, itemSize: Float, viewportSiz
 
 internal fun firstHomeRowScrollDistance(): Float = 0f
 
+internal fun shouldScrollForHomeFocusTransition(previousSection: Int, nextSection: Int): Boolean =
+    nextSection > 0 || (nextSection == 0 && previousSection > 0)
+
 private class HomeBringIntoViewSpec(
     private val shouldScroll: () -> Boolean
 ) : BringIntoViewSpec {
@@ -231,12 +234,15 @@ private fun HomeContent(
                 val scrollState = rememberLazyListState()
                 val firstContentCardFocusRequester = remember { FocusRequester() }
                 var focusedSectionIndex by remember { mutableIntStateOf(-1) }
+                var shouldScrollFocusedSection by remember { mutableStateOf(false) }
                 val bringIntoViewSpec = remember {
-                    HomeBringIntoViewSpec { focusedSectionIndex > 0 }
+                    HomeBringIntoViewSpec { shouldScrollFocusedSection }
                 }
 
                 LaunchedEffect(selectedSport) {
                     scrollState.scrollToItem(0)
+                    focusedSectionIndex = -1
+                    shouldScrollFocusedSection = false
                     onTopBarHiddenChange(false)
                 }
 
@@ -303,7 +309,10 @@ private fun HomeContent(
                                 HeroBanner(
                                     match          = uiState.content.featuredMatch,
                                     onWatchClick   = onMatchClick,
-                                    onMatchFocused = { focusedSectionIndex = -1 },
+                                    onMatchFocused = {
+                                        focusedSectionIndex = -1
+                                        shouldScrollFocusedSection = false
+                                    },
                                     downFocusRequester = firstContentCardFocusRequester
                                 )
                             }
@@ -313,8 +322,13 @@ private fun HomeContent(
                                     title          = section.title,
                                     matches        = section.matches,
                                     onMatchClick   = onMatchClick,
-                                    onMatchFocused = { focusedSectionIndex = sectionIndex },
-                                    onRowFocused   = { focusedSectionIndex = sectionIndex },
+                                    onRowFocused   = {
+                                        shouldScrollFocusedSection = shouldScrollForHomeFocusTransition(
+                                            previousSection = focusedSectionIndex,
+                                            nextSection = sectionIndex
+                                        )
+                                        focusedSectionIndex = sectionIndex
+                                    },
                                     firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
                                     onWatchMore    = { onWatchMore(section.title) },
                                     modifier       = Modifier.padding(bottom = 28.dp)
