@@ -41,6 +41,7 @@ import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.ui.components.ContentRow
 import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.components.TvScaffold
+import com.svoysport.tv.ui.components.directionalFocusIndex
 import com.svoysport.tv.ui.components.nav.NavTab
 import com.svoysport.tv.ui.components.nav.SidebarItem
 import com.svoysport.tv.ui.components.state.HomeErrorState
@@ -51,6 +52,7 @@ import com.svoysport.tv.ui.screens.schedule.ScheduleScreen
 import com.svoysport.tv.ui.screens.search.SearchContent
 import com.svoysport.tv.ui.theme.Gray4
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
 internal enum class SidebarMode { NONE, SEARCH, FAVORITES }
@@ -73,6 +75,8 @@ internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
 internal fun homeBackgroundHeight(screenHeightDp: Float): Float = screenHeightDp
 
 internal fun firstHomeContentCardIndex(): Int = 0
+
+internal fun homeLazyListIndexForSection(sectionIndex: Int): Int = sectionIndex + 2
 
 internal fun homeRowMatches(matches: List<MatchItem>): List<MatchItem> =
     matches.take(HOME_ROW_ITEM_LIMIT)
@@ -173,7 +177,10 @@ fun HomeScreen(
         selectedSidebarItem = visibleSidebarSelection(sidebarMode, selectedSport),
         background = {
             AppBackground()
-            val featuredMatch = (uiState as? HomeUiState.Success)?.content?.featuredMatch
+            val content = (uiState as? HomeUiState.Success)?.content
+            val featuredMatch = content?.let {
+                featuredMatchForSport(it.featuredMatch, it.sections, selectedSport)
+            }
             val homeMatch = focusedHomeMatch ?: featuredMatch
             if (
                 homeMatch != null && selectedTab == NavTab.HOME &&
@@ -253,12 +260,18 @@ private fun HomeContent(
 
         is HomeUiState.Success -> {
             val sections = orderedVisibleSections(filterBySport(uiState.content.sections, selectedSport))
+            val featuredMatch = featuredMatchForSport(
+                uiState.content.featuredMatch,
+                uiState.content.sections,
+                selectedSport
+            )
 
             if (sections.isEmpty()) {
                 LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
                 EmptyState()
             } else {
                 val scrollState = rememberLazyListState()
+                val focusScope = rememberCoroutineScope()
                 val rowItemCounts = sections.map { section ->
                     homeRowMatches(section.matches).size +
                         if (section.matches.size > HOME_ROW_ITEM_LIMIT) 1 else 0
@@ -277,7 +290,7 @@ private fun HomeContent(
                     scrollState.scrollToItem(0)
                     focusedSectionIndex = -1
                     shouldScrollFocusedSection = false
-                    onBackgroundMatchFocused(uiState.content.featuredMatch)
+                    onBackgroundMatchFocused(featuredMatch)
                     onTopBarHiddenChange(false)
                 }
 
@@ -301,7 +314,7 @@ private fun HomeContent(
                         ) {
                             item(key = "hero") {
                                 HeroBanner(
-                                    match          = uiState.content.featuredMatch,
+                                    match          = featuredMatch,
                                     onWatchClick   = onMatchClick,
                                     onMatchFocused = {
                                         shouldScrollFocusedSection = shouldScrollForHomeFocusTransition(
@@ -309,7 +322,7 @@ private fun HomeContent(
                                             nextSection = -1
                                         )
                                         focusedSectionIndex = -1
-                                        onBackgroundMatchFocused(uiState.content.featuredMatch)
+                                        onBackgroundMatchFocused(featuredMatch)
                                     },
                                     downFocusRequester = firstContentCardFocusRequester
                                 )
@@ -329,8 +342,30 @@ private fun HomeContent(
                                         focusedSectionIndex = sectionIndex
                                     },
                                     itemFocusRequesters = sectionFocusRequesters[sectionIndex],
-                                    upFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex - 1).orEmpty(),
-                                    downFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex + 1).orEmpty(),
+                                    onMoveUp = if (sectionIndex > 0) { currentIndex ->
+                                        focusScope.launch {
+                                            val targetSection = sectionIndex - 1
+                                            scrollState.animateScrollToItem(homeLazyListIndexForSection(targetSection))
+                                            withFrameNanos { }
+                                            val targetIndex = directionalFocusIndex(
+                                                currentIndex,
+                                                sectionFocusRequesters[targetSection].size
+                                            ) ?: return@launch
+                                            sectionFocusRequesters[targetSection][targetIndex].requestFocus()
+                                        }
+                                    } else null,
+                                    onMoveDown = if (sectionIndex < sections.lastIndex) { currentIndex ->
+                                        focusScope.launch {
+                                            val targetSection = sectionIndex + 1
+                                            scrollState.animateScrollToItem(homeLazyListIndexForSection(targetSection))
+                                            withFrameNanos { }
+                                            val targetIndex = directionalFocusIndex(
+                                                currentIndex,
+                                                sectionFocusRequesters[targetSection].size
+                                            ) ?: return@launch
+                                            sectionFocusRequesters[targetSection][targetIndex].requestFocus()
+                                        }
+                                    } else null,
                                     onWatchMore    = if (section.matches.size > HOME_ROW_ITEM_LIMIT) {
                                         { onWatchMore(section.title) }
                                     } else null,
@@ -483,6 +518,19 @@ private fun filterBySport(
             )
         }
         .filter { it.matches.isNotEmpty() }
+}
+
+internal fun featuredMatchForSport(
+    featuredMatch: MatchItem,
+    sections: List<HomeSection>,
+    sport: SidebarItem?
+): MatchItem {
+    if (sport == null) return featuredMatch
+    return orderedVisibleSections(filterBySport(sections, sport))
+        .asSequence()
+        .flatMap { it.matches.asSequence() }
+        .firstOrNull()
+        ?: featuredMatch
 }
 
 internal fun orderedVisibleSections(sections: List<HomeSection>): List<HomeSection> =
