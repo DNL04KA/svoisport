@@ -1,6 +1,7 @@
 package com.svoysport.tv.ui.screens.home
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -115,6 +116,7 @@ fun HomeScreen(
     var sidebarMode     by remember { mutableStateOf(SidebarMode.NONE) }
     var topBarHidden    by remember { mutableStateOf(false) }
     var expandedSection by remember { mutableStateOf<String?>(null) }
+    var focusedHomeMatch by remember { mutableStateOf<MatchItem?>(null) }
 
     BackHandler(enabled = expandedSection != null) { expandedSection = null }
 
@@ -150,6 +152,7 @@ fun HomeScreen(
             selectedTab = tab
             sidebarMode = SidebarMode.NONE
             expandedSection = null
+            focusedHomeMatch = null
         },
         isLoggedIn          = SessionManager.isLoggedIn.value ||
                               com.svoysport.tv.session.SubscriptionManager.isSubscribed.value,
@@ -158,7 +161,8 @@ fun HomeScreen(
         selectedSidebarItem = visibleSidebarSelection(sidebarMode, selectedSport),
         background = {
             AppBackground()
-            val homeMatch = (uiState as? HomeUiState.Success)?.content?.featuredMatch
+            val featuredMatch = (uiState as? HomeUiState.Success)?.content?.featuredMatch
+            val homeMatch = focusedHomeMatch ?: featuredMatch
             if (
                 homeMatch != null && selectedTab == NavTab.HOME &&
                 sidebarMode == SidebarMode.NONE && expandedSection == null
@@ -168,6 +172,7 @@ fun HomeScreen(
         },
         onSidebarItemSelected = { item ->
             expandedSection = null
+            focusedHomeMatch = null
             when (item) {
                 SidebarItem.SEARCH    -> sidebarMode = SidebarMode.SEARCH
                 SidebarItem.BOOKMARKS -> sidebarMode = SidebarMode.FAVORITES
@@ -200,7 +205,9 @@ fun HomeScreen(
                     onMatchClick = onMatchClick,
                     onWatchMore  = { sectionTitle ->
                         expandedSection = sectionTitle
+                        focusedHomeMatch = null
                     },
+                    onBackgroundMatchFocused = { focusedHomeMatch = it },
                     onRetry      = { viewModel.loadHomeContent() },
                     onTopBarHiddenChange = { topBarHidden = it }
                 )
@@ -218,6 +225,7 @@ private fun HomeContent(
     selectedSport: SidebarItem?,
     onMatchClick: (String) -> Unit,
     onWatchMore: (String) -> Unit,
+    onBackgroundMatchFocused: (MatchItem?) -> Unit,
     onRetry: () -> Unit,
     onTopBarHiddenChange: (Boolean) -> Unit
 ) {
@@ -248,6 +256,7 @@ private fun HomeContent(
                     scrollState.scrollToItem(0)
                     focusedSectionIndex = -1
                     shouldScrollFocusedSection = false
+                    onBackgroundMatchFocused(uiState.content.featuredMatch)
                     onTopBarHiddenChange(false)
                 }
 
@@ -279,6 +288,7 @@ private fun HomeContent(
                                             nextSection = -1
                                         )
                                         focusedSectionIndex = -1
+                                        onBackgroundMatchFocused(uiState.content.featuredMatch)
                                     },
                                     downFocusRequester = firstContentCardFocusRequester
                                 )
@@ -289,6 +299,7 @@ private fun HomeContent(
                                     title          = section.title,
                                     matches        = section.matches,
                                     onMatchClick   = onMatchClick,
+                                    onMatchFocused = { onBackgroundMatchFocused(it) },
                                     onRowFocused   = {
                                         shouldScrollFocusedSection = shouldScrollForHomeFocusTransition(
                                             previousSection = focusedSectionIndex,
@@ -312,17 +323,23 @@ private fun HomeContent(
 @Composable
 private fun HomeBackground(match: MatchItem) {
     Box(Modifier.fillMaxSize().clipToBounds()) {
-        AsyncImage(
-            model = match.backgroundUrl ?: match.thumbnailUrl,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize()
-                .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
-                .blur(
-                    radius = HOME_BACKGROUND_BLUR_DP.dp,
-                    edgeTreatment = BlurredEdgeTreatment.Unbounded
-                ),
-            contentScale = ContentScale.Crop
-        )
+        Crossfade(
+            targetState = match.backgroundUrl ?: match.thumbnailUrl,
+            animationSpec = tween(durationMillis = 400),
+            label = "focusedMatchBackground"
+        ) { imageUrl ->
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+                    .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
+                    .blur(
+                        radius = HOME_BACKGROUND_BLUR_DP.dp,
+                        edgeTreatment = BlurredEdgeTreatment.Unbounded
+                    ),
+                contentScale = ContentScale.Crop
+            )
+        }
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
