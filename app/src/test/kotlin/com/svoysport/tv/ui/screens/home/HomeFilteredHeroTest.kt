@@ -41,6 +41,22 @@ class HomeFilteredHeroTest {
     }
 
     @Test
+    fun `football section keeps matches whose own title omits sport name`() {
+        val match = match("colombia", "Чемпионат Колумбии").copy(title = "Примера A. Депортес — Медельин")
+        val sections = listOf(HomeSection("football", "Футбол", listOf(match)))
+
+        assertEquals(
+            listOf(match),
+            filterBySport(sections, SidebarItem.FOOTBALL).single().matches
+        )
+    }
+
+    @Test
+    fun `home retains at least one neighboring viewport for focus`() {
+        assertEquals(true, HOME_FOCUS_CACHE_VIEWPORTS >= 1f)
+    }
+
+    @Test
     fun `section zero is lazy item two after hero and spacer`() {
         assertEquals(2, homeLazyListIndexForSection(0))
         assertEquals(4, homeLazyListIndexForSection(2))

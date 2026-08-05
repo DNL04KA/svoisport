@@ -40,11 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.tv.material3.*
 import coil3.compose.AsyncImage
 import com.svoysport.tv.R
@@ -337,8 +332,8 @@ fun ContentRow(
     onRowFocused  : () -> Unit = {},
     onWatchMore   : (() -> Unit)? = null,
     itemFocusRequesters: List<FocusRequester> = emptyList(),
-    onMoveUp: ((Int) -> Unit)? = null,
-    onMoveDown: ((Int) -> Unit)? = null,
+    upFocusRequesters: List<FocusRequester> = emptyList(),
+    downFocusRequesters: List<FocusRequester> = emptyList(),
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -355,6 +350,8 @@ fun ContentRow(
                     horizontalArrangement = Arrangement.spacedBy(gap)
                 ) {
                     itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
+                        val upIndex = directionalFocusIndex(index, upFocusRequesters.size)
+                        val downIndex = directionalFocusIndex(index, downFocusRequesters.size)
                         MatchCard(
                             match = match,
                             onClick = onMatchClick,
@@ -367,18 +364,16 @@ fun ContentRow(
                                 .then(if (index < itemFocusRequesters.size) {
                                     Modifier.focusRequester(itemFocusRequesters[index])
                                 } else Modifier)
-                                .onPreviewKeyEvent { event ->
-                                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                                    when (event.key) {
-                                        Key.DirectionUp -> onMoveUp?.let { it(index); true } ?: false
-                                        Key.DirectionDown -> onMoveDown?.let { it(index); true } ?: false
-                                        else -> false
-                                    }
+                                .focusProperties {
+                                    upIndex?.let { up = upFocusRequesters[it] }
+                                    downIndex?.let { down = downFocusRequesters[it] }
                                 }
                         )
                     }
                     if (onWatchMore != null) item {
                         val index = matches.size
+                        val upIndex = directionalFocusIndex(index, upFocusRequesters.size)
+                        val downIndex = directionalFocusIndex(index, downFocusRequesters.size)
                         WatchMoreCard(
                             onClick = onWatchMore,
                             scale = scale,
@@ -387,13 +382,9 @@ fun ContentRow(
                                 .then(if (index < itemFocusRequesters.size) {
                                     Modifier.focusRequester(itemFocusRequesters[index])
                                 } else Modifier)
-                                .onPreviewKeyEvent { event ->
-                                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                                    when (event.key) {
-                                        Key.DirectionUp -> onMoveUp?.let { it(index); true } ?: false
-                                        Key.DirectionDown -> onMoveDown?.let { it(index); true } ?: false
-                                        else -> false
-                                    }
+                                .focusProperties {
+                                    upIndex?.let { up = upFocusRequesters[it] }
+                                    downIndex?.let { down = downFocusRequesters[it] }
                                 }
                         )
                     }

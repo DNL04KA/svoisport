@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -41,7 +42,6 @@ import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.ui.components.ContentRow
 import com.svoysport.tv.ui.components.AppBackground
 import com.svoysport.tv.ui.components.TvScaffold
-import com.svoysport.tv.ui.components.directionalFocusIndex
 import com.svoysport.tv.ui.components.nav.NavTab
 import com.svoysport.tv.ui.components.nav.SidebarItem
 import com.svoysport.tv.ui.components.state.HomeErrorState
@@ -52,7 +52,6 @@ import com.svoysport.tv.ui.screens.schedule.ScheduleScreen
 import com.svoysport.tv.ui.screens.search.SearchContent
 import com.svoysport.tv.ui.theme.Gray4
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 // Что показывать в области контента, помимо вкладок (Поиск/Избранное из сайдбара)
 internal enum class SidebarMode { NONE, SEARCH, FAVORITES }
@@ -70,6 +69,7 @@ private const val HOME_BACKGROUND_BLUR_DP = 80f
 private const val HOME_ROW_ITEM_LIMIT = 10
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
+internal const val HOME_FOCUS_CACHE_VIEWPORTS = 2f
 internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
 
 internal fun homeBackgroundHeight(screenHeightDp: Float): Float = screenHeightDp
@@ -270,8 +270,12 @@ private fun HomeContent(
                 LaunchedEffect(Unit) { onTopBarHiddenChange(false) }
                 EmptyState()
             } else {
-                val scrollState = rememberLazyListState()
-                val focusScope = rememberCoroutineScope()
+                val scrollState = rememberLazyListState(
+                    cacheWindow = LazyLayoutCacheWindow(
+                        aheadFraction = HOME_FOCUS_CACHE_VIEWPORTS,
+                        behindFraction = HOME_FOCUS_CACHE_VIEWPORTS
+                    )
+                )
                 val rowItemCounts = sections.map { section ->
                     homeRowMatches(section.matches).size +
                         if (section.matches.size > HOME_ROW_ITEM_LIMIT) 1 else 0
@@ -342,30 +346,8 @@ private fun HomeContent(
                                         focusedSectionIndex = sectionIndex
                                     },
                                     itemFocusRequesters = sectionFocusRequesters[sectionIndex],
-                                    onMoveUp = if (sectionIndex > 0) { currentIndex ->
-                                        focusScope.launch {
-                                            val targetSection = sectionIndex - 1
-                                            scrollState.animateScrollToItem(homeLazyListIndexForSection(targetSection))
-                                            withFrameNanos { }
-                                            val targetIndex = directionalFocusIndex(
-                                                currentIndex,
-                                                sectionFocusRequesters[targetSection].size
-                                            ) ?: return@launch
-                                            sectionFocusRequesters[targetSection][targetIndex].requestFocus()
-                                        }
-                                    } else null,
-                                    onMoveDown = if (sectionIndex < sections.lastIndex) { currentIndex ->
-                                        focusScope.launch {
-                                            val targetSection = sectionIndex + 1
-                                            scrollState.animateScrollToItem(homeLazyListIndexForSection(targetSection))
-                                            withFrameNanos { }
-                                            val targetIndex = directionalFocusIndex(
-                                                currentIndex,
-                                                sectionFocusRequesters[targetSection].size
-                                            ) ?: return@launch
-                                            sectionFocusRequesters[targetSection][targetIndex].requestFocus()
-                                        }
-                                    } else null,
+                                    upFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex - 1).orEmpty(),
+                                    downFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex + 1).orEmpty(),
                                     onWatchMore    = if (section.matches.size > HOME_ROW_ITEM_LIMIT) {
                                         { onWatchMore(section.title) }
                                     } else null,
@@ -503,16 +485,17 @@ internal fun sportMatchesSelection(
     return searchable.contains(keyword, ignoreCase = true)
 }
 
-private fun filterBySport(
+internal fun filterBySport(
     sections: List<HomeSection>,
     sport: SidebarItem?
 ): List<HomeSection> {
     if (sport == null) return sections
     return sections
         .map { section ->
+            val wholeSectionMatches = sportMatchesSelection(section.title, section.title, sport)
             section.copy(
                 title = sectionTitleForSport(section.title, sport),
-                matches = section.matches.filter { match ->
+                matches = if (wholeSectionMatches) section.matches else section.matches.filter { match ->
                     sportMatchesSelection(match.competition.name, match.title, sport)
                 }
             )
