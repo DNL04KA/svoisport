@@ -10,7 +10,7 @@ class HomeBackgroundGeometryTest {
 
         assertEquals(1920f, homeBackgroundWidth(1920f))
         assertEquals(1080f, homeBackgroundHeight(1080f))
-        assertEquals(80f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))
+        assertEquals(48f, screenClass.privateFloat("HOME_BACKGROUND_BLUR_DP"))
         assertEquals(0.30f, screenClass.privateFloat("HOME_BACKGROUND_IMAGE_ALPHA"))
         assertEquals(0.30f, screenClass.privateFloat("HOME_BACKGROUND_GRADIENT_ALPHA"))
     }

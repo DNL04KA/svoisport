@@ -65,11 +65,13 @@ internal fun visibleSidebarSelection(
     SidebarMode.NONE -> selectedSport
 }
 
-private const val HOME_BACKGROUND_BLUR_DP = 80f
+internal const val HOME_BACKGROUND_BLUR_DP = 48f
+internal const val HOME_BACKGROUND_CROSSFADE_MS = 180
+internal const val HOME_BACKGROUND_FOCUS_DEBOUNCE_MS = 200L
 private const val HOME_ROW_ITEM_LIMIT = 10
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
-internal const val HOME_FOCUS_CACHE_VIEWPORTS = 2f
+internal const val HOME_FOCUS_CACHE_VIEWPORTS = 1.15f
 internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
 
 internal fun homeBackgroundHeight(screenHeightDp: Float): Float = screenHeightDp
@@ -129,7 +131,7 @@ fun HomeScreen(
 
     LaunchedEffect(pendingHomeMatch) {
         val pending = pendingHomeMatch ?: return@LaunchedEffect
-        kotlinx.coroutines.delay(140)
+        kotlinx.coroutines.delay(HOME_BACKGROUND_FOCUS_DEBOUNCE_MS)
         focusedHomeMatch = pending
     }
 
@@ -367,7 +369,7 @@ private fun HomeBackground(match: MatchItem) {
     Box(Modifier.fillMaxSize().clipToBounds()) {
         Crossfade(
             targetState = match.backgroundUrl ?: match.thumbnailUrl,
-            animationSpec = tween(durationMillis = 250),
+            animationSpec = tween(durationMillis = HOME_BACKGROUND_CROSSFADE_MS),
             label = "focusedMatchBackground"
         ) { imageUrl ->
             AsyncImage(
@@ -377,7 +379,7 @@ private fun HomeBackground(match: MatchItem) {
                     .alpha(HOME_BACKGROUND_IMAGE_ALPHA)
                     .blur(
                         radius = HOME_BACKGROUND_BLUR_DP.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded
+                        edgeTreatment = BlurredEdgeTreatment.Rectangle
                     ),
                 contentScale = ContentScale.Crop
             )
