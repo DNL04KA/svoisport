@@ -6,19 +6,30 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.svoysport.tv.ui.components.state.HomeErrorState
+import androidx.tv.material3.*
+import com.svoysport.tv.R
 import com.svoysport.tv.ui.components.state.HomeLoadingState
+import com.svoysport.tv.ui.theme.Gray3
+import com.svoysport.tv.ui.theme.Primary
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class)
@@ -74,9 +85,10 @@ fun PlayerScreen(
 
             is PlayerUiState.Loading -> HomeLoadingState()
 
-            is PlayerUiState.Error -> HomeErrorState(
+            is PlayerUiState.Error -> PlayerErrorState(
                 message = state.message,
-                onRetry = { viewModel.loadPlayerData() }
+                onRetry = { viewModel.loadPlayerData() },
+                onBack = onBack
             )
 
             is PlayerUiState.Ready -> {
@@ -116,6 +128,68 @@ fun PlayerScreen(
                         if (isOverlayVisible) onBack() else isOverlayVisible = true
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlayerErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    onBack: () -> Unit
+) {
+    val retryFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { retryFocusRequester.requestFocus() }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Button(
+            onClick = onBack,
+            modifier = Modifier.align(Alignment.TopStart).padding(40.dp),
+            shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
+            colors = ButtonDefaults.colors(
+                containerColor = Color.White.copy(alpha = 0.12f),
+                focusedContainerColor = Primary
+            )
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text("Выйти", fontSize = 18.sp)
+            }
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Трансляция не открылась",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(text = message, color = Gray3, fontSize = 18.sp)
+            Spacer(Modifier.height(28.dp))
+            Button(
+                onClick = onRetry,
+                modifier = Modifier.focusRequester(retryFocusRequester),
+                shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
+                colors = ButtonDefaults.colors(
+                    containerColor = Color(0xFF343746),
+                    focusedContainerColor = Primary
+                ),
+                scale = ButtonDefaults.scale(focusedScale = 1.06f)
+            ) {
+                Text("Повторить попытку", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }

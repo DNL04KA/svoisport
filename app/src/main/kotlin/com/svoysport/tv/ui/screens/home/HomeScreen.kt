@@ -81,9 +81,16 @@ internal fun homeFocusScrollDistance(offset: Float, itemSize: Float, viewportSiz
     return if (kotlin.math.abs(offset - targetOffset) < 1f) 0f else offset - targetOffset
 }
 
+internal fun firstHomeRowScrollDistance(): Float = 0f
+
 private object HomeBringIntoViewSpec : BringIntoViewSpec {
     override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float =
         homeFocusScrollDistance(offset, size, containerSize)
+}
+
+private object FirstHomeRowBringIntoViewSpec : BringIntoViewSpec {
+    override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float =
+        firstHomeRowScrollDistance()
 }
 
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
@@ -278,14 +285,22 @@ private fun HomeContent(
                             }
                             item(key = "hero-gap") { Spacer(modifier = Modifier.height(12.dp)) }
                             itemsIndexed(sections, key = { _, section -> section.id }) { sectionIndex, section ->
-                                ContentRow(
-                                    title          = section.title,
-                                    matches        = section.matches,
-                                    onMatchClick   = onMatchClick,
-                                    firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
-                                    onWatchMore    = { onWatchMore(section.title) },
-                                    modifier       = Modifier.padding(bottom = 28.dp)
-                                )
+                                CompositionLocalProvider(
+                                    LocalBringIntoViewSpec provides if (sectionIndex == 0) {
+                                        FirstHomeRowBringIntoViewSpec
+                                    } else {
+                                        HomeBringIntoViewSpec
+                                    }
+                                ) {
+                                    ContentRow(
+                                        title          = section.title,
+                                        matches        = section.matches,
+                                        onMatchClick   = onMatchClick,
+                                        firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
+                                        onWatchMore    = { onWatchMore(section.title) },
+                                        modifier       = Modifier.padding(bottom = 28.dp)
+                                    )
+                                }
                             }
                         }
                     }

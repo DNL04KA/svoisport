@@ -5,6 +5,11 @@ import org.junit.Test
 
 class HomeFocusScrollSpecTest {
     @Test
+    fun `first content row does not move the home screen`() {
+        assertEquals(0f, firstHomeRowScrollDistance())
+    }
+
+    @Test
     fun `focused row settles near upper fifth of viewport`() {
         assertEquals(540f, homeFocusScrollDistance(offset = 700f, itemSize = 240f, viewportSize = 800f))
         assertEquals(0f, homeFocusScrollDistance(offset = 160f, itemSize = 240f, viewportSize = 800f))
