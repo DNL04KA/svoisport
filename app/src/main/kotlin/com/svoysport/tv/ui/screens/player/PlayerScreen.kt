@@ -16,6 +16,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.tv.material3.*
+import coil3.compose.AsyncImage
 import com.svoysport.tv.R
 import com.svoysport.tv.ui.components.state.HomeLoadingState
 import com.svoysport.tv.ui.theme.Gray3
@@ -91,6 +93,8 @@ fun PlayerScreen(
                 onBack = onBack
             )
 
+            is PlayerUiState.Waiting -> PlayerWaitingState(state = state, onBack = onBack)
+
             is PlayerUiState.Ready -> {
                 // ── AndroidView c PlayerView ──────────────────────────────────
                 AndroidView(
@@ -134,6 +138,54 @@ fun PlayerScreen(
 }
 
 @Composable
+private fun PlayerWaitingState(state: PlayerUiState.Waiting, onBack: () -> Unit) {
+    var remainingMs by remember(state.startsAtMs) {
+        mutableLongStateOf((state.startsAtMs - System.currentTimeMillis()).coerceAtLeast(0L))
+    }
+    LaunchedEffect(state.startsAtMs) {
+        while (remainingMs > 0L) {
+            delay(1_000)
+            remainingMs = (state.startsAtMs - System.currentTimeMillis()).coerceAtLeast(0L)
+        }
+    }
+    val minutes = remainingMs / 60_000L
+    val seconds = (remainingMs / 1_000L) % 60L
+
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        AsyncImage(
+            model = state.thumbnailUrl,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.42f
+        )
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.44f)))
+        PlayerExitButton(onBack = onBack, modifier = Modifier.align(Alignment.TopStart).padding(40.dp))
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Начало через", color = Gray3, fontSize = 22.sp)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "%02d:%02d".format(minutes, seconds),
+                color = Color.White,
+                fontSize = 64.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(Modifier.height(28.dp))
+            Text(state.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Трансляция начнётся автоматически. Вам не нужно обновлять экран",
+                color = Gray3,
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
+@Composable
 private fun PlayerErrorState(
     message: String,
     onRetry: () -> Unit,
@@ -143,34 +195,18 @@ private fun PlayerErrorState(
     LaunchedEffect(Unit) { retryFocusRequester.requestFocus() }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        Button(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.TopStart).padding(40.dp),
-            shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
-            colors = ButtonDefaults.colors(
-                containerColor = Color.White.copy(alpha = 0.12f),
-                focusedContainerColor = Primary
-            )
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text("Выйти", fontSize = 18.sp)
-            }
-        }
+        PlayerExitButton(onBack = onBack, modifier = Modifier.align(Alignment.TopStart).padding(40.dp))
 
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Трансляция не открылась",
+                text = if (message.contains("регион", ignoreCase = true)) {
+                    "Трансляция недоступна в вашем регионе"
+                } else {
+                    "Трансляция не открылась"
+                },
                 style = MaterialTheme.typography.headlineLarge.copy(
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
@@ -178,6 +214,14 @@ private fun PlayerErrorState(
             )
             Spacer(Modifier.height(12.dp))
             Text(text = message, color = Gray3, fontSize = 18.sp)
+            if (message.contains("регион", ignoreCase = true)) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Некоторые трансляции ограничены правами показа. Поддержка: info@sport-tv.by",
+                    color = Gray3,
+                    fontSize = 16.sp
+                )
+            }
             Spacer(Modifier.height(28.dp))
             Button(
                 onClick = onRetry,
@@ -191,6 +235,31 @@ private fun PlayerErrorState(
             ) {
                 Text("Повторить попытку", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
+        }
+    }
+}
+
+@Composable
+private fun PlayerExitButton(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = onBack,
+        modifier = modifier,
+        shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
+        colors = ButtonDefaults.colors(
+            containerColor = Color.White.copy(alpha = 0.12f),
+            focusedContainerColor = Primary
+        )
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Text("Выйти", fontSize = 18.sp)
         }
     }
 }

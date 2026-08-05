@@ -13,7 +13,7 @@ class TopNavigationLayoutTest {
 
     @Test
     fun `selected top tab is gray`() {
-        assertEquals(Color(0xFF414654), topTabContainerColor(selected = true, focused = false))
+        assertEquals(Color(0xFF565B68), topTabContainerColor(selected = true, focused = false))
         assertEquals(Color(0xFF4556EB), topTabContainerColor(selected = true, focused = true))
     }
 }

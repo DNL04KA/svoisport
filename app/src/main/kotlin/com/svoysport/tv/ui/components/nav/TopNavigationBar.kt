@@ -33,7 +33,7 @@ internal fun topNavigationLeadingSpaceDp(sidebarExpanded: Boolean): Float = 36f
 
 internal fun topTabContainerColor(selected: Boolean, focused: Boolean): Color = when {
     focused -> Primary
-    selected -> Color(0xFF414654)
+    selected -> Color(0xFF565B68)
     else -> Color.Transparent
 }
 

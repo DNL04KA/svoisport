@@ -10,6 +10,12 @@ sealed class PlayerUiState {
         val isLive:        Boolean,
         val thumbnailUrl:  String
     ) : PlayerUiState()
+    data class Waiting(
+        val title: String,
+        val competition: String,
+        val startsAtMs: Long,
+        val thumbnailUrl: String
+    ) : PlayerUiState()
     data class Error(val message: String) : PlayerUiState()
 }
 

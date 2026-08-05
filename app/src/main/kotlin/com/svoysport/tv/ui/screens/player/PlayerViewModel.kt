@@ -49,6 +49,20 @@ class PlayerViewModel @Inject constructor(
                 .onSuccess { match ->
                     val url = match.streamUrl
                     if (url.isNullOrBlank()) {
+                        val startsInMs = match.startTimeMs - System.currentTimeMillis()
+                        if (!match.isLive && startsInMs in 1..300_000L) {
+                            _uiState.value = PlayerUiState.Waiting(
+                                title = match.title,
+                                competition = match.competition.name,
+                                startsAtMs = match.startTimeMs,
+                                thumbnailUrl = match.backgroundUrl ?: match.thumbnailUrl
+                            )
+                            viewModelScope.launch {
+                                delay(startsInMs + 500L)
+                                loadPlayerData()
+                            }
+                            return@onSuccess
+                        }
                         _uiState.value = PlayerUiState.Error("Трансляция недоступна")
                         return@onSuccess
                     }

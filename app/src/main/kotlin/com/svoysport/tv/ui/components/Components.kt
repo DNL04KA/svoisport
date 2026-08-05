@@ -306,6 +306,7 @@ fun ContentRow(
     matches       : List<MatchItem>,
     onMatchClick  : (String) -> Unit,
     onMatchFocused: (MatchItem) -> Unit = {},
+    onRowFocused  : () -> Unit = {},
     onWatchMore   : (() -> Unit)? = null,
     firstCardFocusRequester: FocusRequester? = null,
     modifier      : Modifier = Modifier
@@ -327,14 +328,17 @@ fun ContentRow(
                         match = match,
                         onClick = onMatchClick,
                         scale = scale,
-                        onFocused = onMatchFocused,
+                        onFocused = { focusedMatch ->
+                            onRowFocused()
+                            onMatchFocused(focusedMatch)
+                        },
                         modifier = if (index == 0 && firstCardFocusRequester != null) {
                             Modifier.focusRequester(firstCardFocusRequester)
                         } else Modifier
                     )
                 }
                 if (onWatchMore != null) item {
-                    WatchMoreCard(onClick = onWatchMore, scale = scale)
+                    WatchMoreCard(onClick = onWatchMore, scale = scale, onFocused = onRowFocused)
                 }
             }
         }
@@ -348,6 +352,7 @@ fun ContentRow(
 fun WatchMoreCard(
     onClick  : () -> Unit,
     scale    : Float    = 1f,
+    onFocused: () -> Unit = {},
     modifier : Modifier = Modifier
 ) {
     val cardW  = (MatchCardVisualSpec.widthDp * scale).dp
@@ -358,7 +363,10 @@ fun WatchMoreCard(
     Surface(
         onClick  = onClick,
         modifier = modifier.width(cardW).height(cardH)
-            .onFocusChanged { isFocused = it.isFocused }.tvFocusScale(isFocused),
+            .onFocusChanged {
+                isFocused = it.isFocused
+                if (it.isFocused) onFocused()
+            }.tvFocusScale(isFocused),
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(corner)),
         colors = ClickableSurfaceDefaults.colors(containerColor = White10, focusedContainerColor = White20),
         border = ClickableSurfaceDefaults.border(

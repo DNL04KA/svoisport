@@ -43,6 +43,7 @@ import com.svoysport.tv.domain.model.MatchItem
 import com.svoysport.tv.domain.model.Team
 import com.svoysport.tv.session.FavoritesManager
 import com.svoysport.tv.session.SessionManager
+import com.svoysport.tv.session.SubscriptionManager
 import com.svoysport.tv.ui.components.ContentRow
 import com.svoysport.tv.ui.components.LiveBadge
 import com.svoysport.tv.ui.components.state.HomeErrorState
@@ -61,7 +62,9 @@ fun DetailsScreen(
     viewModel: DetailsViewModel = hiltViewModel()
 ) {
     val uiState    by viewModel.uiState.collectAsState()
-    val isLoggedIn by SessionManager.isLoggedIn
+    val sessionLoggedIn by SessionManager.isLoggedIn
+    val isSubscribed by SubscriptionManager.isSubscribed
+    val isLoggedIn = sessionLoggedIn || isSubscribed
 
     when (val state = uiState) {
         is DetailsUiState.Loading -> HomeLoadingState()
@@ -73,6 +76,7 @@ fun DetailsScreen(
             match        = state.match,
             related      = state.related,
             isLoggedIn   = isLoggedIn,
+            isSubscribed = isSubscribed,
             onWatchClick = onWatchClick,
             onBack       = onBack,
             onLoginClick = onLoginClick,
@@ -88,6 +92,7 @@ private fun DetailsContent(
     match:        MatchItem,
     related:      List<MatchItem>,
     isLoggedIn:   Boolean,
+    isSubscribed: Boolean,
     onWatchClick: (String) -> Unit,
     onBack:       () -> Unit,
     onLoginClick: () -> Unit,
@@ -95,6 +100,13 @@ private fun DetailsContent(
 ) {
     // Показываем диалог подписки если нужна подписка и пользователь не авторизован
     var showSubDialog by remember { mutableStateOf(false) }
+    var showFavoriteToast by remember { mutableStateOf(false) }
+    LaunchedEffect(showFavoriteToast) {
+        if (showFavoriteToast) {
+            kotlinx.coroutines.delay(2_000)
+            showFavoriteToast = false
+        }
+    }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val sw = maxWidth.value
@@ -140,12 +152,14 @@ private fun DetailsContent(
                 MatchInfoPanel(
                     match        = match,
                     isLoggedIn   = isLoggedIn,
+                    isSubscribed = isSubscribed,
                     scale        = scale,
                     modifier     = Modifier.weight(0.52f),
                     onWatchClick = { matchId ->
-                        if (match.isSubscriptionRequired && !isLoggedIn) showSubDialog = true
+                        if (match.isSubscriptionRequired && !isSubscribed) showSubDialog = true
                         else onWatchClick(matchId)
-                    }
+                    },
+                    onFavoriteAdded = { showFavoriteToast = true }
                 )
                 Spacer(modifier = Modifier.weight(0.48f))
             }
@@ -180,10 +194,24 @@ private fun DetailsContent(
                     SubscriptionDialog(
                         onLogin   = { showSubDialog = false; onLoginClick() },
                         onDismiss = { showSubDialog = false },
+                        isLoggedIn = isLoggedIn,
                         scale     = scale
                     )
                 }
             }
+        }
+        AnimatedVisibility(
+            visible = showFavoriteToast,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopEnd).padding((48f * scale).dp)
+        ) {
+            Text(
+                "Трансляция добавлена в Избранное",
+                color = Color(0xFF1A1C2E),
+                modifier = Modifier.background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            )
         }
     }
 }
@@ -230,12 +258,13 @@ private fun DetailsTopBar(
 private fun MatchInfoPanel(
     match        : MatchItem,
     isLoggedIn   : Boolean,
+    isSubscribed : Boolean,
     scale        : Float    = 1f,
     modifier     : Modifier = Modifier,
-    onWatchClick : (String) -> Unit
+    onWatchClick : (String) -> Unit,
+    onFavoriteAdded: () -> Unit
 ) {
     val watchFr = remember { FocusRequester() }
-    LaunchedEffect(Unit) { watchFr.requestFocus() }
 
     val leagueFs : TextUnit = (12f * scale).coerceAtLeast(10f).sp
     val titleFs  : TextUnit = (64f * scale).coerceAtLeast(20f).sp
@@ -301,7 +330,15 @@ private fun MatchInfoPanel(
         )
         Spacer(Modifier.height((36f * scale).dp))
 
-        ActionButtons(match = match, isLoggedIn = isLoggedIn, watchFr = watchFr, scale = scale, onWatchClick = onWatchClick)
+        ActionButtons(
+            match = match,
+            isLoggedIn = isLoggedIn,
+            isSubscribed = isSubscribed,
+            watchFr = watchFr,
+            scale = scale,
+            onWatchClick = onWatchClick,
+            onFavoriteAdded = onFavoriteAdded
+        )
     }
 }
 
@@ -375,13 +412,32 @@ private fun TeamChip(team: Team, isHome: Boolean, scale: Float = 1f) {
 private fun ActionButtons(
     match        : MatchItem,
     isLoggedIn   : Boolean,
+    isSubscribed : Boolean,
     watchFr      : FocusRequester,
     scale        : Float = 1f,
-    onWatchClick : (String) -> Unit
+    onWatchClick : (String) -> Unit,
+    onFavoriteAdded: () -> Unit
 ) {
+    val reminderFr = remember { FocusRequester() }
     var isWatchFocused    by remember { mutableStateOf(false) }
     var isBookmarkFocused by remember { mutableStateOf(false) }
     val isBookmarked      = match.id in FavoritesManager.favoriteIds.value
+    val isUpcoming = !match.isLive && match.durationSec == 0L && match.startTimeMs > System.currentTimeMillis()
+    val startsInMs = (match.startTimeMs - System.currentTimeMillis()).coerceAtLeast(0L)
+    val canOpenPlayer = !isUpcoming || startsInMs <= 5 * 60_000L
+    val actionLabel = detailsPrimaryActionLabel(
+        requiresSubscription = match.isSubscriptionRequired,
+        isLoggedIn = isLoggedIn,
+        isSubscribed = isSubscribed,
+        canOpenPlayer = canOpenPlayer
+    )
+    val canSetReminder = isUpcoming && startsInMs > 5 * 60_000L && isLoggedIn &&
+        (!match.isSubscriptionRequired || isSubscribed)
+    var reminderEnabled by remember(match.id) { mutableStateOf(false) }
+
+    LaunchedEffect(match.id, canOpenPlayer, canSetReminder) {
+        if (!canOpenPlayer && canSetReminder) reminderFr.requestFocus() else watchFr.requestFocus()
+    }
 
     val watchScale    by animateFloatAsState(if (isWatchFocused)    1.08f else 1f, tween(150), label = "ws")
     val bookmarkScale by animateFloatAsState(if (isBookmarkFocused) 1.08f else 1f, tween(150), label = "bs")
@@ -398,7 +454,7 @@ private fun ActionButtons(
         verticalAlignment     = Alignment.CenterVertically
     ) {
         Surface(
-            onClick  = { onWatchClick(match.id) },
+            onClick  = { if (canOpenPlayer) onWatchClick(match.id) },
             modifier = Modifier.width(btnW).height(btnH)
                 .focusRequester(watchFr).onFocusChanged { isWatchFocused = it.isFocused }.scale(watchScale),
             shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
@@ -406,13 +462,18 @@ private fun ActionButtons(
             scale  = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
         ) {
             Box(modifier = Modifier.fillMaxSize().background(gradBrush, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
-                Text(text = "Смотреть", style = MaterialTheme.typography.bodyLarge.copy(
+                Text(text = actionLabel, style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = watchFs, fontWeight = FontWeight.Medium, color = Color(0xFFE2E2E2)))
             }
         }
 
-        Surface(
-            onClick  = { FavoritesManager.toggle(match.id) },
+        if (isLoggedIn) Surface(
+            onClick  = {
+                val wasBookmarked = match.id in FavoritesManager.favoriteIds.value
+                FavoritesManager.toggle(match.id)
+                if (!wasBookmarked) onFavoriteAdded()
+                watchFr.requestFocus()
+            },
             modifier = Modifier.size(bkSz).onFocusChanged { isBookmarkFocused = it.isFocused }.scale(bookmarkScale),
             shape    = ClickableSurfaceDefaults.shape(CircleShape),
             colors   = ClickableSurfaceDefaults.colors(
@@ -435,10 +496,46 @@ private fun ActionButtons(
             }
         }
 
-        if (match.isSubscriptionRequired && !isLoggedIn) {
+        if (canSetReminder) Surface(
+            onClick = { reminderEnabled = !reminderEnabled },
+            modifier = Modifier.height((52f * scale).dp)
+                .focusRequester(reminderFr),
+            shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(18.dp)),
+            colors = ClickableSurfaceDefaults.colors(
+                containerColor = Color.White.copy(alpha = 0.12f),
+                focusedContainerColor = Primary
+            ),
+            scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)
+        ) {
+            Box(
+                modifier = Modifier.padding(horizontal = (18f * scale).dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    if (reminderEnabled) "Напоминание включено" else "Напомнить за 5 минут",
+                    color = Color.White,
+                    fontSize = (14f * scale).coerceAtLeast(11f).sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        if (match.isSubscriptionRequired && !isSubscribed) {
             SubscriptionBadgeInline(scale = scale)
         }
     }
+}
+
+internal fun detailsPrimaryActionLabel(
+    requiresSubscription: Boolean,
+    isLoggedIn: Boolean,
+    isSubscribed: Boolean,
+    canOpenPlayer: Boolean
+): String = when {
+    !canOpenPlayer -> "Скоро начнётся"
+    requiresSubscription && !isLoggedIn -> "Войти в аккаунт"
+    requiresSubscription && !isSubscribed -> "Оформить подписку"
+    else -> "Смотреть"
 }
 
 // ─── SubscriptionBadgeInline ─────────────────────────────────────────────────
@@ -473,6 +570,7 @@ private fun SubscriptionBadgeInline(scale: Float = 1f) {
 private fun SubscriptionDialog(
     onLogin   : () -> Unit,
     onDismiss : () -> Unit,
+    isLoggedIn: Boolean,
     scale     : Float = 1f
 ) {
     var isLoginFocused   by remember { mutableStateOf(false) }
@@ -513,7 +611,11 @@ private fun SubscriptionDialog(
             )
             Spacer(Modifier.height((12f * scale).dp))
             Text(
-                text  = "Для просмотра этого матча необходимо\nоформить подписку или войти в аккаунт.",
+                text  = if (isLoggedIn) {
+                    "Эта трансляция доступна по подписке.\nОформите подписку для просмотра."
+                } else {
+                    "Эта трансляция доступна по подписке.\nСначала войдите, а затем оформите подписку."
+                },
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = (14f * scale).sp, lineHeight = (21f * scale).sp, color = Gray3
                 ),
@@ -538,7 +640,7 @@ private fun SubscriptionDialog(
                     scale  = ButtonDefaults.scale(scale = 1f, focusedScale = 1f)
                 ) {
                     Text(
-                        text     = "Войти",
+                        text     = if (isLoggedIn) "Оформить подписку" else "Войти в аккаунт",
                         modifier = Modifier.padding(vertical = (6f * scale).dp),
                         style    = MaterialTheme.typography.labelMedium.copy(
                             fontSize = (15f * scale).sp, fontWeight = FontWeight.SemiBold, color = Color.White
