@@ -11,6 +11,9 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.BringIntoViewSpec
+import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -301,6 +305,21 @@ fun SubscriptionBadge(modifier: Modifier = Modifier) {
 
 // ─── ContentRow ──────────────────────────────────────────────────────────────
 
+internal fun horizontalFocusScrollDistance(offset: Float, size: Float, containerSize: Float): Float {
+    val trailingEdge = offset + size
+    return when {
+        offset >= 0f && trailingEdge <= containerSize -> 0f
+        offset < 0f -> offset
+        else -> trailingEdge - containerSize
+    }
+}
+
+private object HorizontalRowBringIntoViewSpec : BringIntoViewSpec {
+    override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float =
+        horizontalFocusScrollDistance(offset, size, containerSize)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContentRow(
     title         : String,
@@ -310,6 +329,7 @@ fun ContentRow(
     onRowFocused  : () -> Unit = {},
     onWatchMore   : (() -> Unit)? = null,
     firstCardFocusRequester: FocusRequester? = null,
+    upFocusRequester: FocusRequester? = null,
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -319,27 +339,40 @@ fun ContentRow(
 
         Column {
             SectionHeader(title = title, modifier = Modifier.padding(start = pad))
-            LazyRow(
-                modifier = Modifier.softHorizontalEdges(),
-                contentPadding        = PaddingValues(horizontal = pad),
-                horizontalArrangement = Arrangement.spacedBy(gap)
-            ) {
-                itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
-                    MatchCard(
-                        match = match,
-                        onClick = onMatchClick,
-                        scale = scale,
-                        onFocused = { focusedMatch ->
-                            onRowFocused()
-                            onMatchFocused(focusedMatch)
-                        },
-                        modifier = if (index == 0 && firstCardFocusRequester != null) {
-                            Modifier.focusRequester(firstCardFocusRequester)
-                        } else Modifier
-                    )
-                }
-                if (onWatchMore != null) item {
-                    WatchMoreCard(onClick = onWatchMore, scale = scale, onFocused = onRowFocused)
+            CompositionLocalProvider(LocalBringIntoViewSpec provides HorizontalRowBringIntoViewSpec) {
+                LazyRow(
+                    modifier = Modifier.softHorizontalEdges(),
+                    contentPadding        = PaddingValues(horizontal = pad),
+                    horizontalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
+                        MatchCard(
+                            match = match,
+                            onClick = onMatchClick,
+                            scale = scale,
+                            onFocused = { focusedMatch ->
+                                onRowFocused()
+                                onMatchFocused(focusedMatch)
+                            },
+                            modifier = Modifier
+                                .then(if (index == 0 && firstCardFocusRequester != null) {
+                                    Modifier.focusRequester(firstCardFocusRequester)
+                                } else Modifier)
+                                .then(if (upFocusRequester != null) {
+                                    Modifier.focusProperties { up = upFocusRequester }
+                                } else Modifier)
+                        )
+                    }
+                    if (onWatchMore != null) item {
+                        WatchMoreCard(
+                            onClick = onWatchMore,
+                            scale = scale,
+                            onFocused = onRowFocused,
+                            modifier = if (upFocusRequester != null) {
+                                Modifier.focusProperties { up = upFocusRequester }
+                            } else Modifier
+                        )
+                    }
                 }
             }
         }

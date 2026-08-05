@@ -64,7 +64,7 @@ internal fun visibleSidebarSelection(
     SidebarMode.NONE -> selectedSport
 }
 
-private const val HOME_BACKGROUND_BLUR_DP = 210f
+private const val HOME_BACKGROUND_BLUR_DP = 120f
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
 internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
@@ -245,7 +245,10 @@ private fun HomeContent(
                 EmptyState()
             } else {
                 val scrollState = rememberLazyListState()
-                val firstContentCardFocusRequester = remember { FocusRequester() }
+                val sectionFocusRequesters = remember(sections.map { it.id }) {
+                    List(sections.size) { FocusRequester() }
+                }
+                val firstContentCardFocusRequester = sectionFocusRequesters.first()
                 var focusedSectionIndex by remember { mutableIntStateOf(-1) }
                 var shouldScrollFocusedSection by remember { mutableStateOf(false) }
                 val bringIntoViewSpec = remember {
@@ -308,6 +311,7 @@ private fun HomeContent(
                                         focusedSectionIndex = sectionIndex
                                     },
                                     firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
+                                    upFocusRequester = sectionFocusRequesters.getOrNull(sectionIndex - 1),
                                     onWatchMore    = { onWatchMore(section.title) },
                                     modifier       = Modifier.padding(bottom = 28.dp)
                                 )
