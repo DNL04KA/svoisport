@@ -393,8 +393,13 @@ private fun AllSectionContent(
                     focusedContainerColor = com.svoysport.tv.ui.theme.Primary
                 ),
                 shape = ButtonDefaults.shape(RoundedCornerShape(18.dp))
-            ) { Text("← Назад") }
-            Text(title, fontSize = 28.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+            ) { Text("← Назад", color = Color.White) }
+            Text(
+                text = title,
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+            )
         }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(230.dp),
