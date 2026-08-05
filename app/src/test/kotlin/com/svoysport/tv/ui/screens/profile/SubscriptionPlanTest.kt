@@ -30,8 +30,19 @@ class SubscriptionPlanTest {
     }
 
     @Test
-    fun `plans display supplied prices`() {
-        assertEquals(listOf("7,00", "6,67", "6,25"), subscriptionPlans.map { it.monthlyPrice })
-        assertEquals(listOf(null, "40,00 BYN", "75,00 BYN"), subscriptionPlans.map { it.total })
+    fun `plans display full charge as primary price`() {
+        assertEquals(
+            listOf("7,00 BYN", "40,00 BYN", "75,00 BYN"),
+            subscriptionPlans.map { it.fullPrice }
+        )
+        assertEquals(
+            listOf(null, "≈ 6,67 BYN/мес.", "≈ 6,25 BYN/мес."),
+            subscriptionPlans.map { it.monthlyEquivalent }
+        )
+    }
+
+    @Test
+    fun `payment action states the amount charged`() {
+        assertEquals("Оплатить 40,00 BYN", subscriptionActionLabel(defaultSubscriptionPlan))
     }
 }

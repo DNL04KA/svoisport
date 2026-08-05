@@ -116,6 +116,7 @@ fun SubscriptionScreen(
 
         SubscribeButton(
             scale = scale,
+            text = subscriptionActionLabel(selectedPlan),
             onClick = { onSubscribe(selectedPlan) },
             modifier = Modifier.align(Alignment.TopCenter).padding(top = (803f * scale).dp)
         )
@@ -231,21 +232,15 @@ private fun PlanCard(
             ) {
                 Text(plan.title, color = Color(0xFFE3E3E3), fontSize = (36f * scale).sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height((72f * scale).dp))
-                if (plan.monthlyPrice != null) {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(plan.monthlyPrice, color = Color(0xFFE3E3E3), fontSize = (54f * scale).sp, fontWeight = FontWeight.SemiBold)
-                        Text(" BYN / мес", color = Color(0xFFE3E3E3), fontSize = (32f * scale).sp)
-                    }
-                } else {
-                    Text(
-                        "Цена на сайте",
-                        color = Color(0xFFE3E3E3),
-                        fontSize = (34f * scale).sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-                if (plan.total != null) {
-                    Text("Итого ${plan.total}", color = Color(0xFFA8A9B2), fontSize = (26f * scale).sp)
+                Text(
+                    plan.fullPrice,
+                    color = Color(0xFFE3E3E3),
+                    fontSize = (54f * scale).sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text("единым платежом", color = Color(0xFFA8A9B2), fontSize = (24f * scale).sp)
+                if (plan.monthlyEquivalent != null) {
+                    Text(plan.monthlyEquivalent, color = Color(0xFFA8A9B2), fontSize = (24f * scale).sp)
                 }
                 Spacer(Modifier.weight(1f))
                 Text(plan.hint, color = Color(0xFFA8A9B2), fontSize = (20f * scale).sp)
@@ -256,7 +251,7 @@ private fun PlanCard(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun SubscribeButton(scale: Float, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SubscribeButton(text: String, scale: Float, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
         onClick = onClick,
         modifier = modifier.size(width = (380f * scale).dp, height = (80f * scale).dp)
@@ -272,7 +267,7 @@ private fun SubscribeButton(scale: Float, onClick: () -> Unit, modifier: Modifie
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.06f)
     ) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Оформить подписку", color = Color(0xFFE3E3E3), fontSize = (28f * scale).sp, fontWeight = FontWeight.Medium)
+            Text(text, color = Color(0xFFE3E3E3), fontSize = (28f * scale).sp, fontWeight = FontWeight.Medium)
         }
     }
 }
