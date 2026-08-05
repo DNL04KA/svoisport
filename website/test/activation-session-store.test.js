@@ -12,7 +12,7 @@ test('creates a waiting session with a 15 minute expiry', () => {
 
   assert.deepEqual(session, {
     sessionId: 'session-1',
-    qrUrl: 'https://example.test/activate.html?session=session-1',
+    qrUrl: 'https://sport-tv.by/payment/?id=36734',
     expiresAt: '2026-08-01T10:15:00.000Z',
   });
   assert.equal(store.getStatus('session-1'), 'waiting');
@@ -21,11 +21,20 @@ test('creates a waiting session with a 15 minute expiry', () => {
     plan: {
       id: '36734',
       title: '6 месяцев',
-      price: null,
-      total: null,
+      price: '40.00 BYN',
+      total: '40.00 BYN',
       paymentUrl: 'https://sport-tv.by/payment/?id=36734',
     },
   });
+});
+
+test('existing subscription activation keeps the session confirmation URL', () => {
+  const store = new ActivationSessionStore({ now: () => 0, id: () => 'session-existing' });
+
+  assert.equal(
+    store.createSession('tv-1', 'https://example.test').qrUrl,
+    'https://example.test/activate.html?session=session-existing'
+  );
 });
 
 test('activates a waiting session exactly once', () => {

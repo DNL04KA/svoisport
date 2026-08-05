@@ -25,7 +25,7 @@ test('creates, confirms, and reports an activation session', async () => {
     assert.equal(createdResponse.status, 201);
     const created = await createdResponse.json();
     assert.match(created.sessionId, /^[A-Za-z0-9_-]{20,}$/);
-    assert.equal(created.qrUrl, `${base}/activate.html?session=${created.sessionId}`);
+    assert.equal(created.qrUrl, 'https://sport-tv.by/payment/?id=36735');
 
     const publicSession = await fetch(`${base}/api/activation-session.php?session=${encodeURIComponent(created.sessionId)}`);
     assert.deepEqual(await publicSession.json(), {
@@ -33,8 +33,8 @@ test('creates, confirms, and reports an activation session', async () => {
       plan: {
         id: '36735',
         title: '12 месяцев',
-        price: null,
-        total: null,
+        price: '75.00 BYN',
+        total: '75.00 BYN',
         paymentUrl: 'https://sport-tv.by/payment/?id=36735',
       },
     });

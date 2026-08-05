@@ -30,7 +30,8 @@ class SubscriptionPlanTest {
     }
 
     @Test
-    fun `unknown prices are not fabricated in the TV app`() {
-        assertEquals(listOf(null, null, null), subscriptionPlans.map { it.monthlyPrice })
+    fun `plans display supplied prices`() {
+        assertEquals(listOf("7,00", "6,67", "6,25"), subscriptionPlans.map { it.monthlyPrice })
+        assertEquals(listOf(null, "40,00 BYN", "75,00 BYN"), subscriptionPlans.map { it.total })
     }
 }

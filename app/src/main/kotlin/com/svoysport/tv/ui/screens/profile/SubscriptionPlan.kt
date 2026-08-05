@@ -13,9 +13,9 @@ data class SubscriptionPlan(
 }
 
 val subscriptionPlans = listOf(
-    SubscriptionPlan("36733", "1 месяц", null, null, "Актуальная цена на сайте", null),
-    SubscriptionPlan("36734", "6 месяцев", null, null, "Актуальная цена на сайте", "Популярный выбор"),
-    SubscriptionPlan("36735", "12 месяцев", null, null, "Актуальная цена на сайте", null)
+    SubscriptionPlan("36733", "1 месяц", "7,00", null, "Попробовать сервис", null),
+    SubscriptionPlan("36734", "6 месяцев", "6,67", "40,00 BYN", "Экономия 2,00 BYN", "Популярный выбор"),
+    SubscriptionPlan("36735", "12 месяцев", "6,25", "75,00 BYN", "Самая выгодная цена", "Экономия 9,00 BYN")
 )
 
 val defaultSubscriptionPlan = subscriptionPlans[1]

@@ -5,9 +5,9 @@ const { neon } = require('@neondatabase/serverless');
 const DEVICE_LIMIT = 3;
 
 const PLANS = {
-  36733: { id: '36733', title: '1 месяц', price: null, total: null, days: 30, paymentUrl: 'https://sport-tv.by/payment/?id=36733' },
-  36734: { id: '36734', title: '6 месяцев', price: null, total: null, days: 180, paymentUrl: 'https://sport-tv.by/payment/?id=36734' },
-  36735: { id: '36735', title: '12 месяцев', price: null, total: null, days: 365, paymentUrl: 'https://sport-tv.by/payment/?id=36735' },
+  36733: { id: '36733', title: '1 месяц', price: '7.00 BYN', total: '7.00 BYN', days: 30, paymentUrl: 'https://sport-tv.by/payment/?id=36733' },
+  36734: { id: '36734', title: '6 месяцев', price: '40.00 BYN', total: '40.00 BYN', days: 180, paymentUrl: 'https://sport-tv.by/payment/?id=36734' },
+  36735: { id: '36735', title: '12 месяцев', price: '75.00 BYN', total: '75.00 BYN', days: 365, paymentUrl: 'https://sport-tv.by/payment/?id=36735' },
 };
 
 async function prepare(sql) {
@@ -58,7 +58,8 @@ module.exports = async function handler(req, res) {
     await sql`INSERT INTO activation_sessions (session_id, device_id, device_name, plan_id, expires_at)
       VALUES (${sessionId}, ${deviceId}, ${String(deviceName).slice(0, 120)}, ${planId}, ${expiresAt.toISOString()})`;
     const origin = `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
-    return send(res, 201, { sessionId, qrUrl: `${origin}/activate.html?session=${encodeURIComponent(sessionId)}`, expiresAt: expiresAt.toISOString() });
+    const qrUrl = planId ? PLANS[planId].paymentUrl : `${origin}/activate.html?session=${encodeURIComponent(sessionId)}`;
+    return send(res, 201, { sessionId, qrUrl, expiresAt: expiresAt.toISOString() });
   }
 
   const sessionId = String(req.query.sessionId || req.query.session || req.body?.session || '');

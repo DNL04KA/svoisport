@@ -29,7 +29,8 @@ class MockActivationApi @Inject constructor() : ActivationApi {
         pollsBySession[sid] = 0
         return ActivationSession(
             sessionId = sid,
-            qrUrl     = "https://sport-tv.by/activate?session=$sid"
+            qrUrl     = if (planId != null) "https://sport-tv.by/payment/?id=$planId"
+                        else "https://sport-tv.by/activate?session=$sid"
         )
     }
 
