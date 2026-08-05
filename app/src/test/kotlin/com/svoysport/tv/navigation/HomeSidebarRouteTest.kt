@@ -18,4 +18,16 @@ class HomeSidebarRouteTest {
         assertNull(sidebarItemFromRoute(null))
         assertNull(sidebarItemFromRoute("UNKNOWN"))
     }
+
+    @Test
+    fun `all content routes keep their target identifiers`() {
+        assertEquals("details/match-42", Screen.Details.createRoute("match-42"))
+        assertEquals("player/match-42", Screen.Player.createRoute("match-42"))
+        assertEquals("activation?planId=36735", Screen.Activation.createRoute("36735"))
+    }
+
+    @Test
+    fun `related match opens details before player`() {
+        assertEquals("details/related-7", relatedMatchRoute("related-7"))
+    }
 }

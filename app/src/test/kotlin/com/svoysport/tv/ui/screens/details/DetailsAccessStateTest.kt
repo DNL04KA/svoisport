@@ -1,6 +1,7 @@
 package com.svoysport.tv.ui.screens.details
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DetailsAccessStateTest {
@@ -23,5 +24,10 @@ class DetailsAccessStateTest {
 
     @Test fun `future match action shows live countdown`() {
         assertEquals("Начало через 00:25:48", formatDetailsCountdown(25 * 60_000L + 48_000L))
+    }
+
+    @Test fun `favorite action is wide enough for the full label and fits the row`() {
+        assertTrue(detailsFavoriteButtonWidthDp() >= 300f)
+        assertTrue(detailsActionRowWidthDp(isUpcoming = true) <= 940f)
     }
 }

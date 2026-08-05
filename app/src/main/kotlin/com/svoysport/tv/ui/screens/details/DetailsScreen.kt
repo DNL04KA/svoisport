@@ -66,6 +66,7 @@ import java.util.*
 @Composable
 fun DetailsScreen(
     onWatchClick:  (String) -> Unit,
+    onRelatedMatchClick: (String) -> Unit,
     onBack:        () -> Unit = {},
     onLoginClick:  () -> Unit = {},
     viewModel: DetailsViewModel = hiltViewModel()
@@ -87,6 +88,7 @@ fun DetailsScreen(
             isLoggedIn   = isLoggedIn,
             isSubscribed = isSubscribed,
             onWatchClick = onWatchClick,
+            onRelatedMatchClick = onRelatedMatchClick,
             onBack       = onBack,
             onLoginClick = onLoginClick,
             onRetryMatch = { viewModel.loadDetails() }
@@ -103,6 +105,7 @@ private fun DetailsContent(
     isLoggedIn:   Boolean,
     isSubscribed: Boolean,
     onWatchClick: (String) -> Unit,
+    onRelatedMatchClick: (String) -> Unit,
     onBack:       () -> Unit,
     onLoginClick: () -> Unit,
     onRetryMatch: () -> Unit
@@ -179,7 +182,7 @@ private fun DetailsContent(
                 ContentRow(
                     title        = "Похожие матчи",
                     matches      = related,
-                    onMatchClick = onWatchClick,
+                    onMatchClick = onRelatedMatchClick,
                     modifier     = Modifier.padding(bottom = (48f * scale).dp)
                 )
             } else {
@@ -544,7 +547,7 @@ private fun ActionButtons(
                 if (!wasBookmarked) onFavoriteAdded()
                 watchFr.requestFocus()
             },
-            modifier = Modifier.width((240f * scale).dp).height(btnH)
+            modifier = Modifier.width((detailsFavoriteButtonWidthDp() * scale).dp).height(btnH)
                 .onFocusChanged { isBookmarkFocused = it.isFocused }.scale(bookmarkScale),
             shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
             colors   = ClickableSurfaceDefaults.colors(
@@ -604,6 +607,16 @@ internal fun formatDetailsCountdown(remainingMs: Long): String {
     val minutes = (totalSeconds / 60L) % 60L
     val seconds = totalSeconds % 60L
     return "Начало через %02d:%02d:%02d".format(hours, minutes, seconds)
+}
+
+internal fun detailsFavoriteButtonWidthDp(): Float = 300f
+
+internal fun detailsActionRowWidthDp(isUpcoming: Boolean): Float {
+    val primary = if (isUpcoming) 340f else 240f
+    val reminder = if (isUpcoming) 260f else 0f
+    val favorite = detailsFavoriteButtonWidthDp()
+    val gaps = if (isUpcoming) 24f else 12f
+    return primary + reminder + favorite + gaps
 }
 
 // ─── SubscriptionBadgeInline ─────────────────────────────────────────────────

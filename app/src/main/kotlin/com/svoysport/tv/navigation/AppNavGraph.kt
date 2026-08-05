@@ -120,6 +120,9 @@ fun AppNavGraph(navController: NavHostController) {
                 onWatchClick = { matchId ->
                     navController.navigate(Screen.Player.createRoute(matchId))
                 },
+                onRelatedMatchClick = { matchId ->
+                    navController.navigate(relatedMatchRoute(matchId))
+                },
                 onBack = { navController.popBackStack() },
                 // Вся авторизация — через QR-активацию (флоу device_id)
                 onLoginClick = { navController.navigate(Screen.ActivationRequired.route) }
@@ -208,3 +211,5 @@ fun AppNavGraph(navController: NavHostController) {
 
 internal fun sidebarItemFromRoute(value: String?): SidebarItem? =
     value?.let { raw -> SidebarItem.entries.firstOrNull { it.name == raw } }
+
+internal fun relatedMatchRoute(matchId: String): String = Screen.Details.createRoute(matchId)
