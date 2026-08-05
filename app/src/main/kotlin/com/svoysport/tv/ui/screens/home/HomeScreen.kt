@@ -64,7 +64,8 @@ internal fun visibleSidebarSelection(
     SidebarMode.NONE -> selectedSport
 }
 
-private const val HOME_BACKGROUND_BLUR_DP = 120f
+private const val HOME_BACKGROUND_BLUR_DP = 80f
+private const val HOME_ROW_ITEM_LIMIT = 10
 private const val HOME_BACKGROUND_IMAGE_ALPHA = 0.30f
 private const val HOME_BACKGROUND_GRADIENT_ALPHA = 0.30f
 internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
@@ -72,6 +73,9 @@ internal fun homeBackgroundWidth(screenWidthDp: Float): Float = screenWidthDp
 internal fun homeBackgroundHeight(screenHeightDp: Float): Float = screenHeightDp
 
 internal fun firstHomeContentCardIndex(): Int = 0
+
+internal fun homeRowMatches(matches: List<MatchItem>): List<MatchItem> =
+    matches.take(HOME_ROW_ITEM_LIMIT)
 
 private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     SidebarItem.SEARCH, SidebarItem.BOOKMARKS -> null
@@ -117,6 +121,13 @@ fun HomeScreen(
     var topBarHidden    by remember { mutableStateOf(false) }
     var expandedSection by remember { mutableStateOf<String?>(null) }
     var focusedHomeMatch by remember { mutableStateOf<MatchItem?>(null) }
+    var pendingHomeMatch by remember { mutableStateOf<MatchItem?>(null) }
+
+    LaunchedEffect(pendingHomeMatch) {
+        val pending = pendingHomeMatch ?: return@LaunchedEffect
+        kotlinx.coroutines.delay(140)
+        focusedHomeMatch = pending
+    }
 
     BackHandler(enabled = expandedSection != null) { expandedSection = null }
 
@@ -153,6 +164,7 @@ fun HomeScreen(
             sidebarMode = SidebarMode.NONE
             expandedSection = null
             focusedHomeMatch = null
+            pendingHomeMatch = null
         },
         isLoggedIn          = SessionManager.isLoggedIn.value ||
                               com.svoysport.tv.session.SubscriptionManager.isSubscribed.value,
@@ -173,6 +185,7 @@ fun HomeScreen(
         onSidebarItemSelected = { item ->
             expandedSection = null
             focusedHomeMatch = null
+            pendingHomeMatch = null
             when (item) {
                 SidebarItem.SEARCH    -> sidebarMode = SidebarMode.SEARCH
                 SidebarItem.BOOKMARKS -> sidebarMode = SidebarMode.FAVORITES
@@ -206,8 +219,9 @@ fun HomeScreen(
                     onWatchMore  = { sectionTitle ->
                         expandedSection = sectionTitle
                         focusedHomeMatch = null
+                        pendingHomeMatch = null
                     },
-                    onBackgroundMatchFocused = { focusedHomeMatch = it },
+                    onBackgroundMatchFocused = { pendingHomeMatch = it },
                     onRetry      = { viewModel.loadHomeContent() },
                     onTopBarHiddenChange = { topBarHidden = it }
                 )
@@ -300,7 +314,7 @@ private fun HomeContent(
                             itemsIndexed(sections, key = { _, section -> section.id }) { sectionIndex, section ->
                                 ContentRow(
                                     title          = section.title,
-                                    matches        = section.matches,
+                                    matches        = homeRowMatches(section.matches),
                                     onMatchClick   = onMatchClick,
                                     onMatchFocused = { onBackgroundMatchFocused(it) },
                                     onRowFocused   = {
@@ -312,7 +326,9 @@ private fun HomeContent(
                                     },
                                     firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
                                     upFocusRequester = sectionFocusRequesters.getOrNull(sectionIndex - 1),
-                                    onWatchMore    = { onWatchMore(section.title) },
+                                    onWatchMore    = if (section.matches.size > HOME_ROW_ITEM_LIMIT) {
+                                        { onWatchMore(section.title) }
+                                    } else null,
                                     modifier       = Modifier.padding(bottom = 28.dp)
                                 )
                             }
@@ -329,7 +345,7 @@ private fun HomeBackground(match: MatchItem) {
     Box(Modifier.fillMaxSize().clipToBounds()) {
         Crossfade(
             targetState = match.backgroundUrl ?: match.thumbnailUrl,
-            animationSpec = tween(durationMillis = 400),
+            animationSpec = tween(durationMillis = 250),
             label = "focusedMatchBackground"
         ) { imageUrl ->
             AsyncImage(

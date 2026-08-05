@@ -179,7 +179,7 @@ fun MatchCard(
         modifier = modifier.width(cardW).onFocusChanged {
             isFocused = it.isFocused
             if (it.isFocused) onFocused(match)
-        }.tvFocusScale(isFocused),
+        }.tvFocusScale(isFocused, focusedScale = 1.03f),
         shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(corner)),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = Color.Transparent,
@@ -342,7 +342,7 @@ fun ContentRow(
             CompositionLocalProvider(LocalBringIntoViewSpec provides HorizontalRowBringIntoViewSpec) {
                 LazyRow(
                     modifier = Modifier.softHorizontalEdges(),
-                    contentPadding        = PaddingValues(horizontal = pad),
+                    contentPadding        = PaddingValues(horizontal = pad, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(gap)
                 ) {
                     itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
