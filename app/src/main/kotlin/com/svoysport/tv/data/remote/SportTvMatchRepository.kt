@@ -88,9 +88,12 @@ class SportTvMatchRepository @Inject constructor(
         return load().mapCatching { matches ->
             if (matches.isEmpty()) throw IllegalStateException("Нет доступных трансляций")
 
-            val live     = matches.filter { it.isLive }
-            val upcoming = matches.filter { it.startTimeMs > System.currentTimeMillis() }
-            val featured = live.firstOrNull() ?: matches.first()
+            val now      = System.currentTimeMillis()
+            val active   = matches.filter { isActiveHomeMatch(it, now) }
+            val live     = active.filter { it.isLive }
+            val upcoming = active.filter { !it.isLive && it.startTimeMs > now }
+            val featured = live.firstOrNull() ?: upcoming.firstOrNull()
+                ?: throw IllegalStateException("Сейчас нет активных трансляций")
 
             val sections = buildList {
                 if (live.isNotEmpty())     add(HomeSection("live", "Онлайн", live))
@@ -98,17 +101,20 @@ class SportTvMatchRepository @Inject constructor(
 
                 // Секции по виду спорта (competition.id из маппера)
                 SPORT_SECTIONS.forEach { (id, title) ->
-                    val items = matches.filter { it.competition.id == id }
+                    val items = active.filter { it.competition.id == id }
                     if (items.isNotEmpty()) add(HomeSection(id, title, items))
                 }
 
                 // Если по какой-то причине секций нет — показываем всё
-                if (isEmpty()) add(HomeSection("all", "Все трансляции", matches))
+                if (isEmpty()) add(HomeSection("all", "Все трансляции", active))
             }
 
             HomeContent(featuredMatch = featured, sections = sections)
         }
     }
+
+    internal fun isActiveHomeMatch(match: MatchItem, nowMs: Long): Boolean =
+        match.isLive || match.startTimeMs > nowMs
 
     override suspend fun getMatchDetails(matchId: String): Result<MatchItem> {
         // Сначала смотрим в общем индексе (наполняется из главной и расписания)

@@ -423,13 +423,15 @@ private fun ActionButtons(
     var isBookmarkFocused by remember { mutableStateOf(false) }
     val isBookmarked      = match.id in FavoritesManager.favoriteIds.value
     val isUpcoming = !match.isLive && match.durationSec == 0L && match.startTimeMs > System.currentTimeMillis()
+    val isExpired = !match.isLive && match.durationSec == 0L && match.startTimeMs <= System.currentTimeMillis()
     val startsInMs = (match.startTimeMs - System.currentTimeMillis()).coerceAtLeast(0L)
-    val canOpenPlayer = !isUpcoming || startsInMs <= 5 * 60_000L
+    val canOpenPlayer = !isExpired && (!isUpcoming || startsInMs <= 5 * 60_000L)
     val actionLabel = detailsPrimaryActionLabel(
         requiresSubscription = match.isSubscriptionRequired,
         isLoggedIn = isLoggedIn,
         isSubscribed = isSubscribed,
-        canOpenPlayer = canOpenPlayer
+        canOpenPlayer = canOpenPlayer,
+        isExpired = isExpired
     )
     val canSetReminder = isUpcoming && startsInMs > 5 * 60_000L && isLoggedIn &&
         (!match.isSubscriptionRequired || isSubscribed)
@@ -530,8 +532,10 @@ internal fun detailsPrimaryActionLabel(
     requiresSubscription: Boolean,
     isLoggedIn: Boolean,
     isSubscribed: Boolean,
-    canOpenPlayer: Boolean
+    canOpenPlayer: Boolean,
+    isExpired: Boolean = false
 ): String = when {
+    isExpired -> "Трансляция завершена"
     !canOpenPlayer -> "Скоро начнётся"
     requiresSubscription && !isLoggedIn -> "Войти в аккаунт"
     requiresSubscription && !isSubscribed -> "Оформить подписку"

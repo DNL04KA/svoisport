@@ -47,6 +47,10 @@ class PlayerViewModel @Inject constructor(
             _uiState.value = PlayerUiState.Loading
             repository.getMatchDetails(matchId)
                 .onSuccess { match ->
+                    if (!match.isLive && match.durationSec == 0L && match.startTimeMs <= System.currentTimeMillis()) {
+                        _uiState.value = PlayerUiState.Error("Трансляция завершена")
+                        return@onSuccess
+                    }
                     val url = match.streamUrl
                     if (url.isNullOrBlank()) {
                         val startsInMs = match.startTimeMs - System.currentTimeMillis()

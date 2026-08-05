@@ -15,5 +15,9 @@ class DetailsAccessStateTest {
     @Test fun `subscriber can watch and far future match cannot be opened`() {
         assertEquals("Смотреть", detailsPrimaryActionLabel(true, true, true, true))
         assertEquals("Скоро начнётся", detailsPrimaryActionLabel(false, true, false, false))
+        assertEquals(
+            "Трансляция завершена",
+            detailsPrimaryActionLabel(false, true, false, false, isExpired = true)
+        )
     }
 }
