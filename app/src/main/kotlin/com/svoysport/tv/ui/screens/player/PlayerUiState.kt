@@ -16,7 +16,11 @@ sealed class PlayerUiState {
         val startsAtMs: Long,
         val thumbnailUrl: String
     ) : PlayerUiState()
-    data class Error(val message: String) : PlayerUiState()
+    data class Error(
+        val message: String,
+        val title: String = "",
+        val thumbnailUrl: String = ""
+    ) : PlayerUiState()
 }
 
 /** Состояние воспроизведения, обновляется каждые ~250 мс */

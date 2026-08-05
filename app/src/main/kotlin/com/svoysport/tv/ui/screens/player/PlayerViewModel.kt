@@ -48,7 +48,9 @@ class PlayerViewModel @Inject constructor(
             repository.getMatchDetails(matchId)
                 .onSuccess { match ->
                     if (!match.isLive && match.durationSec == 0L && match.startTimeMs <= System.currentTimeMillis()) {
-                        _uiState.value = PlayerUiState.Error("Трансляция завершена")
+                        _uiState.value = PlayerUiState.Error(
+                            "Трансляция завершена", match.title, match.backgroundUrl ?: match.thumbnailUrl
+                        )
                         return@onSuccess
                     }
                     val url = match.streamUrl
@@ -67,7 +69,9 @@ class PlayerViewModel @Inject constructor(
                             }
                             return@onSuccess
                         }
-                        _uiState.value = PlayerUiState.Error("Трансляция недоступна")
+                        _uiState.value = PlayerUiState.Error(
+                            "Трансляция недоступна", match.title, match.backgroundUrl ?: match.thumbnailUrl
+                        )
                         return@onSuccess
                     }
                     _uiState.value = PlayerUiState.Ready(

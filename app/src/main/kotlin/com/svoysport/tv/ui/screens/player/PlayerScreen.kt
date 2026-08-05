@@ -89,6 +89,8 @@ fun PlayerScreen(
 
             is PlayerUiState.Error -> PlayerErrorState(
                 message = state.message,
+                title = state.title,
+                thumbnailUrl = state.thumbnailUrl,
                 onRetry = { viewModel.loadPlayerData() },
                 onBack = onBack
             )
@@ -188,56 +190,104 @@ private fun PlayerWaitingState(state: PlayerUiState.Waiting, onBack: () -> Unit)
 @Composable
 private fun PlayerErrorState(
     message: String,
+    title: String,
+    thumbnailUrl: String,
     onRetry: () -> Unit,
     onBack: () -> Unit
 ) {
+    val presentation = playerErrorPresentation(message)
     val retryFocusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) { retryFocusRequester.requestFocus() }
+    LaunchedEffect(presentation.showRetry) {
+        if (presentation.showRetry) retryFocusRequester.requestFocus()
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        PlayerExitButton(onBack = onBack, modifier = Modifier.align(Alignment.TopStart).padding(40.dp))
+        if (thumbnailUrl.isNotBlank()) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.70f
+            )
+        }
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.52f)))
+        Row(
+            modifier = Modifier.align(Alignment.TopStart).padding(36.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            PlayerExitButton(onBack = onBack)
+            if (title.isNotBlank()) Text(title, color = Color.White, fontSize = 26.sp)
+        }
 
         Column(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.Center)
+                .background(Color(0xD9343746), RoundedCornerShape(24.dp))
+                .padding(horizontal = 48.dp, vertical = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (message.contains("регион", ignoreCase = true)) {
-                    "Трансляция недоступна в вашем регионе"
-                } else {
-                    "Трансляция не открылась"
-                },
+                text = presentation.title,
                 style = MaterialTheme.typography.headlineLarge.copy(
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
                 )
             )
             Spacer(Modifier.height(12.dp))
-            Text(text = message, color = Gray3, fontSize = 18.sp)
-            if (message.contains("регион", ignoreCase = true)) {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Некоторые трансляции ограничены правами показа. Поддержка: info@sport-tv.by",
-                    color = Gray3,
-                    fontSize = 16.sp
-                )
+            Text(text = presentation.description, color = Gray3, fontSize = 18.sp)
+            if (presentation.showRetry) {
+                Spacer(Modifier.height(28.dp))
+                Button(
+                    onClick = onRetry,
+                    modifier = Modifier.focusRequester(retryFocusRequester),
+                    shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
+                    colors = ButtonDefaults.colors(
+                        containerColor = Color(0xFF343746),
+                        focusedContainerColor = Primary
+                    ),
+                    scale = ButtonDefaults.scale(focusedScale = 1.06f)
+                ) {
+                    Text("Повторить попытку", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                }
             }
-            Spacer(Modifier.height(28.dp))
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.focusRequester(retryFocusRequester),
-                shape = ButtonDefaults.shape(RoundedCornerShape(18.dp)),
-                colors = ButtonDefaults.colors(
-                    containerColor = Color(0xFF343746),
-                    focusedContainerColor = Primary
-                ),
-                scale = ButtonDefaults.scale(focusedScale = 1.06f)
-            ) {
-                Text("Повторить попытку", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            }
+        }
+        if (!presentation.showRetry) {
+            Text(
+                "Если у вас есть вопросы, обратитесь в поддержку: info@sport-tv.by",
+                color = Gray3,
+                fontSize = 18.sp,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp)
+            )
         }
     }
 }
+
+internal data class PlayerErrorPresentation(
+    val title: String,
+    val description: String,
+    val showRetry: Boolean
+)
+
+internal fun playerErrorPresentation(message: String): PlayerErrorPresentation =
+    if (
+        message.contains("регион", ignoreCase = true) ||
+        message.contains("geo", ignoreCase = true) ||
+        message.contains("country", ignoreCase = true) ||
+        message.contains("451")
+    ) {
+        PlayerErrorPresentation(
+            title = "Трансляция недоступна в вашем регионе",
+            description = "Некоторые трансляции ограничены правами показа в разных странах.",
+            showRetry = false
+        )
+    } else {
+        PlayerErrorPresentation(
+            title = "Трансляция не открылась",
+            description = message,
+            showRetry = true
+        )
+    }
 
 @Composable
 private fun PlayerExitButton(onBack: () -> Unit, modifier: Modifier = Modifier) {

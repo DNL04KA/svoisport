@@ -1,5 +1,8 @@
 package com.svoysport.tv.ui.screens.details
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -35,6 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.*
 import coil3.compose.AsyncImage
@@ -44,6 +51,8 @@ import com.svoysport.tv.domain.model.Team
 import com.svoysport.tv.session.FavoritesManager
 import com.svoysport.tv.session.SessionManager
 import com.svoysport.tv.session.SubscriptionManager
+import com.svoysport.tv.reminder.MatchReminderManager
+import com.svoysport.tv.reminder.canScheduleMatchReminder
 import com.svoysport.tv.ui.components.ContentRow
 import com.svoysport.tv.ui.components.LiveBadge
 import com.svoysport.tv.ui.components.state.HomeErrorState
@@ -419,23 +428,39 @@ private fun ActionButtons(
     onFavoriteAdded: () -> Unit
 ) {
     val reminderFr = remember { FocusRequester() }
+    val context = LocalContext.current
     var isWatchFocused    by remember { mutableStateOf(false) }
     var isBookmarkFocused by remember { mutableStateOf(false) }
     val isBookmarked      = match.id in FavoritesManager.favoriteIds.value
-    val isUpcoming = !match.isLive && match.durationSec == 0L && match.startTimeMs > System.currentTimeMillis()
-    val isExpired = !match.isLive && match.durationSec == 0L && match.startTimeMs <= System.currentTimeMillis()
-    val startsInMs = (match.startTimeMs - System.currentTimeMillis()).coerceAtLeast(0L)
+    var nowMs by remember(match.id) { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(match.id, match.startTimeMs) {
+        while (nowMs < match.startTimeMs) {
+            kotlinx.coroutines.delay(1_000L)
+            nowMs = System.currentTimeMillis()
+        }
+    }
+    val isUpcoming = !match.isLive && match.durationSec == 0L && match.startTimeMs > nowMs
+    val isExpired = !match.isLive && match.durationSec == 0L && match.startTimeMs <= nowMs
+    val startsInMs = (match.startTimeMs - nowMs).coerceAtLeast(0L)
     val canOpenPlayer = !isExpired && (!isUpcoming || startsInMs <= 5 * 60_000L)
-    val actionLabel = detailsPrimaryActionLabel(
-        requiresSubscription = match.isSubscriptionRequired,
-        isLoggedIn = isLoggedIn,
-        isSubscribed = isSubscribed,
-        canOpenPlayer = canOpenPlayer,
-        isExpired = isExpired
-    )
-    val canSetReminder = isUpcoming && startsInMs > 5 * 60_000L && isLoggedIn &&
-        (!match.isSubscriptionRequired || isSubscribed)
-    var reminderEnabled by remember(match.id) { mutableStateOf(false) }
+    val actionLabel = if (isUpcoming && !canOpenPlayer) {
+        formatDetailsCountdown(startsInMs)
+    } else {
+        detailsPrimaryActionLabel(
+            requiresSubscription = match.isSubscriptionRequired,
+            isLoggedIn = isLoggedIn,
+            isSubscribed = isSubscribed,
+            canOpenPlayer = canOpenPlayer,
+            isExpired = isExpired
+        )
+    }
+    val canSetReminder = canScheduleMatchReminder(match, isLoggedIn, isSubscribed, nowMs)
+    val reminderEnabled = match.id in MatchReminderManager.reminderIds.value
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) MatchReminderManager.enable(match)
+    }
 
     LaunchedEffect(match.id, canOpenPlayer, canSetReminder) {
         if (!canOpenPlayer && canSetReminder) reminderFr.requestFocus() else watchFr.requestFocus()
@@ -444,9 +469,8 @@ private fun ActionButtons(
     val watchScale    by animateFloatAsState(if (isWatchFocused)    1.08f else 1f, tween(150), label = "ws")
     val bookmarkScale by animateFloatAsState(if (isBookmarkFocused) 1.08f else 1f, tween(150), label = "bs")
 
-    val btnW   : Dp = (202f * scale).dp
+    val btnW   : Dp = ((if (isUpcoming) 340f else 240f) * scale).dp
     val btnH   : Dp = (80f  * scale).dp
-    val bkSz   : Dp = (52f  * scale).dp
     val bkIco  : Dp = (20f  * scale).dp
     val watchFs      = (28f  * scale).sp
     val gradBrush    = Brush.horizontalGradient(listOf(Color(0xFF4556EB), Color(0xFF6B78F0)))
@@ -469,6 +493,50 @@ private fun ActionButtons(
             }
         }
 
+        if (canSetReminder) Surface(
+            onClick = {
+                if (reminderEnabled) {
+                    MatchReminderManager.disable(match.id)
+                } else if (
+                    Build.VERSION.SDK_INT < 33 ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+                        PackageManager.PERMISSION_GRANTED
+                ) {
+                    MatchReminderManager.enable(match)
+                } else {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            },
+            modifier = Modifier.width((260f * scale).dp).height(btnH)
+                .focusRequester(reminderFr),
+            shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
+            colors = ClickableSurfaceDefaults.colors(
+                containerColor = if (reminderEnabled) Primary else Color.White.copy(alpha = 0.12f),
+                focusedContainerColor = Primary
+            ),
+            scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(horizontal = (16f * scale).dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy((10f * scale).dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_bell),
+                    contentDescription = null,
+                    modifier = Modifier.size((24f * scale).dp),
+                    tint = Color.White
+                )
+                Text(
+                    if (reminderEnabled) "Напоминание включено" else "Напомнить за 5 минут",
+                    color = Color.White,
+                    fontSize = (18f * scale).coerceAtLeast(12f).sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1
+                )
+            }
+        }
+
         if (isLoggedIn) Surface(
             onClick  = {
                 val wasBookmarked = match.id in FavoritesManager.favoriteIds.value
@@ -476,17 +544,22 @@ private fun ActionButtons(
                 if (!wasBookmarked) onFavoriteAdded()
                 watchFr.requestFocus()
             },
-            modifier = Modifier.size(bkSz).onFocusChanged { isBookmarkFocused = it.isFocused }.scale(bookmarkScale),
-            shape    = ClickableSurfaceDefaults.shape(CircleShape),
+            modifier = Modifier.width((240f * scale).dp).height(btnH)
+                .onFocusChanged { isBookmarkFocused = it.isFocused }.scale(bookmarkScale),
+            shape    = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
             colors   = ClickableSurfaceDefaults.colors(
                 containerColor = Color.White.copy(alpha = 0.12f), focusedContainerColor = Color.White.copy(alpha = 0.20f)
             ),
             border = ClickableSurfaceDefaults.border(
-                focusedBorder = Border(border = androidx.compose.foundation.BorderStroke(2.dp, Primary), shape = CircleShape)
+                focusedBorder = Border(border = androidx.compose.foundation.BorderStroke(2.dp, Primary), shape = RoundedCornerShape(20.dp))
             ),
             scale = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
         ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy((10f * scale).dp),
+                modifier = Modifier.fillMaxSize().padding(horizontal = (16f * scale).dp)
+            ) {
                 Icon(
                     imageVector        = ImageVector.vectorResource(
                         if (isBookmarked || isBookmarkFocused) R.drawable.ic_bookmark_active else R.drawable.ic_bookmark
@@ -495,29 +568,12 @@ private fun ActionButtons(
                     tint               = if (isBookmarked) Primary else Color.White,
                     modifier           = Modifier.size(bkIco)
                 )
-            }
-        }
-
-        if (canSetReminder) Surface(
-            onClick = { reminderEnabled = !reminderEnabled },
-            modifier = Modifier.height((52f * scale).dp)
-                .focusRequester(reminderFr),
-            shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(18.dp)),
-            colors = ClickableSurfaceDefaults.colors(
-                containerColor = Color.White.copy(alpha = 0.12f),
-                focusedContainerColor = Primary
-            ),
-            scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)
-        ) {
-            Box(
-                modifier = Modifier.padding(horizontal = (18f * scale).dp),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
-                    if (reminderEnabled) "Напоминание включено" else "Напомнить за 5 минут",
+                    if (isBookmarked) "В Избранном" else "Добавить в Избранное",
                     color = Color.White,
-                    fontSize = (14f * scale).coerceAtLeast(11f).sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontSize = (18f * scale).coerceAtLeast(12f).sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1
                 )
             }
         }
@@ -540,6 +596,14 @@ internal fun detailsPrimaryActionLabel(
     requiresSubscription && !isLoggedIn -> "Войти в аккаунт"
     requiresSubscription && !isSubscribed -> "Оформить подписку"
     else -> "Смотреть"
+}
+
+internal fun formatDetailsCountdown(remainingMs: Long): String {
+    val totalSeconds = remainingMs.coerceAtLeast(0L) / 1_000L
+    val hours = totalSeconds / 3_600L
+    val minutes = (totalSeconds / 60L) % 60L
+    val seconds = totalSeconds % 60L
+    return "Начало через %02d:%02d:%02d".format(hours, minutes, seconds)
 }
 
 // ─── SubscriptionBadgeInline ─────────────────────────────────────────────────

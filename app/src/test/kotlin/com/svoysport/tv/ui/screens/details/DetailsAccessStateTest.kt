@@ -20,4 +20,8 @@ class DetailsAccessStateTest {
             detailsPrimaryActionLabel(false, true, false, false, isExpired = true)
         )
     }
+
+    @Test fun `future match action shows live countdown`() {
+        assertEquals("Начало через 00:25:48", formatDetailsCountdown(25 * 60_000L + 48_000L))
+    }
 }

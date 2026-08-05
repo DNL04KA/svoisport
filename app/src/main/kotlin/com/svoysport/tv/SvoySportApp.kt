@@ -9,6 +9,7 @@ import coil3.request.allowHardware
 import com.svoysport.tv.session.FavoritesManager
 import com.svoysport.tv.session.SubscriptionManager
 import com.svoysport.tv.session.SettingsManager
+import com.svoysport.tv.reminder.MatchReminderManager
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -19,6 +20,7 @@ class SvoySportApp : Application(), SingletonImageLoader.Factory {
         FavoritesManager.init(this)
         SubscriptionManager.init(this)
         SettingsManager.init(this)
+        MatchReminderManager.init(this)
     }
 
     /**
