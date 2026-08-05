@@ -10,6 +10,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -24,10 +26,12 @@ object MatchReminderManager {
     private const val CHANNEL_ID = "match_reminders"
     private const val EXTRA_MATCH_ID = "match_id"
     private const val EXTRA_TITLE = "title"
+    private const val EXTRA_CATEGORY = "category"
 
     private lateinit var appContext: Context
     private val prefs by lazy { appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE) }
     val reminderIds = mutableStateOf<Set<String>>(emptySet())
+    val activeAlert = mutableStateOf<ReminderAlert?>(null)
 
     fun init(context: Context) {
         appContext = context.applicationContext
@@ -58,12 +62,12 @@ object MatchReminderManager {
         alarmManager().setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             triggerAt,
-            reminderPendingIntent(match.id, match.title)
+            reminderPendingIntent(match.id, match.title, match.competition.name)
         )
     }
 
     fun disable(matchId: String) {
-        alarmManager().cancel(reminderPendingIntent(matchId, ""))
+        alarmManager().cancel(reminderPendingIntent(matchId, "", ""))
         removeStored(matchId)
     }
 
@@ -86,10 +90,11 @@ object MatchReminderManager {
 
     private fun alarmManager() = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    private fun reminderPendingIntent(matchId: String, title: String): PendingIntent {
+    private fun reminderPendingIntent(matchId: String, title: String, category: String): PendingIntent {
         val intent = Intent(appContext, MatchReminderReceiver::class.java)
             .putExtra(EXTRA_MATCH_ID, matchId)
             .putExtra(EXTRA_TITLE, title)
+            .putExtra(EXTRA_CATEGORY, category)
         return PendingIntent.getBroadcast(
             appContext,
             matchId.hashCode(),
@@ -113,7 +118,13 @@ object MatchReminderManager {
         }
     }
 
-    internal fun showNotification(matchId: String, title: String) {
+    internal fun showNotification(matchId: String, title: String, category: String) {
+        val alert = reminderAlert(matchId, title, category)
+        activeAlert.value = alert
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (activeAlert.value == alert) activeAlert.value = null
+        }, REMINDER_ALERT_DURATION_MS)
+
         if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(
                 appContext, Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
@@ -139,6 +150,8 @@ object MatchReminderManager {
 
     internal fun matchId(intent: Intent): String = intent.getStringExtra(EXTRA_MATCH_ID).orEmpty()
     internal fun title(intent: Intent): String = intent.getStringExtra(EXTRA_TITLE).orEmpty()
+    internal fun category(intent: Intent): String = intent.getStringExtra(EXTRA_CATEGORY).orEmpty()
+    fun dismissAlert() { activeAlert.value = null }
     private fun startKey(id: String) = "start_$id"
     private fun titleKey(id: String) = "title_$id"
 }
@@ -148,7 +161,11 @@ class MatchReminderReceiver : BroadcastReceiver() {
         MatchReminderManager.init(context)
         val matchId = MatchReminderManager.matchId(intent)
         if (matchId.isBlank()) return
-        MatchReminderManager.showNotification(matchId, MatchReminderManager.title(intent))
+        MatchReminderManager.showNotification(
+            matchId,
+            MatchReminderManager.title(intent),
+            MatchReminderManager.category(intent)
+        )
         MatchReminderManager.markDelivered(matchId)
     }
 }
