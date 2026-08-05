@@ -112,7 +112,7 @@ private fun QrContent(qrUrl: String, planId: String?, scale: Float, onBack: () -
                 Spacer(Modifier.height((16f * scale).dp))
                 Box(
                     modifier = Modifier
-                        .size(width = (400f * scale).dp, height = (505f * scale).dp)
+                        .size(width = (400f * scale).dp, height = (390f * scale).dp)
                         .clip(RoundedCornerShape((42f * scale).dp))
                         .background(Color(0xFF303239))
                         .border((4f * scale).dp, Color.White, RoundedCornerShape((42f * scale).dp)),
