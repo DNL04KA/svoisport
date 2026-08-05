@@ -5,9 +5,9 @@ const crypto = require('crypto');
 const SESSION_TTL_MS = 15 * 60 * 1000;
 const SUBSCRIPTION_TTL_MS = 365 * 24 * 60 * 60 * 1000;
 const PLANS = Object.freeze({
-  month_1: Object.freeze({ id: 'month_1', title: '1 месяц', price: '9,99 BYN / мес', total: null }),
-  month_3: Object.freeze({ id: 'month_3', title: '3 месяца', price: '8,49 BYN / мес', total: '25,49 BYN' }),
-  month_12: Object.freeze({ id: 'month_12', title: '12 месяцев', price: '6,49 BYN / мес', total: '77,92 BYN' }),
+  36733: Object.freeze({ id: '36733', title: '1 месяц', price: null, total: null, paymentUrl: 'https://sport-tv.by/payment/?id=36733' }),
+  36734: Object.freeze({ id: '36734', title: '6 месяцев', price: null, total: null, paymentUrl: 'https://sport-tv.by/payment/?id=36734' }),
+  36735: Object.freeze({ id: '36735', title: '12 месяцев', price: null, total: null, paymentUrl: 'https://sport-tv.by/payment/?id=36735' }),
 });
 
 class ActivationSessionStore {

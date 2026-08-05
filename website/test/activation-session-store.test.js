@@ -8,7 +8,7 @@ test('creates a waiting session with a 15 minute expiry', () => {
   let now = Date.parse('2026-08-01T10:00:00Z');
   const store = new ActivationSessionStore({ now: () => now, id: () => 'session-1' });
 
-  const session = store.createSession('tv-1', 'https://example.test', 'month_3');
+  const session = store.createSession('tv-1', 'https://example.test', '36734');
 
   assert.deepEqual(session, {
     sessionId: 'session-1',
@@ -18,7 +18,13 @@ test('creates a waiting session with a 15 minute expiry', () => {
   assert.equal(store.getStatus('session-1'), 'waiting');
   assert.deepEqual(store.getPublicSession('session-1'), {
     status: 'waiting',
-    plan: { id: 'month_3', title: '3 месяца', price: '8,49 BYN / мес', total: '25,49 BYN' },
+    plan: {
+      id: '36734',
+      title: '6 месяцев',
+      price: null,
+      total: null,
+      paymentUrl: 'https://sport-tv.by/payment/?id=36734',
+    },
   });
 });
 

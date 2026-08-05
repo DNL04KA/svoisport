@@ -20,7 +20,7 @@ test('creates, confirms, and reports an activation session', async () => {
     const createdResponse = await fetch(`${base}/api/create-activation-session.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ device_id: 'tv-integration', plan_id: 'month_12' }),
+      body: JSON.stringify({ device_id: 'tv-integration', plan_id: '36735' }),
     });
     assert.equal(createdResponse.status, 201);
     const created = await createdResponse.json();
@@ -30,7 +30,13 @@ test('creates, confirms, and reports an activation session', async () => {
     const publicSession = await fetch(`${base}/api/activation-session.php?session=${encodeURIComponent(created.sessionId)}`);
     assert.deepEqual(await publicSession.json(), {
       status: 'waiting',
-      plan: { id: 'month_12', title: '12 месяцев', price: '6,49 BYN / мес', total: '77,92 BYN' },
+      plan: {
+        id: '36735',
+        title: '12 месяцев',
+        price: null,
+        total: null,
+        paymentUrl: 'https://sport-tv.by/payment/?id=36735',
+      },
     });
 
     const waiting = await fetch(`${base}/api/check-activation-session.php?sessionId=${encodeURIComponent(created.sessionId)}`);

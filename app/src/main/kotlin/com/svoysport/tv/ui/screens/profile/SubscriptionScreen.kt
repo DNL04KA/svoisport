@@ -182,7 +182,7 @@ private fun PlanCard(
 ) {
     var focused by remember { mutableStateOf(false) }
     val animatedScale by animateFloatAsState(if (focused) 1.04f else 1f, tween(150), label = "plan")
-    val background = if (plan.id == "month_3") {
+    val background = if (plan.id == defaultSubscriptionPlan.id) {
         Brush.verticalGradient(listOf(Color(0xFF1E245C), Color(0xFF050507)))
     } else {
         Brush.verticalGradient(listOf(Color(0xFF292A31), Color(0xFF050506)))
@@ -217,7 +217,7 @@ private fun PlanCard(
                 Box(
                     modifier = Modifier.align(Alignment.TopCenter)
                         .background(
-                            if (plan.id == "month_3") subscriptionButtonGradient else Brush.horizontalGradient(listOf(Color(0xFF595A62), Color(0xFF2C2C2F))),
+                            if (plan.id == defaultSubscriptionPlan.id) subscriptionButtonGradient else Brush.horizontalGradient(listOf(Color(0xFF595A62), Color(0xFF2C2C2F))),
                             RoundedCornerShape(103.dp)
                         )
                         .padding(horizontal = (16f * scale).dp, vertical = (8f * scale).dp)
@@ -231,9 +231,18 @@ private fun PlanCard(
             ) {
                 Text(plan.title, color = Color(0xFFE3E3E3), fontSize = (36f * scale).sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height((72f * scale).dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(plan.monthlyPrice, color = Color(0xFFE3E3E3), fontSize = (54f * scale).sp, fontWeight = FontWeight.SemiBold)
-                    Text(" BYN / мес", color = Color(0xFFE3E3E3), fontSize = (32f * scale).sp)
+                if (plan.monthlyPrice != null) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(plan.monthlyPrice, color = Color(0xFFE3E3E3), fontSize = (54f * scale).sp, fontWeight = FontWeight.SemiBold)
+                        Text(" BYN / мес", color = Color(0xFFE3E3E3), fontSize = (32f * scale).sp)
+                    }
+                } else {
+                    Text(
+                        "Цена на сайте",
+                        color = Color(0xFFE3E3E3),
+                        fontSize = (34f * scale).sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
                 if (plan.total != null) {
                     Text("Итого ${plan.total}", color = Color(0xFFA8A9B2), fontSize = (26f * scale).sp)

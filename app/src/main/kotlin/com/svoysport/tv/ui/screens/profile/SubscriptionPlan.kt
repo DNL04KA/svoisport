@@ -3,16 +3,19 @@ package com.svoysport.tv.ui.screens.profile
 data class SubscriptionPlan(
     val id: String,
     val title: String,
-    val monthlyPrice: String,
+    val monthlyPrice: String?,
     val total: String?,
     val hint: String,
     val badge: String?
-)
+) {
+    val paymentUrl: String
+        get() = "https://sport-tv.by/payment/?id=$id"
+}
 
 val subscriptionPlans = listOf(
-    SubscriptionPlan("month_1", "1 месяц", "9,99", null, "Попробовать сервис", null),
-    SubscriptionPlan("month_3", "3 месяца", "8,49", "25,49 BYN", "Экономия 15%", "Популярный выбор"),
-    SubscriptionPlan("month_12", "12 месяцев", "6,49", "77,92 BYN", "Самая выгодная цена", "Экономия 35%")
+    SubscriptionPlan("36733", "1 месяц", null, null, "Актуальная цена на сайте", null),
+    SubscriptionPlan("36734", "6 месяцев", null, null, "Актуальная цена на сайте", "Популярный выбор"),
+    SubscriptionPlan("36735", "12 месяцев", null, null, "Актуальная цена на сайте", null)
 )
 
 val defaultSubscriptionPlan = subscriptionPlans[1]

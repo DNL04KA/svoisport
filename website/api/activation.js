@@ -5,9 +5,9 @@ const { neon } = require('@neondatabase/serverless');
 const DEVICE_LIMIT = 3;
 
 const PLANS = {
-  month_1: { id: 'month_1', title: '1 месяц', price: '9,99 BYN / мес', total: null, days: 30 },
-  month_3: { id: 'month_3', title: '3 месяца', price: '8,49 BYN / мес', total: '25,49 BYN', days: 90 },
-  month_12: { id: 'month_12', title: '12 месяцев', price: '6,49 BYN / мес', total: '77,92 BYN', days: 365 },
+  36733: { id: '36733', title: '1 месяц', price: null, total: null, days: 30, paymentUrl: 'https://sport-tv.by/payment/?id=36733' },
+  36734: { id: '36734', title: '6 месяцев', price: null, total: null, days: 180, paymentUrl: 'https://sport-tv.by/payment/?id=36734' },
+  36735: { id: '36735', title: '12 месяцев', price: null, total: null, days: 365, paymentUrl: 'https://sport-tv.by/payment/?id=36735' },
 };
 
 async function prepare(sql) {
@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
     if (action === 'status' && req.method === 'GET') return send(res, 200, { status: session.status });
     if (action === 'public' && req.method === 'GET') {
       const plan = session.plan_id ? PLANS[session.plan_id] : null;
-      return send(res, 200, { status: session.status, plan: plan ? { id: plan.id, title: plan.title, price: plan.price, total: plan.total } : null });
+      return send(res, 200, { status: session.status, plan: plan ? { id: plan.id, title: plan.title, price: plan.price, total: plan.total, paymentUrl: plan.paymentUrl } : null });
     }
     if (action === 'activate' && req.method === 'POST') {
       if (session.status === 'expired') return send(res, 410, { status: 'expired' });
