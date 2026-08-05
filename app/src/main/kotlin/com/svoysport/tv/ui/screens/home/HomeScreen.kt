@@ -259,10 +259,14 @@ private fun HomeContent(
                 EmptyState()
             } else {
                 val scrollState = rememberLazyListState()
-                val sectionFocusRequesters = remember(sections.map { it.id }) {
-                    List(sections.size) { FocusRequester() }
+                val rowItemCounts = sections.map { section ->
+                    homeRowMatches(section.matches).size +
+                        if (section.matches.size > HOME_ROW_ITEM_LIMIT) 1 else 0
                 }
-                val firstContentCardFocusRequester = sectionFocusRequesters.first()
+                val sectionFocusRequesters = remember(sections.map { it.id }, rowItemCounts) {
+                    rowItemCounts.map { count -> List(count) { FocusRequester() } }
+                }
+                val firstContentCardFocusRequester = sectionFocusRequesters.first().first()
                 var focusedSectionIndex by remember { mutableIntStateOf(-1) }
                 var shouldScrollFocusedSection by remember { mutableStateOf(false) }
                 val bringIntoViewSpec = remember {
@@ -324,8 +328,9 @@ private fun HomeContent(
                                         )
                                         focusedSectionIndex = sectionIndex
                                     },
-                                    firstCardFocusRequester = if (sectionIndex == 0) firstContentCardFocusRequester else null,
-                                    upFocusRequester = sectionFocusRequesters.getOrNull(sectionIndex - 1),
+                                    itemFocusRequesters = sectionFocusRequesters[sectionIndex],
+                                    upFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex - 1).orEmpty(),
+                                    downFocusRequesters = sectionFocusRequesters.getOrNull(sectionIndex + 1).orEmpty(),
                                     onWatchMore    = if (section.matches.size > HOME_ROW_ITEM_LIMIT) {
                                         { onWatchMore(section.title) }
                                     } else null,

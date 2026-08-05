@@ -314,6 +314,9 @@ internal fun horizontalFocusScrollDistance(offset: Float, size: Float, container
     }
 }
 
+internal fun directionalFocusIndex(currentIndex: Int, targetCount: Int): Int? =
+    if (targetCount <= 0) null else currentIndex.coerceIn(0, targetCount - 1)
+
 private object HorizontalRowBringIntoViewSpec : BringIntoViewSpec {
     override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float =
         horizontalFocusScrollDistance(offset, size, containerSize)
@@ -328,8 +331,9 @@ fun ContentRow(
     onMatchFocused: (MatchItem) -> Unit = {},
     onRowFocused  : () -> Unit = {},
     onWatchMore   : (() -> Unit)? = null,
-    firstCardFocusRequester: FocusRequester? = null,
-    upFocusRequester: FocusRequester? = null,
+    itemFocusRequesters: List<FocusRequester> = emptyList(),
+    upFocusRequesters: List<FocusRequester> = emptyList(),
+    downFocusRequesters: List<FocusRequester> = emptyList(),
     modifier      : Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -346,6 +350,8 @@ fun ContentRow(
                     horizontalArrangement = Arrangement.spacedBy(gap)
                 ) {
                     itemsIndexed(items = matches, key = { _, match -> match.id }) { index, match ->
+                        val upIndex = directionalFocusIndex(index, upFocusRequesters.size)
+                        val downIndex = directionalFocusIndex(index, downFocusRequesters.size)
                         MatchCard(
                             match = match,
                             onClick = onMatchClick,
@@ -355,22 +361,31 @@ fun ContentRow(
                                 onMatchFocused(focusedMatch)
                             },
                             modifier = Modifier
-                                .then(if (index == 0 && firstCardFocusRequester != null) {
-                                    Modifier.focusRequester(firstCardFocusRequester)
+                                .then(if (index < itemFocusRequesters.size) {
+                                    Modifier.focusRequester(itemFocusRequesters[index])
                                 } else Modifier)
-                                .then(if (upFocusRequester != null) {
-                                    Modifier.focusProperties { up = upFocusRequester }
-                                } else Modifier)
+                                .focusProperties {
+                                    upIndex?.let { up = upFocusRequesters[it] }
+                                    downIndex?.let { down = downFocusRequesters[it] }
+                                }
                         )
                     }
                     if (onWatchMore != null) item {
+                        val index = matches.size
+                        val upIndex = directionalFocusIndex(index, upFocusRequesters.size)
+                        val downIndex = directionalFocusIndex(index, downFocusRequesters.size)
                         WatchMoreCard(
                             onClick = onWatchMore,
                             scale = scale,
                             onFocused = onRowFocused,
-                            modifier = if (upFocusRequester != null) {
-                                Modifier.focusProperties { up = upFocusRequester }
-                            } else Modifier
+                            modifier = Modifier
+                                .then(if (index < itemFocusRequesters.size) {
+                                    Modifier.focusRequester(itemFocusRequesters[index])
+                                } else Modifier)
+                                .focusProperties {
+                                    upIndex?.let { up = upFocusRequesters[it] }
+                                    downIndex?.let { down = downFocusRequesters[it] }
+                                }
                         )
                     }
                 }
