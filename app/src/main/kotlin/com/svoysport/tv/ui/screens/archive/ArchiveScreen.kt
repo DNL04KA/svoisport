@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
@@ -17,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -65,6 +68,11 @@ data class ArchiveDateGroup(
     val date: String,
     val matches: List<ArchiveMatch>
 )
+
+internal fun initialArchiveFocusPosition(groupSizes: List<Int>): Pair<Int, Int>? {
+    val groupIndex = groupSizes.indexOfFirst { it > 0 }
+    return if (groupIndex < 0) null else groupIndex to 0
+}
 
 // ─── ViewModel: реальный архив с sport-tv.by (list2.php?archive=1) ───────────
 
@@ -130,6 +138,14 @@ fun ArchiveScreen(
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val initialFocusRequester = remember { FocusRequester() }
+    val initialFocusPosition = remember(state.groups) {
+        initialArchiveFocusPosition(state.groups.map { it.matches.size })
+    }
+
+    LaunchedEffect(initialFocusPosition) {
+        if (initialFocusPosition != null) runCatching { initialFocusRequester.requestFocus() }
+    }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val sw = maxWidth.value
@@ -163,7 +179,7 @@ fun ArchiveScreen(
                 contentPadding      = PaddingValues(horizontal = pad, vertical = pad),
                 verticalArrangement = Arrangement.spacedBy(groupGap)
             ) {
-                items(state.groups, key = { it.date }) { group ->
+                itemsIndexed(state.groups, key = { _, group -> group.date }) { groupIndex, group ->
                     ArchiveDateGroupRow(
                         group    = group,
                         cardW    = cardW,
@@ -171,7 +187,10 @@ fun ArchiveScreen(
                         cardGap  = cardGap,
                         dateFs   = dateFs,
                         innerGap = (24f * scale).dp,
-                        onMatchClick = onMatchClick
+                        onMatchClick = onMatchClick,
+                        initialFocusRequester = if (initialFocusPosition?.first == groupIndex) {
+                            initialFocusRequester
+                        } else null
                     )
                 }
             }
@@ -189,7 +208,8 @@ private fun ArchiveDateGroupRow(
     cardGap : Dp,
     dateFs  : TextUnit,
     innerGap: Dp,
-    onMatchClick: (String) -> Unit
+    onMatchClick: (String) -> Unit,
+    initialFocusRequester: FocusRequester?
 ) {
     Column(
         modifier            = Modifier.fillMaxWidth(),
@@ -208,8 +228,16 @@ private fun ArchiveDateGroupRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(cardGap)
         ) {
-            items(group.matches, key = { it.id }) { match ->
-                ArchiveCard(match = match, cardW = cardW, cardH = cardH, onMatchClick = onMatchClick)
+            itemsIndexed(group.matches, key = { _, match -> match.id }) { matchIndex, match ->
+                ArchiveCard(
+                    match = match,
+                    cardW = cardW,
+                    cardH = cardH,
+                    onMatchClick = onMatchClick,
+                    modifier = if (matchIndex == 0 && initialFocusRequester != null) {
+                        Modifier.focusRequester(initialFocusRequester)
+                    } else Modifier
+                )
             }
         }
     }
@@ -223,7 +251,8 @@ private fun ArchiveCard(
     match: ArchiveMatch,
     cardW: Dp,
     cardH: Dp,
-    onMatchClick: (String) -> Unit
+    onMatchClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val sc by animateFloatAsState(if (isFocused) 1.08f else 1f, tween(150), label = "ac")
@@ -231,7 +260,7 @@ private fun ArchiveCard(
 
     Surface(
         onClick  = { onMatchClick(match.id) },
-        modifier = Modifier.width(cardW).height(cardH)
+        modifier = modifier.width(cardW).height(cardH)
             .onFocusChanged { isFocused = it.isFocused }.scale(sc),
         shape  = ClickableSurfaceDefaults.shape(cardShape),
         colors = ClickableSurfaceDefaults.colors(containerColor = CardBg, focusedContainerColor = CardBg),

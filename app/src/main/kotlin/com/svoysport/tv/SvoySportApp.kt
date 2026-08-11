@@ -1,6 +1,7 @@
 package com.svoysport.tv
 
 import android.app.Application
+import android.os.Build
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -30,6 +31,9 @@ class SvoySportApp : Application(), SingletonImageLoader.Factory {
     override fun newImageLoader(context: PlatformContext): ImageLoader =
         ImageLoader.Builder(context)
             .components { add(OkHttpNetworkFetcherFactory()) }
-            .allowHardware(false)   // часть TV-устройств не декодируют hardware bitmaps
+            .allowHardware(shouldAllowHardwareBitmaps(Build.VERSION.SDK_INT))
             .build()
 }
+
+/** Hardware textures avoid a CPU bitmap upload on every image draw on modern TVs. */
+internal fun shouldAllowHardwareBitmaps(sdkInt: Int): Boolean = sdkInt >= Build.VERSION_CODES.O

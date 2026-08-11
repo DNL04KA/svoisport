@@ -85,7 +85,9 @@ fun SportTvListingDto.toMatchItem(): MatchItem {
         streamUrl     = stream,
         isSubscriptionRequired = isPaid == true,
         isHot         = live,
-        durationSec   = duration ?: ((endMs - startMs) / 1000).coerceAtLeast(0)
+        // date_end describes the programme window for live/scheduled listings.
+        // Only the archive feed's explicit duration means a playable recording.
+        durationSec   = duration ?: 0L
     )
 }
 
