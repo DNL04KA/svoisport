@@ -114,6 +114,11 @@ private fun tabForSidebarSelection(item: SidebarItem): NavTab? = when (item) {
     else -> NavTab.HOME
 }
 
+internal fun sportAfterTopTabSelection(
+    currentSport: SidebarItem?,
+    selectedTab: NavTab
+): SidebarItem? = if (selectedTab == NavTab.HOME) null else currentSport
+
 internal fun shouldHideHomeTopBar(firstVisibleItem: Int, scrollOffset: Int): Boolean =
     firstVisibleItem >= 2
 
@@ -197,7 +202,8 @@ fun HomeScreen(
     TvScaffold(
         selectedTab         = selectedTab,
         onTabSelected       = { tab ->
-            // Переключение вкладки сверху сбрасывает режим Поиск/Избранное
+            // Верхняя «Главная» всегда означает общую исходную витрину.
+            selectedSport = sportAfterTopTabSelection(selectedSport, tab)
             selectedTab = tab
             sidebarMode = SidebarMode.NONE
             expandedSection = null

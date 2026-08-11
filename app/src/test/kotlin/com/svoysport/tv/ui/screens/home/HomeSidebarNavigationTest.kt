@@ -26,4 +26,17 @@ class HomeSidebarNavigationTest {
             assertEquals("$sport must leave schedule", NavTab.HOME, method?.invoke(null, sport))
         }
     }
+
+    @Test
+    fun `opening top home tab resets a sport filter`() {
+        assertEquals(null, sportAfterTopTabSelection(SidebarItem.FOOTBALL, NavTab.HOME))
+        assertEquals(
+            SidebarItem.FOOTBALL,
+            sportAfterTopTabSelection(SidebarItem.FOOTBALL, NavTab.SCHEDULE)
+        )
+        assertEquals(
+            SidebarItem.FOOTBALL,
+            sportAfterTopTabSelection(SidebarItem.FOOTBALL, NavTab.ARCHIVE)
+        )
+    }
 }

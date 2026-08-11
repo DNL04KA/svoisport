@@ -74,6 +74,12 @@ internal fun initialArchiveFocusPosition(groupSizes: List<Int>): Pair<Int, Int>?
     return if (groupIndex < 0) null else groupIndex to 0
 }
 
+internal fun archiveTitleSizeSp(cardHeightDp: Float): Float =
+    26f * (cardHeightDp / 237f)
+
+internal fun archiveTitleLineHeightSp(cardHeightDp: Float): Float =
+    32f * (cardHeightDp / 237f)
+
 // ─── ViewModel: реальный архив с sport-tv.by (list2.php?archive=1) ───────────
 
 @HiltViewModel
@@ -333,8 +339,8 @@ private fun ArchiveCard(
                     text     = match.title,
                     style    = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 26.sp,
-                        lineHeight = 32.sp,
+                        fontSize = archiveTitleSizeSp(cardH.value).sp,
+                        lineHeight = archiveTitleLineHeightSp(cardH.value).sp,
                         letterSpacing = 0.sp,
                         color = Color.White
                     ),
