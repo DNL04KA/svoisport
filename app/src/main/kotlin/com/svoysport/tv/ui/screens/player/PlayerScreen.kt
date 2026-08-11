@@ -124,12 +124,9 @@ fun PlayerScreen(
                 PlayerOverlay(
                     isVisible     = isOverlayVisible,
                     title         = state.title,
-                    competition   = state.competition,
                     isLive        = state.isLive,
                     playbackState = playbackState,
                     onPlayPause   = { viewModel.togglePlayPause() },
-                    onSeekForward = { viewModel.seekForward() },
-                    onSeekRewind  = { viewModel.seekRewind() },
                     onBack        = {
                         if (isOverlayVisible) onBack() else isOverlayVisible = true
                     }

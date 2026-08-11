@@ -12,10 +12,8 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +26,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -112,6 +115,14 @@ private fun DetailsContent(
 ) {
     // Показываем диалог подписки если нужна подписка и пользователь не авторизован
     var showSubDialog by remember { mutableStateOf(false) }
+    var showRelated by remember(match.id) { mutableStateOf(false) }
+    val relatedFocusRequester = remember(match.id) { FocusRequester() }
+    LaunchedEffect(showRelated) {
+        if (showRelated) {
+            kotlinx.coroutines.delay(80L)
+            runCatching { relatedFocusRequester.requestFocus() }
+        }
+    }
     var showFavoriteToast by remember { mutableStateOf(false) }
     LaunchedEffect(showFavoriteToast) {
         if (showFavoriteToast) {
@@ -153,42 +164,55 @@ private fun DetailsContent(
                 .background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xF00D0F1C))))
         )
 
-        // ── Основной контент ─────────────────────────────────────────────────
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-            DetailsTopBar(onBack = onBack, backSz = backSz, backIco = backIco, topPad = topPad, padStart = padStart)
-
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = padStart, end = padEnd, top = (12f * scale).dp),
-                horizontalArrangement = Arrangement.spacedBy(0.dp)
-            ) {
+        // Первый экран фиксирован: иначе BringIntoView в Android TV сам
+        // центрирует сфокусированную кнопку и ломает Figma-композицию.
+        if (!showRelated) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 MatchInfoPanel(
                     match        = match,
                     isLoggedIn   = isLoggedIn,
                     isSubscribed = isSubscribed,
                     scale        = scale,
-                    modifier     = Modifier.weight(0.52f),
+                    modifier     = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(
+                            start = (detailsHeroStartDp() * scale).dp,
+                            top = (detailsHeroTopDp() * scale).dp
+                        ),
                     onWatchClick = { matchId ->
                         if (match.isSubscriptionRequired && !isSubscribed) showSubDialog = true
                         else onWatchClick(matchId)
                     },
-                    onFavoriteAdded = { showFavoriteToast = true }
+                    onFavoriteAdded = { showFavoriteToast = true },
+                    onNavigateDown = { if (related.isNotEmpty()) showRelated = true }
                 )
-                Spacer(modifier = Modifier.weight(0.48f))
             }
-
-            Spacer(modifier = Modifier.height((40f * scale).dp))
-
-            if (related.isNotEmpty()) {
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp) {
+                        showRelated = false
+                        true
+                    } else false
+                }
+            ) {
                 ContentRow(
-                    title        = "Похожие матчи",
-                    matches      = related,
+                    title = "Похожие матчи",
+                    matches = related,
                     onMatchClick = onRelatedMatchClick,
-                    modifier     = Modifier.padding(bottom = (48f * scale).dp)
+                    itemFocusRequesters = listOf(relatedFocusRequester),
+                    modifier = Modifier.align(Alignment.CenterStart)
                 )
-            } else {
-                Spacer(modifier = Modifier.height((48f * scale).dp))
             }
         }
+
+        DetailsTopBar(
+            onBack = onBack,
+            backSz = backSz,
+            backIco = backIco,
+            topPad = topPad,
+            padStart = padStart
+        )
 
         if (showSubDialog) {
             Dialog(
@@ -271,35 +295,30 @@ private fun MatchInfoPanel(
     match        : MatchItem,
     isLoggedIn   : Boolean,
     isSubscribed : Boolean,
-    scale        : Float    = 1f,
     modifier     : Modifier = Modifier,
+    scale        : Float    = 1f,
     onWatchClick : (String) -> Unit,
-    onFavoriteAdded: () -> Unit
+    onFavoriteAdded: () -> Unit,
+    onNavigateDown: () -> Unit
 ) {
     val watchFr = remember { FocusRequester() }
 
-    val leagueFs : TextUnit = (12f * scale).coerceAtLeast(10f).sp
+    val leagueFs : TextUnit = (32f * scale).coerceAtLeast(13f).sp
     val titleFs  : TextUnit = (64f * scale).coerceAtLeast(20f).sp
     val titleLH  : TextUnit = (76f * scale).coerceAtLeast(24f).sp
-    val metaFs   : TextUnit = (13f * scale).coerceAtLeast(10f).sp
-    val descFs   : TextUnit = (14f * scale).coerceAtLeast(11f).sp
-    val descLH   : TextUnit = (22f * scale).coerceAtLeast(16f).sp
-    val metaIco  : Dp       = (14f * scale).dp
+    Column(modifier = modifier.widthIn(max = (1500f * scale).dp)) {
+        DetailsBadges(match = match, isSubscribed = isSubscribed, scale = scale)
+        Spacer(Modifier.height((34f * scale).dp))
 
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(0.dp)) {
         Text(
-            text  = match.competition.name.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = leagueFs, fontWeight = FontWeight.SemiBold,
-                color = Gray3, letterSpacing = 1.8.sp
+            text = match.competition.name,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = leagueFs,
+                fontWeight = FontWeight.Normal,
+                color = Color.White.copy(alpha = 0.68f)
             )
         )
-        Spacer(Modifier.height((10f * scale).dp))
-
-        if (match.isLive) {
-            LiveBadge()
-            Spacer(Modifier.height((10f * scale).dp))
-        }
+        Spacer(Modifier.height((24f * scale).dp))
 
         Text(
             text     = match.title,
@@ -309,38 +328,7 @@ private fun MatchInfoPanel(
             ),
             maxLines = 2, overflow = TextOverflow.Ellipsis
         )
-        Spacer(Modifier.height((20f * scale).dp))
-
-        if (match.homeTeam.name.isNotBlank() || match.awayTeam.name.isNotBlank()) {
-            TeamsRow(homeTeam = match.homeTeam, awayTeam = match.awayTeam, isLive = match.isLive, scale = scale)
-            Spacer(Modifier.height((16f * scale).dp))
-        }
-
-        val timeLabel = buildString {
-            if (match.isLive) append("Идёт сейчас")
-            else append("Начало в ${SimpleDateFormat("d MMMM, HH:mm", Locale("ru")).format(Date(match.startTimeMs))}")
-        }
-        Row(
-            verticalAlignment     = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy((6f * scale).dp)
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_calendar),
-                contentDescription = null, tint = Gray3,
-                modifier = Modifier.size(metaIco)
-            )
-            Text(text = timeLabel, style = MaterialTheme.typography.labelMedium.copy(fontSize = metaFs, color = Gray3))
-        }
-        Spacer(Modifier.height((20f * scale).dp))
-
-        Text(
-            text     = match.description,
-            style    = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = descFs, lineHeight = descLH, color = Color.White.copy(alpha = 0.65f)
-            ),
-            maxLines = 4, overflow = TextOverflow.Ellipsis
-        )
-        Spacer(Modifier.height((36f * scale).dp))
+        Spacer(Modifier.height((60f * scale).dp))
 
         ActionButtons(
             match = match,
@@ -349,8 +337,47 @@ private fun MatchInfoPanel(
             watchFr = watchFr,
             scale = scale,
             onWatchClick = onWatchClick,
-            onFavoriteAdded = onFavoriteAdded
+            onFavoriteAdded = onFavoriteAdded,
+            onNavigateDown = onNavigateDown
         )
+    }
+}
+
+@Composable
+private fun DetailsBadges(match: MatchItem, isSubscribed: Boolean, scale: Float) {
+    val badgeShape = RoundedCornerShape((14f * scale).dp)
+    val badgeText = when {
+        match.isLive -> "Live"
+        else -> "Сегодня ${SimpleDateFormat("HH:mm", Locale("ru")).format(Date(match.startTimeMs))}"
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy((6f * scale).dp)) {
+        Text(
+            badgeText,
+            color = Color.White,
+            fontSize = (26f * scale).coerceAtLeast(12f).sp,
+            modifier = Modifier
+                .background(if (match.isLive) LiveRed else Color(0xCC343746), badgeShape)
+                .padding(horizontal = (16f * scale).dp, vertical = (8f * scale).dp)
+        )
+        if (match.isHot) {
+            Text(
+                "🔥",
+                fontSize = (24f * scale).coerceAtLeast(12f).sp,
+                modifier = Modifier
+                    .background(Color(0xCC343746), badgeShape)
+                    .padding(horizontal = (10f * scale).dp, vertical = (8f * scale).dp)
+            )
+        }
+        if (match.isSubscriptionRequired && !isSubscribed) {
+            Text(
+                "Подписка",
+                color = Color.White,
+                fontSize = (24f * scale).coerceAtLeast(12f).sp,
+                modifier = Modifier
+                    .background(Primary, badgeShape)
+                    .padding(horizontal = (16f * scale).dp, vertical = (8f * scale).dp)
+            )
+        }
     }
 }
 
@@ -428,7 +455,8 @@ private fun ActionButtons(
     watchFr      : FocusRequester,
     scale        : Float = 1f,
     onWatchClick : (String) -> Unit,
-    onFavoriteAdded: () -> Unit
+    onFavoriteAdded: () -> Unit,
+    onNavigateDown: () -> Unit
 ) {
     val reminderFr = remember { FocusRequester() }
     val context = LocalContext.current
@@ -479,7 +507,13 @@ private fun ActionButtons(
     val gradBrush    = Brush.horizontalGradient(listOf(Color(0xFF4556EB), Color(0xFF6B78F0)))
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy((12f * scale).dp),
+        modifier = Modifier.onPreviewKeyEvent { event ->
+            if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionDown) {
+                onNavigateDown()
+                true
+            } else false
+        },
+        horizontalArrangement = Arrangement.spacedBy((20f * scale).dp),
         verticalAlignment     = Alignment.CenterVertically
     ) {
         Surface(
@@ -490,7 +524,15 @@ private fun ActionButtons(
             colors = ClickableSurfaceDefaults.colors(containerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
             scale  = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
         ) {
-            Box(modifier = Modifier.fillMaxSize().background(gradBrush, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
+            val backgroundModifier = if (canOpenPlayer) {
+                Modifier.background(gradBrush, RoundedCornerShape(20.dp))
+            } else {
+                Modifier.background(Color(0xFF343746), RoundedCornerShape(20.dp))
+            }
+            Box(
+                modifier = Modifier.fillMaxSize().then(backgroundModifier),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(text = actionLabel, style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = watchFs, fontWeight = FontWeight.Medium, color = Color(0xFFE2E2E2)))
             }
@@ -510,7 +552,7 @@ private fun ActionButtons(
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             },
-            modifier = Modifier.width((260f * scale).dp).height(btnH)
+            modifier = Modifier.width((420f * scale).dp).height(btnH)
                 .focusRequester(reminderFr),
             shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
             colors = ClickableSurfaceDefaults.colors(
@@ -581,9 +623,6 @@ private fun ActionButtons(
             }
         }
 
-        if (match.isSubscriptionRequired && !isSubscribed) {
-            SubscriptionBadgeInline(scale = scale)
-        }
     }
 }
 
@@ -609,13 +648,17 @@ internal fun formatDetailsCountdown(remainingMs: Long): String {
     return "Начало через %02d:%02d:%02d".format(hours, minutes, seconds)
 }
 
-internal fun detailsFavoriteButtonWidthDp(): Float = 300f
+internal fun detailsHeroTopDp(): Float = 568f
+
+internal fun detailsHeroStartDp(): Float = 140f
+
+internal fun detailsFavoriteButtonWidthDp(): Float = 420f
 
 internal fun detailsActionRowWidthDp(isUpcoming: Boolean): Float {
     val primary = if (isUpcoming) 340f else 240f
-    val reminder = if (isUpcoming) 260f else 0f
+    val reminder = if (isUpcoming) 420f else 0f
     val favorite = detailsFavoriteButtonWidthDp()
-    val gaps = if (isUpcoming) 24f else 12f
+    val gaps = if (isUpcoming) 40f else 20f
     return primary + reminder + favorite + gaps
 }
 

@@ -1,14 +1,32 @@
 package com.svoysport.tv.ui.screens.player
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -20,459 +38,262 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.tv.material3.*
+import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.ClickableSurfaceDefaults
+import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
+import androidx.tv.material3.Text
 import com.svoysport.tv.R
-import com.svoysport.tv.ui.components.LiveBadge
-import com.svoysport.tv.ui.theme.*
+import com.svoysport.tv.ui.theme.LiveRed
+import com.svoysport.tv.ui.theme.Primary
 
-// ─── PlayerOverlay ────────────────────────────────────────────────────────────
-
+/** Минималистичный TV-оверлей по Figma Viewing / Player (1920×1080). */
 @Composable
 fun PlayerOverlay(
-    isVisible:      Boolean,
-    title:          String,
-    competition:    String,
-    isLive:         Boolean,
-    playbackState:  PlayerPlaybackState,
-    onPlayPause:    () -> Unit,
-    onSeekForward:  () -> Unit,
-    onSeekRewind:   () -> Unit,
-    onBack:         () -> Unit,
-    modifier:       Modifier = Modifier
+    isVisible: Boolean,
+    title: String,
+    isLive: Boolean,
+    playbackState: PlayerPlaybackState,
+    onPlayPause: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    // Фокус на кнопку play/pause каждый раз при появлении оверлея
-    val playFr = remember { FocusRequester() }
+    val playFocusRequester = remember { FocusRequester() }
     LaunchedEffect(isVisible) {
-        if (isVisible) {
-            runCatching { playFr.requestFocus() }
-        }
+        if (isVisible) runCatching { playFocusRequester.requestFocus() }
     }
 
     AnimatedVisibility(
-        visible  = isVisible,
-        enter    = fadeIn(tween(200)),
-        exit     = fadeOut(tween(300)),
+        visible = isVisible,
+        enter = fadeIn(tween(180)),
+        exit = fadeOut(tween(220)),
         modifier = modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val uiScale = minOf(maxWidth.value / 1920f, maxHeight.value / 1080f, 1f)
+                .coerceAtLeast(0.35f)
+
+            Box(
+                Modifier.fillMaxSize().background(
                     Brush.verticalGradient(
-                        0.00f to Color.Black.copy(alpha = 0.75f),
-                        0.18f to Color.Transparent,
-                        0.75f to Color.Transparent,
-                        1.00f to Color.Black.copy(alpha = 0.85f)
+                        0f to Color.Black.copy(alpha = 0.42f),
+                        0.22f to Color.Transparent,
+                        0.72f to Color.Transparent,
+                        1f to Color.Black.copy(alpha = 0.72f)
                     )
                 )
-        ) {
-            // ── Верхняя шапка ────────────────────────────────────────────────
-            TopBar(
-                title       = title,
-                competition = competition,
-                isLive      = isLive,
-                onBack      = onBack,
-                modifier    = Modifier.align(Alignment.TopStart)
-            )
+            ) {
+                PlayerTopBar(
+                    title = title,
+                    onBack = onBack,
+                    scale = uiScale,
+                    modifier = Modifier.align(Alignment.TopStart)
+                )
 
-            // ── Центральные кнопки управления ────────────────────────────────
-            CenterControls(
-                isPlaying     = playbackState.isPlaying,
-                playFr        = playFr,
-                onPlayPause   = onPlayPause,
-                onSeekForward = onSeekForward,
-                onSeekRewind  = onSeekRewind,
-                modifier      = Modifier.align(Alignment.Center)
-            )
+                PrimaryPlaybackControl(
+                    isPlaying = playbackState.isPlaying,
+                    focusRequester = playFocusRequester,
+                    onClick = onPlayPause,
+                    scale = uiScale,
+                    modifier = Modifier.align(Alignment.Center)
+                )
 
-            // ── Нижняя панель: прогресс + время ──────────────────────────────
-            BottomBar(
-                isLive        = isLive,
-                playbackState = playbackState,
-                modifier      = Modifier.align(Alignment.BottomStart)
-            )
+                PlayerTimeline(
+                    isLive = isLive,
+                    playbackState = playbackState,
+                    scale = uiScale,
+                    modifier = Modifier.align(Alignment.BottomStart)
+                )
+            }
         }
     }
 }
 
-// ─── TopBar ───────────────────────────────────────────────────────────────────
-
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun TopBar(
-    title:       String,
-    competition: String,
-    isLive:      Boolean,
-    onBack:      () -> Unit,
-    modifier:    Modifier = Modifier
+private fun PlayerTopBar(
+    title: String,
+    onBack: () -> Unit,
+    scale: Float,
+    modifier: Modifier = Modifier
 ) {
-    var isBackFocused by remember { mutableStateOf(false) }
-    val backScale by animateFloatAsState(
-        if (isBackFocused) 1.08f else 1.0f, tween(150), label = "back"
-    )
-
     Row(
-        modifier          = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 60.dp, vertical = 32.dp),
+        modifier = modifier.padding(start = (36f * scale).dp, top = (36f * scale).dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalArrangement = Arrangement.spacedBy((28f * scale).dp)
     ) {
-        // Кнопка «Назад»
         Surface(
-            onClick  = onBack,
-            modifier = Modifier
-                .onFocusChanged { isBackFocused = it.isFocused }
-                .scale(backScale),
-            shape  = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
+            onClick = onBack,
+            modifier = Modifier.size(playerBackButtonSizeDp(scale).dp),
+            shape = ClickableSurfaceDefaults.shape(CircleShape),
             colors = ClickableSurfaceDefaults.colors(
-                containerColor        = Color.White.copy(alpha = 0.12f),
-                focusedContainerColor = Color.White.copy(alpha = 0.22f)
+                containerColor = Primary,
+                focusedContainerColor = Primary
             ),
-            border = ClickableSurfaceDefaults.border(
-                focusedBorder = Border(
-                    border = androidx.compose.foundation.BorderStroke(1.5.dp, Primary),
-                    shape  = RoundedCornerShape(20.dp)
-                )
-            ),
-            scale = ClickableSurfaceDefaults.scale(scale = 1.0f, focusedScale = 1.0f)
+            scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f)
         ) {
-            Row(
-                modifier          = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector        = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                    contentDescription = null,
-                    tint               = Color.White,
-                    modifier           = Modifier.size(16.dp)
-                )
-                Text(
-                    text  = "Назад",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 14.sp,
-                        color    = Color.White
-                    )
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                    contentDescription = "Назад",
+                    tint = Color.White,
+                    modifier = Modifier.size((34f * scale).dp)
                 )
             }
         }
-
-        // Разделитель
-        Box(
-            modifier = Modifier
-                .width(1.dp)
-                .height(20.dp)
-                .background(Color.White.copy(alpha = 0.25f))
-        )
-
-        // Метаданные матча
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(
-                verticalAlignment     = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (isLive) LiveBadge()
-                Text(
-                    text  = competition,
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 12.sp,
-                        color    = Color.White.copy(alpha = 0.65f)
-                    )
-                )
-            }
-            Text(
-                text  = title,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize   = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color      = Color.White
-                )
-            )
-        }
-    }
-}
-
-// ─── CenterControls ───────────────────────────────────────────────────────────
-
-@Composable
-private fun CenterControls(
-    isPlaying:     Boolean,
-    playFr:        FocusRequester,
-    onPlayPause:   () -> Unit,
-    onSeekForward: () -> Unit,
-    onSeekRewind:  () -> Unit,
-    modifier:      Modifier = Modifier
-) {
-    Row(
-        modifier              = modifier,
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalAlignment     = Alignment.CenterVertically
-    ) {
-        // ← Перемотка назад 10с
-        PlayerIconButton(
-            iconRes           = R.drawable.ic_replay_10,
-            contentDescription = "-10 сек",
-            size              = 56.dp,
-            onClick           = onSeekRewind
-        )
-
-        // ◼ / ▶  Play / Pause  — большая центральная кнопка
-        PlayPauseButton(
-            isPlaying  = isPlaying,
-            focusReq   = playFr,
-            onClick    = onPlayPause
-        )
-
-        // Перемотка вперёд 10с →
-        PlayerIconButton(
-            iconRes           = R.drawable.ic_forward_10,
-            contentDescription = "+10 сек",
-            size              = 56.dp,
-            onClick           = onSeekForward
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = (32f * scale).coerceAtLeast(14f).sp,
+            lineHeight = (40f * scale).coerceAtLeast(18f).sp,
+            fontWeight = FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth(0.82f)
         )
     }
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun PlayPauseButton(
+private fun PrimaryPlaybackControl(
     isPlaying: Boolean,
-    focusReq:  FocusRequester,
-    onClick:   () -> Unit
+    focusRequester: FocusRequester,
+    onClick: () -> Unit,
+    scale: Float,
+    modifier: Modifier = Modifier
 ) {
-    var isFocused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        if (isFocused) 1.12f else 1.0f, tween(150), label = "pp"
+    var focused by remember { mutableStateOf(false) }
+    val focusScale by animateFloatAsState(
+        if (focused) 1.06f else 1f,
+        tween(140),
+        label = "playerPrimaryControl"
     )
-
     Surface(
-        onClick  = onClick,
-        modifier = Modifier
-            .size(72.dp)
-            .focusRequester(focusReq)
-            .onFocusChanged { isFocused = it.isFocused }
-            .scale(scale),
-        shape  = ClickableSurfaceDefaults.shape(CircleShape),
+        onClick = onClick,
+        modifier = modifier
+            .width(playerPrimaryControlWidthDp(scale).dp)
+            .height((90f * scale).dp)
+            .focusRequester(focusRequester)
+            .onFocusChanged { focused = it.isFocused }
+            .scale(focusScale),
+        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape((18f * scale).dp)),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor        = Primary,
-            focusedContainerColor = Primary
+            containerColor = Color.White.copy(alpha = 0.30f),
+            focusedContainerColor = Primary.copy(alpha = 0.94f)
         ),
-        border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(
-                border = androidx.compose.foundation.BorderStroke(3.dp, Color.White.copy(alpha = 0.6f)),
-                shape  = CircleShape
-            )
-        ),
-        scale = ClickableSurfaceDefaults.scale(scale = 1.0f, focusedScale = 1.0f)
+        scale = ClickableSurfaceDefaults.scale(scale = 1f, focusedScale = 1f)
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(
-                // Иконки из UI-kit: ic_play (line) / ic_pause (fill)
-                imageVector        = ImageVector.vectorResource(
+                imageVector = ImageVector.vectorResource(
                     if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
                 ),
                 contentDescription = if (isPlaying) "Пауза" else "Воспроизвести",
-                tint               = Color.White,
-                modifier           = Modifier.size(30.dp)
+                tint = Color.White,
+                modifier = Modifier.size((38f * scale).dp)
             )
         }
     }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun PlayerIconButton(
-    iconRes:           Int,
-    contentDescription: String,
-    size:              androidx.compose.ui.unit.Dp,
-    onClick:           () -> Unit
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        if (isFocused) 1.08f else 1.0f, tween(150), label = "btn"
-    )
-
-    Surface(
-        onClick  = onClick,
-        modifier = Modifier
-            .size(size)
-            .onFocusChanged { isFocused = it.isFocused }
-            .scale(scale),
-        shape  = ClickableSurfaceDefaults.shape(CircleShape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor        = Color.White.copy(alpha = 0.12f),
-            focusedContainerColor = Color.White.copy(alpha = 0.22f)
-        ),
-        border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(
-                border = androidx.compose.foundation.BorderStroke(2.dp, Primary),
-                shape  = CircleShape
-            )
-        ),
-        scale = ClickableSurfaceDefaults.scale(scale = 1.0f, focusedScale = 1.0f)
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Icon(
-                imageVector        = ImageVector.vectorResource(iconRes),
-                contentDescription = contentDescription,
-                tint               = Color.White,
-                modifier           = Modifier.size(26.dp)
-            )
-        }
-    }
-}
-
-// ─── BottomBar ────────────────────────────────────────────────────────────────
-
-@Composable
-private fun BottomBar(
-    isLive:        Boolean,
+private fun PlayerTimeline(
+    isLive: Boolean,
     playbackState: PlayerPlaybackState,
-    modifier:      Modifier = Modifier
+    scale: Float,
+    modifier: Modifier = Modifier
 ) {
+    val horizontalPadding = (15f * scale).dp
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 60.dp, end = 60.dp, bottom = 36.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(start = horizontalPadding, end = horizontalPadding, bottom = (10f * scale).dp),
+        verticalArrangement = Arrangement.spacedBy((10f * scale).dp)
     ) {
-        // Прогрессбар
-        if (!isLive && playbackState.durationMs > 0L) {
-            ProgressBar(
-                currentMs  = playbackState.currentPositionMs,
-                durationMs = playbackState.durationMs,
-                bufferedMs = playbackState.bufferedPositionMs
-            )
-        } else if (isLive) {
-            LiveProgressBar()
-        }
-
-        // Время
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment     = Alignment.CenterVertically
-        ) {
-            if (isLive) {
-                Row(
-                    verticalAlignment     = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(LiveRed, CircleShape)
-                    )
-                    Text(
-                        text  = "ПРЯМОЙ ЭФИР",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize   = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color      = LiveRed
-                        )
-                    )
-                }
-            } else {
-                Text(
-                    text  = formatTime(playbackState.currentPositionMs),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 14.sp,
-                        color    = Color.White
-                    )
-                )
-                Text(
-                    text  = formatTime(playbackState.durationMs),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 14.sp,
-                        color    = Color.White.copy(alpha = 0.55f)
-                    )
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProgressBar(
-    currentMs:  Long,
-    durationMs: Long,
-    bufferedMs: Long
-) {
-    val playedFraction   = if (durationMs > 0) (currentMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
-    val bufferedFraction = if (durationMs > 0) (bufferedMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .background(Color.White.copy(alpha = 0.20f), RoundedCornerShape(2.dp))
-    ) {
-        // Буферизованная часть
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(bufferedFraction)
-                .fillMaxHeight()
-                .background(Color.White.copy(alpha = 0.35f), RoundedCornerShape(2.dp))
-        )
-        // Проигранная часть
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(playedFraction)
-                .fillMaxHeight()
-                .background(Primary, RoundedCornerShape(2.dp))
-        )
-        // Ползунок
-        if (playedFraction > 0f) {
+        if (isLive) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = with(androidx.compose.ui.platform.LocalDensity.current) {
-                        // Выравниваем ползунок по правому краю проигранного
-                        0.dp // Упрощённо: будет recalculated через onGloballyPositioned
-                    })
-                    .fillMaxWidth(playedFraction)
-                    .wrapContentWidth(Alignment.End)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(Color.White, CircleShape)
+                Modifier.fillMaxWidth().height((6f * scale).dp)
+                    .background(LiveRed, RoundedCornerShape((3f * scale).dp))
+            )
+        } else {
+            PlaybackProgress(
+                currentMs = playbackState.currentPositionMs,
+                durationMs = playbackState.durationMs,
+                bufferedMs = playbackState.bufferedPositionMs,
+                scale = scale
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy((18f * scale).dp)
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(
+                    if (playbackState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+                ),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size((24f * scale).dp)
+            )
+            Box(Modifier.size((16f * scale).dp).background(Color.White))
+            Text(
+                text = if (isLive) "ПРЯМОЙ ЭФИР" else formatPlayerTimeline(
+                    playbackState.currentPositionMs,
+                    playbackState.durationMs
+                ),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = Color.White,
+                    fontSize = (16f * scale).coerceAtLeast(11f).sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-            }
+            )
         }
     }
 }
 
 @Composable
-private fun LiveProgressBar() {
+private fun PlaybackProgress(
+    currentMs: Long,
+    durationMs: Long,
+    bufferedMs: Long,
+    scale: Float
+) {
+    val played = if (durationMs > 0L) (currentMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
+    val buffered = if (durationMs > 0L) (bufferedMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(3.dp)
-            .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        Color.White.copy(alpha = 0.15f),
-                        LiveRed.copy(alpha = 0.6f),
-                        LiveRed
-                    )
-                ),
-                RoundedCornerShape(2.dp)
-            )
-    )
+        Modifier.fillMaxWidth().height((6f * scale).dp)
+            .background(Color.White.copy(alpha = 0.28f), RoundedCornerShape((3f * scale).dp))
+    ) {
+        Box(
+            Modifier.fillMaxWidth(buffered).fillMaxHeight()
+                .background(Color.White.copy(alpha = 0.42f), RoundedCornerShape((3f * scale).dp))
+        )
+        Box(
+            Modifier.fillMaxWidth(played).fillMaxHeight()
+                .background(Color.White, RoundedCornerShape((3f * scale).dp))
+        )
+    }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+internal fun playerBackButtonSizeDp(scale: Float): Float = 88f * scale
 
-private fun formatTime(ms: Long): String {
-    if (ms <= 0L) return "0:00"
-    val totalSec = ms / 1000
-    val h        = totalSec / 3600
-    val m        = (totalSec % 3600) / 60
-    val s        = totalSec % 60
-    return if (h > 0) "%d:%02d:%02d".format(h, m, s)
-    else              "%d:%02d".format(m, s)
+internal fun playerPrimaryControlWidthDp(scale: Float): Float = 144f * scale
+
+internal fun formatPlayerTimeline(currentMs: Long, durationMs: Long): String =
+    "${formatPlayerTime(currentMs)} / ${formatPlayerTime(durationMs)}"
+
+private fun formatPlayerTime(ms: Long): String {
+    val totalSeconds = ms.coerceAtLeast(0L) / 1_000L
+    val hours = totalSeconds / 3_600L
+    val minutes = (totalSeconds % 3_600L) / 60L
+    val seconds = totalSeconds % 60L
+    return if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds)
+    else "%d:%02d".format(minutes, seconds)
 }

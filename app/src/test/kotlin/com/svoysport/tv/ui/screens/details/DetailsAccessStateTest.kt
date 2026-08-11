@@ -27,7 +27,12 @@ class DetailsAccessStateTest {
     }
 
     @Test fun `favorite action is wide enough for the full label and fits the row`() {
-        assertTrue(detailsFavoriteButtonWidthDp() >= 300f)
-        assertTrue(detailsActionRowWidthDp(isUpcoming = true) <= 940f)
+        assertEquals(420f, detailsFavoriteButtonWidthDp(), 0.01f)
+        assertEquals(1_220f, detailsActionRowWidthDp(isUpcoming = true), 0.01f)
+    }
+
+    @Test fun `details hero follows the Figma lower third`() {
+        assertEquals(568f, detailsHeroTopDp(), 0.01f)
+        assertEquals(140f, detailsHeroStartDp(), 0.01f)
     }
 }
