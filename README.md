@@ -7,12 +7,15 @@ reminders, and subscription activation from the TV by QR code.
 Built for the leanback launcher — the whole UI is driven by the remote control
 (D-pad), with no touch input assumed.
 
+<!-- Screenshots go here, as a section right below this line. Suggested order:
+     home with the hero banner, the player overlay, the schedule, QR activation.
+
 ## Screenshots
 
-<!-- Add screenshots here, e.g.:
-![Home](docs/screenshots/home.png)
-![Player](docs/screenshots/player.png)
-![Activation](docs/screenshots/activation.png)
+| | |
+| --- | --- |
+| ![Home](docs/screenshots/home.png) | ![Player](docs/screenshots/player.png) |
+| ![Schedule](docs/screenshots/schedule.png) | ![Activation](docs/screenshots/activation.png) |
 -->
 
 ## Features
