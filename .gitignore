@@ -21,3 +21,6 @@ keystore.properties
 # ─── OS noise ────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+
+# Local tooling
+.claude/
